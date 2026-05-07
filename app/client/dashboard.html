@@ -1,0 +1,144 @@
+<!-- ============================================================
+     CLIENT DASHBOARD — dashboard.html
+     ============================================================ -->
+<!-- SAVE AS: app/client/dashboard.html -->
+
+<div class="page-enter">
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1 id="dash-greeting">Good morning 👋</h1>
+      <p>Here's what's happening across your contracts.</p>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card card-1">
+      <div class="stat-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Active contracts
+      </div>
+      <div class="stat-value" id="stat-active">—</div>
+      <div class="stat-sub" id="stat-active-sub">Loading…</div>
+    </div>
+    <div class="stat-card card-2">
+      <div class="stat-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        Pending approvals
+      </div>
+      <div class="stat-value" id="stat-approvals">—</div>
+      <div class="stat-sub" id="stat-approvals-sub">Loading…</div>
+    </div>
+    <div class="stat-card card-3">
+      <div class="stat-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        Contractors
+      </div>
+      <div class="stat-value" id="stat-contractors">—</div>
+      <div class="stat-sub">Active relationships</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 320px;gap:18px;">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Recent contracts</span>
+        <span class="panel-action" onclick="navigate('contracts')">View all →</span>
+      </div>
+      <div class="panel-body" id="dash-contracts-list">
+        ${[0,1,2].map(()=>`<div style="display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border-2);"><div class="skeleton" style="width:36px;height:36px;border-radius:50%;flex-shrink:0;"></div><div style="flex:1;"><div class="skeleton" style="height:13px;width:55%;margin-bottom:6px;"></div><div class="skeleton" style="height:11px;width:35%;"></div></div><div class="skeleton" style="height:22px;width:60px;border-radius:999px;"></div></div>`).join("")}
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:18px;">
+      <!-- Pending approvals -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Awaiting your approval</span>
+        </div>
+        <div class="panel-body" id="dash-approvals-list">
+          <div class="panel-empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 11 12 14 22 4"/></svg>
+            No pending approvals.
+          </div>
+        </div>
+      </div>
+      <!-- Contractors -->
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Your contractors</span></div>
+        <div class="panel-body" id="dash-contractors-list">
+          <div class="panel-empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            No contractors yet.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+window.pageInit=async function(user){
+  const h=new Date().getHours();
+  const g=h<12?"Good morning":h<17?"Good afternoon":"Good evening";
+  const el=document.getElementById("dash-greeting");
+  if(el)el.textContent=g+", "+(user?.firstName||"there")+" 👋";
+  await loadDashboard();
+};
+
+async function loadDashboard(){
+  try{
+    const res=await WD.api({action:"get_dashboard",token:WD.getToken()});
+    if(!res.success)return;
+    const s=res.stats||{};
+    document.getElementById("stat-active").textContent=s.activeContracts||0;
+    document.getElementById("stat-active-sub").textContent=(s.activeContracts||0)===0?"No active contracts":"In progress";
+    document.getElementById("stat-approvals").textContent=s.pendingApprovals||0;
+    document.getElementById("stat-approvals-sub").textContent=(s.pendingApprovals||0)===0?"All caught up":"Need your review";
+    document.getElementById("stat-contractors").textContent=s.contractors||0;
+    renderRecentContracts(res.recentContracts||[]);
+    renderPendingApprovals(res.recentContracts||[]);
+    renderContractors(res.contractors||[]);
+  }catch(e){console.error("Dashboard error:",e);}
+}
+
+function renderRecentContracts(contracts){
+  const el=document.getElementById("dash-contracts-list");if(!el)return;
+  if(!contracts.length){el.innerHTML=`<div class="panel-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>No contracts yet.</div>`;return;}
+  el.innerHTML=contracts.map(c=>{
+    const color=WD.avatarColor(c.contractorName||"");
+    const init=WD.initials(c.contractorName||"?");
+    return`<div class="list-row" onclick="navigate('contracts')">
+      <div class="list-av" style="background:${color}">${WD.escHtml(init)}</div>
+      <div class="list-info"><div class="list-name">${WD.escHtml(c.title)}</div><div class="list-sub">${WD.escHtml(c.contractorName||"")} · ${WD.typePillHtml(c.type)}</div></div>
+      <div>${WD.badgeHtml(c.status)}</div>
+    </div>`;
+  }).join("");
+}
+
+function renderPendingApprovals(contracts){
+  const el=document.getElementById("dash-approvals-list");if(!el)return;
+  const pending=[];
+  contracts.forEach(c=>{(c.milestones||[]).forEach(m=>{if(m.status==="done"&&m.approvalStatus==="pending"){pending.push({contract:c,milestone:m});}});});
+  if(!pending.length){el.innerHTML=`<div class="panel-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 11 12 14 22 4"/></svg>All caught up!</div>`;return;}
+  el.innerHTML=pending.slice(0,3).map(({contract:c,milestone:m})=>`
+    <div class="list-row" onclick="navigate('contracts')">
+      <div style="flex:1;min-width:0;">
+        <div class="list-name" style="font-size:.78rem;">${WD.escHtml(m.title)}</div>
+        <div class="list-sub">${WD.escHtml(c.title)}</div>
+      </div>
+      <span style="background:var(--amber-bg);color:var(--amber-text);font-size:.65rem;font-weight:700;padding:3px 8px;border-radius:999px;flex-shrink:0;">Approve</span>
+    </div>`).join("");
+}
+
+function renderContractors(contractors){
+  const el=document.getElementById("dash-contractors-list");if(!el)return;
+  if(!contractors||!contractors.length){el.innerHTML=`<div class="panel-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>No contractors yet.</div>`;return;}
+  el.innerHTML=contractors.map(c=>{
+    const color=WD.avatarColor(c.name||c.contractorName||"");
+    const init=WD.initials(c.name||c.contractorName||"?");
+    return`<div class="list-row">
+      <div class="list-av" style="background:${color}">${WD.escHtml(init)}</div>
+      <div class="list-info"><div class="list-name">${WD.escHtml(c.name||c.contractorName||"")}</div><div class="list-sub">${WD.escHtml(c.workspace||"")}</div></div>
+    </div>`;
+  }).join("");
+}
+</script>
