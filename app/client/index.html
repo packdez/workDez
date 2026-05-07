@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en" data-mode="light" data-theme-role="client">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>workDez — Client</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/workdez.css">
+<style>
+#loading-bar{position:fixed;top:0;left:0;right:0;height:2px;background:var(--accent);z-index:9999;transform:scaleX(0);transform-origin:left;transition:transform .3s var(--ease),opacity .3s;opacity:0;}
+#loading-bar.loading{opacity:1;animation:loadBar 1.2s var(--ease) infinite;}
+#loading-bar.done{transform:scaleX(1);opacity:0;}
+@keyframes loadBar{0%{transform:scaleX(0);}60%{transform:scaleX(.8);}100%{transform:scaleX(.9);}}
+#page-content{flex:1;padding:28px 28px 48px;max-width:1280px;width:100%;animation:pageIn .22s var(--ease) both;}
+@keyframes pageIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+@media(max-width:768px){#page-content{padding:16px 14px 40px;}}
+/* Client role badge in sidebar */
+.sidebar-brand-role{color:var(--accent);}
+</style>
+</head>
+<body>
+
+<div id="loading-bar"></div>
+
+<div id="auth-gate">
+  <div class="gate-logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+    </svg>
+  </div>
+  <span class="gate-text">Loading workDez…</span>
+</div>
+
+<div id="sidebar-overlay" onclick="WD.closeSidebar()"></div>
+
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <nav id="sidebar">
+    <div class="sidebar-header">
+      <a href="#" class="sidebar-brand" onclick="navigate('dashboard');return false;">
+        <div class="sidebar-brand-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+          </svg>
+        </div>
+        <div class="sidebar-brand-info">
+          <div class="sidebar-brand-name">workDez</div>
+          <div class="sidebar-brand-role">Client</div>
+        </div>
+      </a>
+      <div class="theme-toggle">
+        <button class="theme-toggle-btn active" data-mode="light" onclick="WD.applyTheme('light')" title="Light">☀️</button>
+        <button class="theme-toggle-btn" data-mode="dark" onclick="WD.applyTheme('dark')" title="Dark">🌙</button>
+      </div>
+    </div>
+
+    <div class="sidebar-nav">
+      <div class="nav-section-label">Workspace</div>
+
+      <a class="nav-item active" data-page="dashboard" onclick="navigate('dashboard');return false;" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+        </svg>
+        Dashboard
+      </a>
+
+      <a class="nav-item" data-page="contracts" onclick="navigate('contracts');return false;" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        Contracts
+        <span class="nav-dot" id="nav-contracts-dot"></span>
+      </a>
+
+      <div class="nav-section-label">Account</div>
+
+      <a class="nav-item" data-page="settings" onclick="navigate('settings');return false;" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+        </svg>
+        Settings
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-menu" id="user-menu">
+        <div class="user-menu-item" onclick="navigate('settings');WD.closeUserMenu();">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          Profile &amp; settings
+        </div>
+        <div class="user-menu-divider"></div>
+        <div class="user-menu-item danger" onclick="WD.logout('client_logout')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sign out
+        </div>
+      </div>
+      <div class="user-pill" id="user-pill" onclick="WD.toggleUserMenu()">
+        <div class="user-av" id="user-av">?</div>
+        <div class="user-info">
+          <div class="user-name" id="user-name">Loading…</div>
+          <div class="user-role">Client</div>
+        </div>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:var(--ink-4);flex-shrink:0;">
+          <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
+        </svg>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div id="main">
+    <header id="topbar">
+      <div class="topbar-left">
+        <button class="topbar-hamburger" onclick="WD.openSidebar()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
+        <span class="topbar-title" id="topbar-title">Dashboard</span>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-primary" id="topbar-action-btn" onclick="triggerPageAction()" style="display:none;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          <span id="topbar-action-label">New</span>
+        </button>
+      </div>
+    </header>
+
+    <main id="page-content"></main>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="../assets/workdez.js"></script>
+<script>
+const CLIENT_API_URL = "https://script.google.com/macros/s/AKfycbx7Hy4gCgfbF9uIN1fqYrvgIwsm168ujVigqjYfpV0DecKXXp8Oq8Q8vBZubnrOq2Ph/exec";
+const API_KEY        = "f4b22d86-07b2-4f5b-b2fa-d2c6fb01395161ada23f-3e60-48ab-b657-8c6670c9991d";
+const LOGIN_URL      = "login.html";
+
+WD.init({apiUrl:CLIENT_API_URL,apiKey:API_KEY,storePrefix:"wd_client_",loginUrl:LOGIN_URL});
+
+const PAGES={
+  dashboard:{title:"Dashboard",file:"dashboard.html",action:null},
+  contracts:{title:"Contracts",file:"contracts.html",action:null},
+  settings: {title:"Settings", file:"settings.html", action:null}
+};
+
+let currentPage="",currentUser=null,_pageActionFn=null,_pollTimer=null;
+
+WD.initTheme();
+
+// ── Boot ──────────────────────────────────────────────────
+async function bootShell(){
+  const token=WD.getToken();
+  if(!token){const cached=WD.getUser();if(cached){finishBoot(cached);return;}return WD.redirect();}
+  try{
+    const controller=new AbortController();
+    const tid=setTimeout(()=>controller.abort(),10000);
+    const body=new Blob([JSON.stringify({action:"client_validate_token",token,apiKey:API_KEY})],{type:"text/plain"});
+    const res=await(await fetch(CLIENT_API_URL,{method:"POST",body,signal:controller.signal})).json();
+    clearTimeout(tid);
+    if(res.success&&res.client){
+      const store=localStorage.getItem("wd_client_token")?localStorage:sessionStorage;
+      store.setItem("wd_client_user",JSON.stringify(res.client));
+      finishBoot(res.client);
+    }else{const cached=WD.getUser();if(cached){finishBoot(cached);return;}WD.redirect();}
+  }catch(e){const cached=WD.getUser();if(cached){finishBoot(cached);return;}WD.redirect();}
+}
+
+function finishBoot(user){
+  currentUser=user;
+  WD.bootSidebar(user);
+  document.getElementById("auth-gate").classList.add("hidden");
+  document.getElementById("app").classList.add("ready");
+  const hash=window.location.hash.replace("#","");
+  navigate(PAGES[hash]?hash:"dashboard",true);
+  startPolling();
+}
+
+bootShell();
+
+// ── Navigation ─────────────────────────────────────────────
+async function navigate(page,initial=false){
+  if(page===currentPage&&!initial)return;
+  const config=PAGES[page];if(!config)return;
+  currentPage=page;
+  if(!initial)history.pushState(null,"","#"+page);
+  document.querySelectorAll(".nav-item[data-page]").forEach(item=>{item.classList.toggle("active",item.dataset.page===page);});
+  document.getElementById("topbar-title").textContent=config.title;
+  const actionBtn=document.getElementById("topbar-action-btn");
+  const actionLabel=document.getElementById("topbar-action-label");
+  if(config.action){actionBtn.style.display="";actionLabel.textContent=config.actionLabel||"New";}
+  else actionBtn.style.display="none";
+  _pageActionFn=config.action||null;
+  WD.closeSidebar();
+  await loadPage(config.file);
+}
+
+window.addEventListener("popstate",()=>{
+  const hash=window.location.hash.replace("#","");
+  if(PAGES[hash]&&hash!==currentPage)navigate(hash,true);
+});
+
+// ── Page loader ────────────────────────────────────────────
+async function loadPage(file){
+  const content=document.getElementById("page-content");
+  startLoadingBar();
+  content.innerHTML=buildSkeleton();
+  try{
+    const res=await fetch(file+"?v="+Date.now());
+    if(!res.ok)throw new Error("Not found: "+file);
+    const html=await res.text();
+    finishLoadingBar();
+    content.innerHTML=html;
+    content.style.animation="none";content.offsetHeight;content.style.animation="";
+    content.querySelectorAll("script").forEach(old=>{
+      const s=document.createElement("script");
+      Array.from(old.attributes).forEach(a=>s.setAttribute(a.name,a.value));
+      s.textContent=old.textContent;old.parentNode.replaceChild(s,old);
+    });
+    if(typeof window.pageInit==="function")window.pageInit(currentUser);
+  }catch(e){
+    finishLoadingBar();
+    content.innerHTML=`<div class="empty-state" style="padding:80px 32px;"><div class="empty-state-icon" style="background:var(--red-bg);border-color:var(--red-border);color:var(--red);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><h3>Page failed to load</h3><p>Could not load ${WD.escHtml(file)}.</p><button class="btn btn-secondary" onclick="loadPage('${WD.escHtml(file)}')">Try again</button></div>`;
+  }
+}
+
+function buildSkeleton(){
+  return`<div style="display:flex;flex-direction:column;gap:16px;padding:28px;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+      <div><div class="skeleton" style="height:28px;width:200px;border-radius:8px;margin-bottom:8px;"></div><div class="skeleton" style="height:14px;width:280px;border-radius:6px;"></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;">
+      ${[0,1,2].map(()=>`<div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;"><div class="skeleton" style="height:12px;width:60%;margin-bottom:10px;"></div><div class="skeleton" style="height:32px;width:40%;margin-bottom:6px;border-radius:4px;"></div><div class="skeleton" style="height:11px;width:50%;"></div></div>`).join("")}
+    </div>
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r-lg);">
+      ${[0,1,2].map(()=>`<div style="display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border-2);"><div class="skeleton" style="width:36px;height:36px;border-radius:50%;flex-shrink:0;"></div><div style="flex:1;"><div class="skeleton" style="height:13px;width:55%;margin-bottom:6px;"></div><div class="skeleton" style="height:11px;width:38%;"></div></div><div class="skeleton" style="height:22px;width:60px;border-radius:999px;"></div></div>`).join("")}
+    </div>
+  </div>`;
+}
+
+function startLoadingBar(){const b=document.getElementById("loading-bar");b.className="loading";}
+function finishLoadingBar(){const b=document.getElementById("loading-bar");b.className="done";setTimeout(()=>{b.className="";},400);}
+
+function triggerPageAction(){if(_pageActionFn&&typeof window[_pageActionFn]==="function")window[_pageActionFn]();}
+
+// ── Polling for contractor updates ─────────────────────────
+function startPolling(){
+  _pollTimer=setInterval(async()=>{
+    try{
+      const token=WD.getToken();if(!token)return;
+      const res=await WD.api({action:"get_contracts",token});
+      if(!res.success)return;
+      const hasChanges=(res.contracts||[]).some(c=>{
+        const seen=localStorage.getItem("wd_client_seen_"+c.id);
+        return seen&&seen!==c.updatedAt;
+      });
+      const dot=document.getElementById("nav-contracts-dot");
+      if(dot)dot.classList.toggle("show",hasChanges);
+      if(currentPage==="contracts"&&typeof window.onPollUpdate==="function")window.onPollUpdate(res.contracts);
+    }catch(e){}
+  },30000);
+}
+
+function markContractSeen(contractId,updatedAt){localStorage.setItem("wd_client_seen_"+contractId,updatedAt);}
+function contractHasChanges(contract){const seen=localStorage.getItem("wd_client_seen_"+contract.id);if(!seen)return false;return seen!==contract.updatedAt;}
+
+window.addEventListener("beforeunload",()=>clearInterval(_pollTimer));
+document.addEventListener("keydown",e=>{if(e.key==="Escape")WD.closeUserMenu();});
+</script>
+</body>
+</html>
