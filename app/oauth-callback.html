@@ -219,7 +219,7 @@ async function run() {
   const action       = accountType === "client" ? "client_oauth_complete" : "contractor_oauth_complete";
   const tokenKey     = accountType === "client" ? "wd_client_token"  : "wd_contractor_token";
   const userKey      = accountType === "client" ? "wd_client_user"   : "wd_contractor_user";
-  const shellPath    = accountType === "client" ? "../client/shell.html" : "shell.html";
+  const shellPath    = accountType === "client" ? "../client/index.html" : "index.html";
 
   const steps = ["step-exchange","step-sheet","step-drive","step-activate"];
 
