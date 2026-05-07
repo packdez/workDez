@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connecting… — workDez</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --accent:#1a6b3c;--accent-light:#22c55e;
+  --ink:#0f172a;--ink-3:#64748b;--ink-4:#94a3b8;
+  --bg:#ffffff;--bg-2:#f8fafc;--border:#e2e8f0;
+  --red:#dc2626;--red-bg:#fef2f2;
+  --font-sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --r:10px;--ease:cubic-bezier(.22,1,.36,1);
+}
+body{
+  font-family:var(--font-sans);background:var(--bg-2);color:var(--ink);
+  min-height:100svh;display:flex;align-items:center;justify-content:center;
+  padding:20px;-webkit-font-smoothing:antialiased;
+}
+.card{
+  background:var(--bg);border:1px solid var(--border);border-radius:20px;
+  padding:40px 36px;max-width:400px;width:100%;text-align:center;
+  box-shadow:0 8px 40px rgba(0,0,0,.07);
+}
+.brand{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:28px;text-decoration:none;}
+.brand-mark{
+  width:36px;height:36px;border-radius:9px;
+  background:linear-gradient(135deg,#22c55e,#15803d);
+  display:flex;align-items:center;justify-content:center;
+}
+.brand-mark svg{color:#fff;width:17px;height:17px;}
+.brand-name{font-size:.95rem;font-weight:700;color:var(--ink);}
+
+/* States */
+.state{display:none;}
+.state.active{display:block;}
+
+/* Loading */
+.spinner-wrap{
+  width:56px;height:56px;margin:0 auto 20px;
+  border-radius:50%;border:3px solid var(--border);
+  border-top-color:var(--accent);
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Success */
+.success-icon{
+  width:64px;height:64px;border-radius:50%;margin:0 auto 20px;
+  background:linear-gradient(135deg,var(--accent-light),var(--accent));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 24px rgba(26,107,60,.3);
+  animation:popIn .5s var(--ease) both;
+}
+.success-icon svg{color:#fff;width:28px;height:28px;}
+@keyframes popIn{
+  from{transform:scale(.6);opacity:0;}
+  to{transform:scale(1);opacity:1;}
+}
+
+/* Error */
+.error-icon{
+  width:64px;height:64px;border-radius:50%;margin:0 auto 20px;
+  background:var(--red-bg);border:2px solid #fecaca;
+  display:flex;align-items:center;justify-content:center;
+}
+.error-icon svg{color:var(--red);width:28px;height:28px;}
+
+.state-title{font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:8px;}
+.state-sub{font-size:.84rem;color:var(--ink-3);line-height:1.6;margin-bottom:20px;}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  height:42px;padding:0 20px;background:var(--accent);color:#fff;
+  border:none;border-radius:var(--r);font-size:.84rem;font-weight:600;
+  font-family:var(--font-sans);cursor:pointer;text-decoration:none;
+  transition:background .15s;
+}
+.btn:hover{background:#155c33;}
+
+/* Progress steps */
+.progress-steps{display:flex;flex-direction:column;gap:10px;margin:20px 0;text-align:left;}
+.progress-step{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;background:var(--bg-2);border:1px solid var(--border);
+  border-radius:var(--r);font-size:.8rem;color:var(--ink-3);
+  transition:all .3s var(--ease);
+}
+.progress-step.done{border-color:#bbf7d0;background:#f0fdf4;color:#166534;}
+.progress-step.current{border-color:var(--accent);color:var(--ink);}
+.progress-step-icon{
+  width:20px;height:20px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.progress-step.done .progress-step-icon{background:var(--accent);}
+.progress-step.done .progress-step-icon svg{color:#fff;width:10px;height:10px;}
+.progress-step.current .progress-step-icon{
+  border:2px solid var(--accent);
+  animation:pulse 1s ease infinite;
+}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(26,107,60,.3);}
+  50%{box-shadow:0 0 0 4px rgba(26,107,60,.1);}
+}
+.progress-step.pending .progress-step-icon{
+  width:20px;height:20px;border:2px solid var(--border);border-radius:50%;
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <a href="/app/" class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+      </svg>
+    </div>
+    <span class="brand-name">workDez</span>
+  </a>
+
+  <!-- Loading state -->
+  <div class="state active" id="state-loading">
+    <div class="spinner-wrap"></div>
+    <div class="state-title">Connecting your account…</div>
+    <div class="state-sub">Setting up your Google Sheet and Drive folder. This takes just a moment.</div>
+    <div class="progress-steps">
+      <div class="progress-step current" id="step-exchange">
+        <div class="progress-step-icon"></div>
+        <span>Verifying Google authorization</span>
+      </div>
+      <div class="progress-step pending" id="step-sheet">
+        <div class="progress-step-icon"></div>
+        <span>Creating your Google Sheet</span>
+      </div>
+      <div class="progress-step pending" id="step-drive">
+        <div class="progress-step-icon"></div>
+        <span>Creating your Drive folder</span>
+      </div>
+      <div class="progress-step pending" id="step-activate">
+        <div class="progress-step-icon"></div>
+        <span>Activating your workspace</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success state -->
+  <div class="state" id="state-success">
+    <div class="success-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+    <div class="state-title">You're all set! 🎉</div>
+    <div class="state-sub">
+      Your Google Sheet and Drive folder have been created in your account.
+      Redirecting you to your workspace…
+    </div>
+  </div>
+
+  <!-- Error state -->
+  <div class="state" id="state-error">
+    <div class="error-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="15" y1="9" x2="9" y2="15"/>
+        <line x1="9" y1="9" x2="15" y2="15"/>
+      </svg>
+    </div>
+    <div class="state-title">Connection failed</div>
+    <div class="state-sub" id="error-msg">
+      Something went wrong while connecting your Google account. Please try again.
+    </div>
+    <a href="signup.html" class="btn">Try again</a>
+  </div>
+</div>
+
+<script>
+const CONTRACTOR_API_URL = "https://script.google.com/macros/s/AKfycbzA7GlUiUGxuINThYj5ZtP2YFROyyjBwVWMpWbwfyUMow5oQeBDvUx3m4weV_UIwhJgWQ/exec";
+const CLIENT_API_URL     = "https://script.google.com/macros/s/AKfycbx7Hy4gCgfbF9uIN1fqYrvgIwsm168ujVigqjYfpV0DecKXXp8Oq8Q8vBZubnrOq2Ph/exec";
+const API_KEY            = "f4b22d86-07b2-4f5b-b2fa-d2c6fb01395161ada23f-3e60-48ab-b657-8c6670c9991d";
+
+function showState(id) {
+  document.querySelectorAll(".state").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+function markStep(stepId, status) {
+  const el = document.getElementById(stepId);
+  if (!el) return;
+  el.className = "progress-step " + status;
+  if (status === "done") {
+    el.querySelector(".progress-step-icon").innerHTML =
+      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>`;
+  }
+}
+
+function nextStep(steps, idx) {
+  if (idx > 0) markStep(steps[idx - 1], "done");
+  if (idx < steps.length) markStep(steps[idx], "current");
+}
+
+async function run() {
+  const params       = new URLSearchParams(window.location.search);
+  const code         = params.get("code");
+  const state        = params.get("state");   // pre-auth token
+  const error        = params.get("error");
+
+  // Determine type: contractor or client
+  const accountType  = sessionStorage.getItem("wd_pre_auth_type") || "contractor";
+  const preAuthToken = state || sessionStorage.getItem("wd_pre_auth_token") || "";
+  const remember     = sessionStorage.getItem("wd_pre_auth_remember") === "1";
+
+  const apiUrl       = accountType === "client" ? CLIENT_API_URL : CONTRACTOR_API_URL;
+  const action       = accountType === "client" ? "client_oauth_complete" : "contractor_oauth_complete";
+  const tokenKey     = accountType === "client" ? "wd_client_token"  : "wd_contractor_token";
+  const userKey      = accountType === "client" ? "wd_client_user"   : "wd_contractor_user";
+  const shellPath    = accountType === "client" ? "../client/shell.html" : "shell.html";
+
+  const steps = ["step-exchange","step-sheet","step-drive","step-activate"];
+
+  if (error) {
+    document.getElementById("error-msg").textContent =
+      error === "access_denied"
+        ? "You cancelled the Google authorization. Please try again."
+        : "Google returned an error: " + error;
+    showState("state-error");
+    return;
+  }
+
+  if (!code || !preAuthToken) {
+    document.getElementById("error-msg").textContent =
+      "Missing authorization code. Please try signing up again.";
+    showState("state-error");
+    return;
+  }
+
+  // Animate through steps while API processes
+  nextStep(steps, 0);
+
+  try {
+    // Step animation (visual feedback while API runs)
+    const stepTimer = setInterval(() => {}, 800);
+
+    const body = new Blob([JSON.stringify({
+      action:       action,
+      authCode:     code,
+      preAuthToken: preAuthToken,
+      remember:     remember,
+      apiKey:       API_KEY,
+      // Pass invite data if present (for client OAuth)
+      inviteToken:  sessionStorage.getItem("wd_invite_token")  || "",
+      inviteCode:   sessionStorage.getItem("wd_invite_code")   || ""
+    })], { type: "text/plain" });
+
+    // Advance steps visually with delay
+    setTimeout(() => nextStep(steps, 1), 800);
+    setTimeout(() => nextStep(steps, 2), 1600);
+    setTimeout(() => nextStep(steps, 3), 2400);
+
+    const res = await (await fetch(apiUrl, { method: "POST", body })).json();
+
+    clearInterval(stepTimer);
+    markStep(steps[steps.length - 1], "done");
+
+    if (res.success) {
+      // Store session
+      const store = remember ? localStorage : sessionStorage;
+      store.setItem(tokenKey, res.token);
+      store.setItem(userKey,  JSON.stringify(res.contractor || res.client));
+
+      // Clean up pre-auth storage
+      ["wd_pre_auth_token","wd_pre_auth_remember","wd_pre_auth_type",
+       "wd_invite_token","wd_invite_code"].forEach(k => sessionStorage.removeItem(k));
+
+      showState("state-success");
+      setTimeout(() => { window.location.href = shellPath; }, 1800);
+    } else {
+      document.getElementById("error-msg").textContent =
+        res.error || "Failed to complete Google connection. Please try again.";
+      showState("state-error");
+    }
+
+  } catch(e) {
+    document.getElementById("error-msg").textContent =
+      "Network error. Please check your connection and try again.";
+    showState("state-error");
+  }
+}
+
+run();
+</script>
+</body>
+</html>
