@@ -1,0 +1,261 @@
+<!-- ============================================================
+     dashboard.html — Contractor Dashboard (injected into shell)
+     No html/head/body tags — this is a page fragment
+     pageInit(user) is called by shell after injection
+     ============================================================ -->
+
+<div class="page-enter">
+
+  <!-- Page header -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1 id="dash-greeting">Good morning 👋</h1>
+      <p>Here's what's happening in your workspace today.</p>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card card-1">
+      <div class="stat-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+        </svg>
+        Active contracts
+      </div>
+      <div class="stat-value" id="stat-active">—</div>
+      <div class="stat-sub" id="stat-active-sub">Loading…</div>
+    </div>
+    <div class="stat-card card-2">
+      <div class="stat-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+        </svg>
+        Active clients
+      </div>
+      <div class="stat-value" id="stat-clients">—</div>
+      <div class="stat-sub" id="stat-clients-sub">Loading…</div>
+    </div>
+    <div class="stat-card card-3">
+      <div class="stat-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <polyline points="9 11 12 14 22 4"/>
+          <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+        </svg>
+        Pending approvals
+      </div>
+      <div class="stat-value" id="stat-approvals">—</div>
+      <div class="stat-sub" id="stat-approvals-sub">Loading…</div>
+    </div>
+    <div class="stat-card card-4">
+      <div class="stat-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <polyline points="1 4 1 10 7 10"/>
+          <path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
+        </svg>
+        Revisions requested
+      </div>
+      <div class="stat-value" id="stat-revisions">—</div>
+      <div class="stat-sub" id="stat-revisions-sub">Loading…</div>
+    </div>
+  </div>
+
+  <!-- Main content grid -->
+  <div style="display:grid;grid-template-columns:1fr 340px;gap:18px;">
+
+    <!-- Recent contracts -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Recent contracts</span>
+        <span class="panel-action" onclick="navigate('contracts')">View all →</span>
+      </div>
+      <div class="panel-body" id="dash-contracts-list">
+        <div style="display:flex;flex-direction:column;gap:0;">
+          ${[0,1,2].map(() => `
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border-2);">
+            <div class="skeleton" style="width:36px;height:36px;border-radius:50%;flex-shrink:0;"></div>
+            <div style="flex:1;">
+              <div class="skeleton" style="height:13px;width:55%;margin-bottom:6px;"></div>
+              <div class="skeleton" style="height:11px;width:35%;"></div>
+            </div>
+            <div class="skeleton" style="height:22px;width:60px;border-radius:999px;"></div>
+          </div>`).join("")}
+        </div>
+      </div>
+    </div>
+
+    <!-- Right column -->
+    <div style="display:flex;flex-direction:column;gap:18px;">
+
+      <!-- Quick actions -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Quick actions</span>
+        </div>
+        <div style="padding:12px;">
+          <button class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:8px;"
+            onclick="navigate('contracts');setTimeout(()=>typeof openNewContract==='function'&&openNewContract(),300);">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            New contract
+          </button>
+          <button class="btn btn-secondary" style="width:100%;justify-content:center;"
+            onclick="navigate('clients');setTimeout(()=>typeof openNewClient==='function'&&openNewClient(),300);">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Add client
+          </button>
+        </div>
+      </div>
+
+      <!-- Recent clients -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Recent clients</span>
+          <span class="panel-action" onclick="navigate('clients')">View all →</span>
+        </div>
+        <div class="panel-body" id="dash-clients-list">
+          <div class="panel-empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            </svg>
+            No clients yet.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// Called by shell after injection
+window.pageInit = async function(user) {
+  // Set greeting
+  const h = new Date().getHours();
+  const g = h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
+  const el = document.getElementById("dash-greeting");
+  if (el) el.textContent = g + ", " + (user?.firstName || "there") + " 👋";
+
+  await loadDashboard();
+};
+
+async function loadDashboard() {
+  try {
+    const token = WD.getToken();
+
+    // Load contracts and clients in parallel
+    const [contractsRes, clientsRes] = await Promise.all([
+      WD.api({ action: "get_contracts", token }),
+      WD.api({ action: "get_clients",   token })
+    ]);
+
+    if (contractsRes.success) {
+      const stats = contractsRes.contracts ? {
+        active:    contractsRes.contracts.filter(c => c.status === "active").length,
+        approvals: contractsRes.contracts.reduce((n, c) =>
+          n + (c.milestones||[]).filter(m => m.status==="done" && m.approvalStatus==="pending").length, 0),
+        revisions: contractsRes.contracts.reduce((n, c) =>
+          n + (c.milestones||[]).filter(m => m.approvalStatus==="revision_requested").length, 0)
+      } : { active: 0, approvals: 0, revisions: 0 };
+
+      document.getElementById("stat-active").textContent    = stats.active;
+      document.getElementById("stat-active-sub").textContent =
+        stats.active === 0 ? "No active contracts" : stats.active + " in progress";
+      document.getElementById("stat-approvals").textContent  = stats.approvals;
+      document.getElementById("stat-approvals-sub").textContent =
+        stats.approvals === 0 ? "Nothing pending" : "Awaiting your review";
+      document.getElementById("stat-revisions").textContent  = stats.revisions;
+      document.getElementById("stat-revisions-sub").textContent =
+        stats.revisions === 0 ? "All good" : "Client feedback pending";
+
+      renderRecentContracts(contractsRes.contracts || []);
+    }
+
+    if (clientsRes.success) {
+      document.getElementById("stat-clients").textContent    =
+        (clientsRes.clients||[]).filter(c => c.status === "active").length;
+      document.getElementById("stat-clients-sub").textContent = "Total clients";
+      renderRecentClients(clientsRes.clients || []);
+    }
+
+  } catch(e) {
+    console.error("Dashboard load error:", e);
+  }
+}
+
+function renderRecentContracts(contracts) {
+  const el = document.getElementById("dash-contracts-list");
+  if (!el) return;
+
+  const recent = contracts
+    .filter(c => c.status !== "deleted")
+    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+    .slice(0, 5);
+
+  if (!recent.length) {
+    el.innerHTML = `<div class="panel-empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+      </svg>
+      No contracts yet. Create your first one.
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = recent.map(c => {
+    const progress   = parseInt(c.progress) || 0;
+    const clientInit = WD.initials(c.clientName || "?");
+    const color      = WD.avatarColor(c.clientName || "");
+    return `<div class="list-row" onclick="navigate('contracts')">
+      <div class="list-av" style="background:${color}">${WD.escHtml(clientInit)}</div>
+      <div class="list-info">
+        <div class="list-name">${WD.escHtml(c.title)}</div>
+        <div class="list-sub">${WD.escHtml(c.clientName || "—")} · ${WD.typePillHtml(c.type)}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        ${WD.badgeHtml(c.status)}
+        <div style="font-size:.68rem;color:var(--ink-4);margin-top:3px;">${progress}%</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function renderRecentClients(clients) {
+  const el = document.getElementById("dash-clients-list");
+  if (!el) return;
+
+  const recent = clients
+    .filter(c => c.status !== "deleted" && c.status !== "archived")
+    .slice(0, 4);
+
+  if (!recent.length) {
+    el.innerHTML = `<div class="panel-empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+      </svg>
+      No clients yet.
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = recent.map(c => {
+    const init  = WD.initials(c.name);
+    const color = WD.avatarColor(c.name);
+    return `<div class="list-row" onclick="navigate('clients')">
+      <div class="list-av" style="background:${color}">${WD.escHtml(init)}</div>
+      <div class="list-info">
+        <div class="list-name">${WD.escHtml(c.name)}</div>
+        <div class="list-sub">${WD.escHtml(c.company || c.email || "No company")}</div>
+      </div>
+      <div style="font-size:.72rem;color:var(--ink-4);">${c.activeContracts || 0} active</div>
+    </div>`;
+  }).join("");
+}
+</script>
