@@ -1,0 +1,537 @@
+<!-- clients.html — Contractor Clients Page -->
+<style>
+.clients-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+.client-search-wrap{position:relative;flex:1;min-width:200px;}
+.client-search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--ink-4);pointer-events:none;width:14px;height:14px;}
+.client-search-input{width:100%;height:37px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);padding:0 12px 0 34px;font-size:.83rem;color:var(--ink);font-family:var(--font-sans);outline:none;transition:border-color .18s;}
+.client-search-input:focus{border-color:var(--accent);}
+.client-search-input::placeholder{color:var(--ink-4);}
+.client-filter-btn{height:37px;padding:0 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);font-size:.79rem;font-weight:600;color:var(--ink-3);cursor:pointer;font-family:var(--font-sans);transition:all .15s;white-space:nowrap;}
+.client-filter-btn:hover{border-color:var(--ink-5);color:var(--ink-2);}
+.client-filter-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-bg);}
+.clients-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+.client-card{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:20px;cursor:pointer;transition:border-color .2s,box-shadow .2s,transform .2s;animation:cardIn .3s var(--ease) both;}
+.client-card:hover{border-color:var(--accent-border);box-shadow:var(--sh-md);transform:translateY(-2px);}
+.client-card-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;}
+.client-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;color:#fff;flex-shrink:0;}
+.client-card-info{flex:1;min-width:0;}
+.client-card-name{font-size:.9rem;font-weight:700;color:var(--ink);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.client-card-company{font-size:.74rem;color:var(--ink-4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.client-card-email{font-size:.73rem;color:var(--ink-4);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.client-stats{display:flex;gap:8px;}
+.client-stat{flex:1;background:var(--bg-2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;text-align:center;}
+.client-stat-val{font-family:var(--font-serif);font-size:1.1rem;color:var(--ink);line-height:1;}
+.client-stat-lbl{font-size:.6rem;font-weight:700;color:var(--ink-4);letter-spacing:.06em;text-transform:uppercase;margin-top:3px;}
+.client-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid var(--border-2);}
+.invite-badge{display:inline-flex;align-items:center;gap:5px;font-size:.65rem;font-weight:700;padding:3px 8px;border-radius:999px;}
+.invite-badge.pending{background:var(--amber-bg);color:var(--amber-text);border:1px solid var(--amber-border);}
+.invite-badge.accepted{background:var(--accent-bg);color:var(--accent-text);border:1px solid var(--accent-border);}
+.invite-badge.none{background:var(--bg-3);color:var(--ink-4);}
+/* Detail panel extras */
+.client-detail-avatar{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;color:#fff;flex-shrink:0;margin:0 auto 4px;}
+.contract-mini-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-2);cursor:pointer;transition:background .12s;}
+.contract-mini-row:last-child{border-bottom:none;}
+.contract-mini-row:hover{background:var(--bg-2);}
+/* Invite code display */
+.invite-code-box{background:var(--bg-2);border:2px dashed var(--accent-border);border-radius:var(--r);padding:14px 16px;text-align:center;}
+.invite-code-val{font-family:var(--font-serif);font-size:1.8rem;color:var(--accent);letter-spacing:.1em;margin:4px 0;}
+.invite-code-hint{font-size:.72rem;color:var(--ink-4);line-height:1.5;}
+@media(max-width:768px){
+  .clients-grid{grid-template-columns:1fr;}
+  .client-card-top{gap:10px;}
+}
+</style>
+
+<div class="page-enter">
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1>Clients</h1>
+      <p id="clients-count-label">Manage all your client relationships.</p>
+    </div>
+  </div>
+
+  <div class="clients-toolbar">
+    <div class="client-search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input class="client-search-input" type="text" id="client-search" placeholder="Search clients…" oninput="handleClientSearch()">
+    </div>
+    <button class="client-filter-btn active" onclick="setClientFilter('all',this)">All</button>
+    <button class="client-filter-btn" onclick="setClientFilter('active',this)">Active</button>
+    <button class="client-filter-btn" onclick="setClientFilter('invited',this)">Invited</button>
+    <button class="client-filter-btn" onclick="setClientFilter('archived',this)">Archived</button>
+  </div>
+
+  <div id="clients-loading">
+    <div class="clients-grid">
+      ${[0,1,2].map(()=>`<div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:20px;"><div style="display:flex;gap:12px;margin-bottom:14px;"><div class="skeleton" style="width:44px;height:44px;border-radius:50%;flex-shrink:0;"></div><div style="flex:1;"><div class="skeleton" style="height:14px;width:60%;margin-bottom:6px;"></div><div class="skeleton" style="height:11px;width:80%;"></div></div></div><div style="display:flex;gap:8px;"><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div></div></div>`).join("")}
+    </div>
+  </div>
+  <div id="clients-container"></div>
+  <div id="clients-empty" style="display:none;">
+    <div class="empty-state">
+      <div class="empty-state-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      </div>
+      <h3>No clients yet</h3>
+      <p>Add your first client to start creating contracts and inviting them to your workspace.</p>
+      <button class="btn btn-primary" onclick="openNewClient()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add client
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- CLIENT DETAIL PANEL -->
+<div class="detail-panel" id="client-detail">
+  <div class="detail-topbar">
+    <span class="detail-topbar-title" id="cd-name">Client</span>
+    <div class="detail-topbar-actions">
+      <button class="btn btn-sm btn-secondary" id="cd-invite-btn" onclick="openInviteModal()" style="display:none;">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        <span class="btn-label">Invite</span>
+      </button>
+      <button class="btn btn-icon btn-secondary" onclick="openEditClient()" title="Edit">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>
+      <button class="btn btn-icon btn-ghost" onclick="closeClientDetail()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="detail-scroll">
+    <!-- Profile -->
+    <div class="detail-section" style="text-align:center;padding:24px 18px 16px;">
+      <div class="client-detail-avatar" id="cd-avatar">?</div>
+      <div style="font-family:var(--font-serif);font-size:1.4rem;color:var(--ink);letter-spacing:-.02em;margin-bottom:2px;" id="cd-fullname">—</div>
+      <div style="font-size:.8rem;color:var(--ink-4);" id="cd-company-line">—</div>
+      <div style="margin-top:10px;" id="cd-invite-status-wrap"></div>
+    </div>
+
+    <!-- Contact -->
+    <div class="detail-section">
+      <div class="detail-section-title">Contact</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div id="cd-email-row" style="display:none;">
+          <div class="detail-field-label">Email</div>
+          <a id="cd-email-link" href="#" style="font-size:.84rem;color:var(--accent);font-weight:500;text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">—</a>
+        </div>
+        <div id="cd-phone-row" style="display:none;">
+          <div class="detail-field-label">Phone</div>
+          <div class="detail-field-val" id="cd-phone">—</div>
+        </div>
+        <div id="cd-notes-row" style="display:none;">
+          <div class="detail-field-label">Notes</div>
+          <div class="detail-field-val" id="cd-notes" style="font-size:.82rem;color:var(--ink-3);line-height:1.6;font-weight:400;white-space:pre-wrap;">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="detail-section">
+      <div class="detail-section-title">Contracts</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <div style="flex:1;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);padding:10px;text-align:center;">
+          <div style="font-family:var(--font-serif);font-size:1.3rem;color:var(--ink);" id="cd-stat-total">—</div>
+          <div style="font-size:.6rem;font-weight:700;color:var(--ink-4);text-transform:uppercase;letter-spacing:.06em;margin-top:3px;">Total</div>
+        </div>
+        <div style="flex:1;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);padding:10px;text-align:center;">
+          <div style="font-family:var(--font-serif);font-size:1.3rem;color:var(--accent);" id="cd-stat-active">—</div>
+          <div style="font-size:.6rem;font-weight:700;color:var(--ink-4);text-transform:uppercase;letter-spacing:.06em;margin-top:3px;">Active</div>
+        </div>
+        <div style="flex:1;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);padding:10px;text-align:center;">
+          <div style="font-family:var(--font-serif);font-size:1.3rem;color:var(--ink);" id="cd-stat-done">—</div>
+          <div style="font-size:.6rem;font-weight:700;color:var(--ink-4);text-transform:uppercase;letter-spacing:.06em;margin-top:3px;">Done</div>
+        </div>
+      </div>
+      <div id="cd-contracts-list"></div>
+    </div>
+
+    <!-- Invite section -->
+    <div class="detail-section" id="cd-invite-section" style="display:none;">
+      <div class="detail-section-title">Workspace invite</div>
+      <div id="cd-invite-box"></div>
+    </div>
+
+    <!-- Danger zone -->
+    <div class="detail-section">
+      <div class="detail-section-title">Actions</div>
+      <button class="btn btn-secondary" style="width:100%;justify-content:center;margin-bottom:8px;" onclick="openInviteModal()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Send workspace invite
+      </button>
+      <button class="btn btn-secondary" style="width:100%;justify-content:center;color:var(--red);border-color:var(--red-border);" onclick="archiveClient()"
+        onmouseover="this.style.background='var(--red-bg)'" onmouseout="this.style.background=''">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+        Archive client
+      </button>
+    </div>
+  </div>
+</div>
+<div class="detail-overlay" id="client-detail-overlay" onclick="closeClientDetail()"></div>
+
+<!-- ADD / EDIT CLIENT MODAL -->
+<div class="modal-overlay" id="modal-client" onclick="if(event.target===this)WD.closeModal('modal-client')">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <span class="modal-title" id="client-modal-title">Add client</span>
+      <button class="modal-close" onclick="WD.closeModal('modal-client')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-client-id">
+      <div class="auth-error" id="client-modal-error" style="display:none;align-items:center;gap:8px;padding:10px 12px;background:var(--red-bg);border:1px solid var(--red-border);border-radius:var(--r);font-size:.8rem;color:var(--red);">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>
+        <span id="client-modal-error-text">Error</span>
+      </div>
+      <div class="field">
+        <label class="field-label">Full name *</label>
+        <input class="field-input" type="text" id="c-name" placeholder="e.g. Jane Smith" autocomplete="off">
+        <span class="field-error" id="err-c-name" style="display:none;font-size:.71rem;color:var(--red);margin-top:2px;">Required</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="field">
+          <label class="field-label">Email <span style="font-weight:400;color:var(--ink-4);">(optional)</span></label>
+          <input class="field-input" type="email" id="c-email" placeholder="jane@company.com" autocomplete="off">
+          <span class="field-error" id="err-c-email" style="display:none;font-size:.71rem;color:var(--red);margin-top:2px;">Invalid email</span>
+        </div>
+        <div class="field">
+          <label class="field-label">Phone <span style="font-weight:400;color:var(--ink-4);">(optional)</span></label>
+          <input class="field-input" type="tel" id="c-phone" placeholder="+1 555 000 0000">
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">Company <span style="font-weight:400;color:var(--ink-4);">(optional)</span></label>
+        <input class="field-input" type="text" id="c-company" placeholder="e.g. Acme Corp" autocomplete="off">
+      </div>
+      <div class="field">
+        <label class="field-label">Notes <span style="font-weight:400;color:var(--ink-4);">(optional)</span></label>
+        <textarea class="field-input" id="c-notes" rows="2" placeholder="Any notes about this client…" style="height:auto;padding:10px 12px;resize:vertical;min-height:68px;"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="WD.closeModal('modal-client')">Cancel</button>
+      <button class="btn btn-primary" id="client-save-btn" onclick="saveClient()">
+        <span class="btn-label" id="client-save-label">Add client</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- INVITE MODAL -->
+<div class="modal-overlay" id="modal-invite" onclick="if(event.target===this)WD.closeModal('modal-invite')">
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-header">
+      <span class="modal-title">Invite to workspace</span>
+      <button class="modal-close" onclick="WD.closeModal('modal-invite')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:.84rem;color:var(--ink-3);line-height:1.6;margin-bottom:4px;">
+        Send <strong id="invite-client-name">this client</strong> a link to join your workDez workspace. They'll be able to view contracts, approve milestones and upload files.
+      </p>
+      <div id="invite-existing-box" style="display:none;margin-bottom:4px;"></div>
+      <div class="field">
+        <label class="field-label">Client email</label>
+        <input class="field-input" type="email" id="invite-email" placeholder="client@example.com">
+        <span class="field-hint">We'll send the invite link to this address.</span>
+      </div>
+      <div class="notice-banner blue" style="margin-top:4px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <span>The client will see contracts and milestones assigned to them — nothing else.</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="WD.closeModal('modal-invite')">Cancel</button>
+      <button class="btn btn-primary" id="invite-send-btn" onclick="sendInvite()">
+        <span class="btn-label">Send invite</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════ STATE ═══════════════════════════
+let _clients=[],_contracts=[],_selectedClient=null;
+let _clientFilter="all",_clientSearchTimer=null;
+
+// ═══════════════════════ INIT ════════════════════════════
+window.pageInit=async function(user){await loadClients();};
+window.openNewClient=function(){openClientModal("new");};
+
+async function loadClients(){
+  try{
+    const token=WD.getToken();
+    const[clr,cr]=await Promise.all([WD.api({action:"get_clients",token}),WD.api({action:"get_contracts",token})]);
+    if(clr.success)_clients=clr.clients||[];
+    if(cr.success)_contracts=cr.contracts||[];
+    document.getElementById("clients-loading").style.display="none";
+    renderClients();
+  }catch(e){document.getElementById("clients-loading").style.display="none";WD.showToast("Failed to load clients.","error");}
+}
+
+// ═══════════════════════ RENDER ══════════════════════════
+function renderClients(){
+  const q=(document.getElementById("client-search")?.value||"").toLowerCase();
+  const filtered=_clients.filter(c=>{
+    if(c.status==="deleted")return false;
+    if(_clientFilter==="active"&&c.status!=="active")return false;
+    if(_clientFilter==="archived"&&c.status!=="archived")return false;
+    if(_clientFilter==="invited"&&c.inviteStatus!=="pending")return false;
+    if(q&&!WD.fuzzyMatch(c.name,q)&&!WD.fuzzyMatch(c.company||"",q)&&!WD.fuzzyMatch(c.email||"",q))return false;
+    return true;
+  });
+
+  const total=_clients.filter(c=>c.status!=="deleted").length;
+  const lbl=document.getElementById("clients-count-label");
+  if(lbl)lbl.textContent=total===0?"Add your first client.":total+" client"+(total!==1?"s":"")+" in your workspace.";
+
+  const container=document.getElementById("clients-container"),empty=document.getElementById("clients-empty");
+  if(!filtered.length){container.innerHTML="";empty.style.display="";return;}
+  empty.style.display="none";
+
+  container.innerHTML=`<div class="clients-grid">${filtered.map((c,i)=>{
+    const init=WD.initials(c.name),color=WD.avatarColor(c.name);
+    const clientContracts=_contracts.filter(p=>p.clientId===c.id&&p.status!=="deleted");
+    const activeC=clientContracts.filter(p=>p.status==="active").length;
+    const doneC=clientContracts.filter(p=>p.status==="completed").length;
+    const invStat=c.inviteStatus||"none";
+    const invLabel=invStat==="accepted"?"✓ Joined":invStat==="pending"?"Invited":"Not invited";
+    const invClass=invStat==="accepted"?"accepted":invStat==="pending"?"pending":"none";
+    const isArchived=c.status==="archived";
+    return`<div class="client-card" style="${isArchived?"opacity:.6":""};animation-delay:${i*.04}s" onclick="openClientDetail('${c.id}')">
+      <div class="client-card-top">
+        <div class="client-avatar" style="background:${color}">${WD.escHtml(init)}</div>
+        <div class="client-card-info">
+          <div class="client-card-name">${WD.escHtml(c.name)}</div>
+          ${c.company?`<div class="client-card-company">${WD.escHtml(c.company)}</div>`:""}
+          ${c.email?`<div class="client-card-email">${WD.escHtml(c.email)}</div>`:""}
+        </div>
+        ${isArchived?`<span style="background:var(--bg-3);color:var(--ink-4);font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:999px;flex-shrink:0;">Archived</span>`:""}
+      </div>
+      <div class="client-stats">
+        <div class="client-stat"><div class="client-stat-val">${clientContracts.length}</div><div class="client-stat-lbl">Total</div></div>
+        <div class="client-stat"><div class="client-stat-val" style="color:var(--accent);">${activeC}</div><div class="client-stat-lbl">Active</div></div>
+        <div class="client-stat"><div class="client-stat-val">${doneC}</div><div class="client-stat-lbl">Done</div></div>
+      </div>
+      <div class="client-card-footer">
+        <span class="invite-badge ${invClass}">${invLabel}</span>
+        <span style="font-size:.73rem;color:var(--ink-4);">Since ${WD.fmtDateShort(c.createdAt)}</span>
+      </div>
+    </div>`;
+  }).join("")}</div>`;
+}
+
+function setClientFilter(f,el){_clientFilter=f;document.querySelectorAll(".client-filter-btn").forEach(b=>b.classList.remove("active"));el.classList.add("active");renderClients();}
+function handleClientSearch(){clearTimeout(_clientSearchTimer);_clientSearchTimer=setTimeout(renderClients,150);}
+
+// ═══════════════════════ DETAIL PANEL ════════════════════
+function openClientDetail(id){
+  _selectedClient=_clients.find(c=>c.id===id);
+  if(!_selectedClient)return;
+  populateClientDetail(_selectedClient);
+  document.getElementById("client-detail").classList.add("open");
+  document.getElementById("client-detail-overlay").classList.add("open");
+}
+
+function populateClientDetail(c){
+  const color=WD.avatarColor(c.name);
+  const init=WD.initials(c.name);
+  const av=document.getElementById("cd-avatar");
+  av.textContent=init;av.style.background=color;
+
+  document.getElementById("cd-name").textContent=c.name;
+  document.getElementById("cd-fullname").textContent=c.name;
+  document.getElementById("cd-company-line").textContent=c.company||c.email||"";
+
+  // Contact
+  if(c.email){document.getElementById("cd-email-row").style.display="";document.getElementById("cd-email-link").textContent=c.email;document.getElementById("cd-email-link").href="mailto:"+c.email;}
+  else document.getElementById("cd-email-row").style.display="none";
+  if(c.phone){document.getElementById("cd-phone-row").style.display="";document.getElementById("cd-phone").textContent=c.phone;}
+  else document.getElementById("cd-phone-row").style.display="none";
+  if(c.notes){document.getElementById("cd-notes-row").style.display="";document.getElementById("cd-notes").textContent=c.notes;}
+  else document.getElementById("cd-notes-row").style.display="none";
+
+  // Invite status
+  const sw=document.getElementById("cd-invite-status-wrap");
+  const invStat=c.inviteStatus||"none";
+  if(invStat==="accepted")sw.innerHTML=`<span class="invite-badge accepted">✓ Joined workspace</span>`;
+  else if(invStat==="pending")sw.innerHTML=`<span class="invite-badge pending">📧 Invite pending</span>`;
+  else sw.innerHTML=`<span class="invite-badge none">Not yet invited</span>`;
+
+  // Invite button
+  const invBtn=document.getElementById("cd-invite-btn");
+  if(invBtn)invBtn.style.display=invStat==="accepted"?"none":"";
+
+  // Stats
+  const clientContracts=_contracts.filter(p=>p.clientId===c.id&&p.status!=="deleted");
+  document.getElementById("cd-stat-total").textContent=clientContracts.length;
+  document.getElementById("cd-stat-active").textContent=clientContracts.filter(p=>p.status==="active").length;
+  document.getElementById("cd-stat-done").textContent=clientContracts.filter(p=>p.status==="completed").length;
+
+  // Contracts list
+  const cl=document.getElementById("cd-contracts-list");
+  if(!clientContracts.length){cl.innerHTML=`<div style="font-size:.78rem;color:var(--ink-4);text-align:center;padding:12px 0;">No contracts yet.</div>`;}
+  else{
+    cl.innerHTML=clientContracts.slice(0,5).map(p=>`
+      <div class="contract-mini-row" onclick="closeClientDetail();navigate('contracts');setTimeout(()=>openDetail&&openDetail('${p.id}'),300);">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:.83rem;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${WD.escHtml(p.title)}</div>
+          <div style="font-size:.7rem;color:var(--ink-4);margin-top:1px;">${WD.typePillHtml(p.type)}</div>
+        </div>
+        <div>${WD.badgeHtml(p.status)}</div>
+        <div style="font-size:.72rem;color:var(--ink-4);flex-shrink:0;">${p.type!=="retainer"?p.progress+"%":""}</div>
+      </div>`).join("")}
+    ${clientContracts.length>5?`<div style="font-size:.74rem;color:var(--accent);text-align:center;padding:8px 0;cursor:pointer;font-weight:600;" onclick="closeClientDetail();navigate('contracts');">View all ${clientContracts.length} contracts →</div>`:""}`;
+  }
+
+  // Invite section
+  const invSec=document.getElementById("cd-invite-section");
+  const invBox=document.getElementById("cd-invite-box");
+  if(invStat!=="accepted"){
+    invSec.style.display="";
+    if(c.inviteCode&&c.inviteToken){
+      invBox.innerHTML=`<div class="invite-code-box"><div style="font-size:.7rem;font-weight:700;color:var(--ink-4);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px;">Invite code</div><div class="invite-code-val">${WD.escHtml(c.inviteCode)}</div><div class="invite-code-hint">Share this code or copy the link below</div><div style="display:flex;gap:6px;margin-top:10px;"><button class="btn btn-sm btn-secondary" style="flex:1;justify-content:center;" onclick="copyInviteLink('${c.inviteToken}')">Copy link</button><button class="btn btn-sm btn-primary" style="flex:1;justify-content:center;" onclick="openInviteModal()">Resend email</button></div></div>`;
+    }else{
+      invBox.innerHTML=`<div style="font-size:.78rem;color:var(--ink-4);">No invite sent yet. Click "Send workspace invite" to generate an invite.</div>`;
+    }
+  }else{
+    invSec.style.display="none";
+  }
+}
+
+function closeClientDetail(){
+  document.getElementById("client-detail").classList.remove("open");
+  document.getElementById("client-detail-overlay").classList.remove("open");
+  _selectedClient=null;
+}
+
+function copyInviteLink(token){
+  const link="https://workdez.com/app/client/signup.html?invite="+token;
+  navigator.clipboard.writeText(link).then(()=>WD.showToast("Invite link copied!","success")).catch(()=>{const t=document.createElement("textarea");t.value=link;document.body.appendChild(t);t.select();document.execCommand("copy");document.body.removeChild(t);WD.showToast("Link copied!","success");});
+}
+
+// ═══════════════════════ ADD / EDIT CLIENT ════════════════
+function openClientModal(mode,client){
+  document.getElementById("client-modal-title").textContent=mode==="edit"?"Edit client":"Add client";
+  document.getElementById("client-save-label").textContent=mode==="edit"?"Save changes":"Add client";
+  document.getElementById("edit-client-id").value=client?.id||"";
+  document.getElementById("c-name").value=client?.name||"";
+  document.getElementById("c-email").value=client?.email||"";
+  document.getElementById("c-phone").value=client?.phone||"";
+  document.getElementById("c-company").value=client?.company||"";
+  document.getElementById("c-notes").value=client?.notes||"";
+  document.getElementById("client-modal-error").style.display="none";
+  document.getElementById("err-c-name").style.display="none";
+  document.getElementById("err-c-email").style.display="none";
+  document.getElementById("c-name").classList.remove("error");
+  document.getElementById("c-email").classList.remove("error");
+  WD.openModal("modal-client");
+  setTimeout(()=>document.getElementById("c-name")?.focus(),100);
+}
+
+function openEditClient(){
+  if(!_selectedClient)return;
+  openClientModal("edit",_selectedClient);
+}
+
+async function saveClient(){
+  const editId=document.getElementById("edit-client-id").value;
+  const name=document.getElementById("c-name").value.trim();
+  const email=document.getElementById("c-email").value.trim().toLowerCase();
+  const phone=document.getElementById("c-phone").value.trim();
+  const company=document.getElementById("c-company").value.trim();
+  const notes=document.getElementById("c-notes").value.trim();
+
+  // Validate
+  let ok=true;
+  document.getElementById("err-c-name").style.display="none";
+  document.getElementById("err-c-email").style.display="none";
+  document.getElementById("c-name").classList.remove("error");
+  document.getElementById("c-email").classList.remove("error");
+
+  if(!name){document.getElementById("err-c-name").style.display="";document.getElementById("c-name").classList.add("error");ok=false;}
+  if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){document.getElementById("err-c-email").style.display="";document.getElementById("c-email").classList.add("error");ok=false;}
+  if(!ok)return;
+
+  const btn=document.getElementById("client-save-btn");WD.setBtnLoading(btn,true);
+  document.getElementById("client-modal-error").style.display="none";
+
+  try{
+    if(editId){
+      // Update
+      const res=await WD.api({action:"update_client",token:WD.getToken(),clientId:editId,name,email,phone,company,notes});
+      if(res.success){
+        const idx=_clients.findIndex(c=>c.id===editId);
+        if(idx>-1)Object.assign(_clients[idx],{name,email,phone,company,notes});
+        if(_selectedClient?.id===editId)Object.assign(_selectedClient,{name,email,phone,company,notes});
+        renderClients();if(_selectedClient)populateClientDetail(_selectedClient);
+        WD.closeModal("modal-client");WD.showToast("Client updated.","success");
+      }else{document.getElementById("client-modal-error-text").textContent=res.error||"Failed to update.";document.getElementById("client-modal-error").style.display="flex";}
+    }else{
+      // Create
+      const res=await WD.api({action:"create_client",token:WD.getToken(),name,email,phone,company,notes});
+      if(res.success){
+        _clients.unshift(res.client);renderClients();WD.closeModal("modal-client");WD.showToast("Client added!","success");
+        setTimeout(()=>openClientDetail(res.client.id),200);
+      }else{document.getElementById("client-modal-error-text").textContent=res.error||"Failed to add.";document.getElementById("client-modal-error").style.display="flex";}
+    }
+  }catch(e){document.getElementById("client-modal-error-text").textContent="Connection error.";document.getElementById("client-modal-error").style.display="flex";}
+  finally{WD.setBtnLoading(btn,false);}
+}
+
+// ═══════════════════════ INVITE ═══════════════════════════
+function openInviteModal(){
+  if(!_selectedClient)return;
+  document.getElementById("invite-client-name").textContent=_selectedClient.name;
+  document.getElementById("invite-email").value=_selectedClient.email||"";
+
+  // Show existing invite if any
+  const box=document.getElementById("invite-existing-box");
+  if(_selectedClient.inviteCode){
+    box.style.display="";
+    box.innerHTML=`<div class="notice-banner amber" style="margin-bottom:8px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg><span>Existing invite code: <strong>${WD.escHtml(_selectedClient.inviteCode)}</strong> — sending a new one will replace it.</span></div>`;
+  }else{
+    box.style.display="none";
+  }
+  WD.openModal("modal-invite");
+  setTimeout(()=>document.getElementById("invite-email")?.focus(),100);
+}
+
+async function sendInvite(){
+  if(!_selectedClient)return;
+  const email=document.getElementById("invite-email").value.trim();
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){WD.showToast("Enter a valid email address.","warn");return;}
+
+  const btn=document.getElementById("invite-send-btn");WD.setBtnLoading(btn,true);
+  try{
+    const res=await WD.api({action:"generate_invite",token:WD.getToken(),clientEmail:email,clientName:_selectedClient.name,clientId:_selectedClient.id});
+    if(res.success){
+      // Update local client with invite info
+      const idx=_clients.findIndex(c=>c.id===_selectedClient.id);
+      if(idx>-1){_clients[idx].inviteToken=res.inviteToken;_clients[idx].inviteCode=res.inviteCode;_clients[idx].inviteStatus="pending";_clients[idx].email=_clients[idx].email||email;}
+      if(_selectedClient){_selectedClient.inviteToken=res.inviteToken;_selectedClient.inviteCode=res.inviteCode;_selectedClient.inviteStatus="pending";_selectedClient.email=_selectedClient.email||email;}
+      renderClients();if(_selectedClient)populateClientDetail(_selectedClient);
+      WD.closeModal("modal-invite");WD.showToast("Invite sent to "+email,"success");
+    }else WD.showToast(res.error||"Failed to send invite.","error");
+  }catch(e){WD.showToast("Connection error.","error");}
+  finally{WD.setBtnLoading(btn,false);}
+}
+
+// ═══════════════════════ ARCHIVE ═════════════════════════
+async function archiveClient(){
+  if(!_selectedClient)return;
+  const name=_selectedClient.name;
+  if(!confirm(`Archive ${name}? They won't appear in your active clients list.`))return;
+  try{
+    const res=await WD.api({action:"archive_client",token:WD.getToken(),clientId:_selectedClient.id});
+    if(res.success){
+      const idx=_clients.findIndex(c=>c.id===_selectedClient.id);
+      if(idx>-1)_clients[idx].status="archived";
+      renderClients();closeClientDetail();WD.showToast(name+" archived.","success");
+    }else WD.showToast(res.error||"Failed.","error");
+  }catch(e){WD.showToast("Connection error.","error");}
+}
+</script>
