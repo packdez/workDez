@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en" data-mode="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>workDez — Contractor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/workdez.css">
+<style>
+/* ── Shell-specific styles ── */
+
+/* Loading bar at top */
+#loading-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--accent);
+  z-index: 9999;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s var(--ease), opacity 0.3s;
+  opacity: 0;
+}
+#loading-bar.loading {
+  opacity: 1;
+  animation: loadBar 1.2s var(--ease) infinite;
+}
+#loading-bar.done {
+  transform: scaleX(1);
+  opacity: 0;
+}
+@keyframes loadBar {
+  0%   { transform: scaleX(0); }
+  60%  { transform: scaleX(0.8); }
+  100% { transform: scaleX(0.9); }
+}
+
+/* Subscription banner */
+#sub-banner {
+  background: linear-gradient(135deg, var(--amber-bg), #fff8e7);
+  border-bottom: 1px solid var(--amber-border);
+  padding: 8px 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8rem;
+  color: var(--amber-text);
+  display: none;
+}
+#sub-banner.show { display: flex; }
+#sub-banner svg { width: 14px; height: 14px; flex-shrink: 0; }
+#sub-banner a {
+  font-weight: 700;
+  color: var(--amber-text);
+  text-decoration: underline;
+  cursor: pointer;
+  margin-left: 4px;
+}
+#sub-banner-close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--amber-text);
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+#sub-banner-close:hover { opacity: 1; }
+
+/* Page content area */
+#page-content {
+  flex: 1;
+  padding: 28px 28px 48px;
+  max-width: 1280px;
+  width: 100%;
+  animation: pageIn 0.22s var(--ease) both;
+}
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Page loading skeleton */
+.page-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 28px;
+}
+.page-skeleton-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+/* Notification drawer */
+#notif-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(0,0,0,0.2);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+#notif-overlay.open { opacity: 1; pointer-events: all; }
+
+#notif-drawer {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: 360px;
+  max-width: 100vw;
+  background: var(--bg);
+  border-left: 1px solid var(--border);
+  z-index: 301;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.35s var(--ease);
+  box-shadow: -8px 0 40px rgba(0,0,0,0.08);
+}
+#notif-drawer.open { transform: translateX(0); }
+
+.notif-header {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.notif-header h3 { font-size: 0.9rem; font-weight: 700; color: var(--ink); }
+.notif-list { flex: 1; overflow-y: auto; }
+.notif-item {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-2);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.notif-item:hover { background: var(--bg-2); }
+.notif-item.unread { background: var(--accent-bg); }
+.notif-item-title { font-size: 0.8rem; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+.notif-item-body  { font-size: 0.76rem; color: var(--ink-3); line-height: 1.45; }
+.notif-item-time  { font-size: 0.68rem; color: var(--ink-4); margin-top: 4px; }
+.notif-empty {
+  padding: 48px 20px;
+  text-align: center;
+  color: var(--ink-4);
+  font-size: 0.82rem;
+}
+.notif-empty svg { width: 32px; height: 32px; margin: 0 auto 12px; display: block; color: var(--border); }
+
+/* Topbar notification dot */
+.notif-dot {
+  position: absolute;
+  top: 6px; right: 6px;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--red);
+  border: 1.5px solid var(--bg);
+  display: none;
+}
+.notif-dot.show { display: block; }
+
+/* Contractor-specific nav active states */
+.nav-item[data-page="dashboard"].active  { background: var(--accent-bg); color: var(--accent); }
+.nav-item[data-page="contracts"].active  { background: var(--accent-bg); color: var(--accent); }
+.nav-item[data-page="clients"].active    { background: var(--accent-bg); color: var(--accent); }
+
+/* Subscription badge in sidebar */
+.sub-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.58rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-left: auto;
+}
+
+@media (max-width: 768px) {
+  #page-content { padding: 16px 14px 40px; }
+  #notif-drawer { width: 100vw; }
+  #sub-banner { padding: 8px 16px; }
+}
+</style>
+</head>
+<body>
+
+<div id="loading-bar"></div>
+
+<!-- Auth gate -->
+<div id="auth-gate">
+  <div class="gate-logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+    </svg>
+  </div>
+  <span class="gate-text">Loading workDez…</span>
+</div>
+
+<!-- Sidebar overlay (mobile) -->
+<div id="sidebar-overlay" onclick="WD.closeSidebar()"></div>
+
+<!-- Notification overlay -->
+<div id="notif-overlay" onclick="closeNotifications()"></div>
+
+<!-- Main app -->
+<div id="app">
+
+  <!-- ═══════════════ SIDEBAR ═══════════════ -->
+  <nav id="sidebar">
+    <div class="sidebar-header">
+      <a href="#" class="sidebar-brand" onclick="navigate('dashboard');return false;">
+        <div class="sidebar-brand-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+          </svg>
+        </div>
+        <div class="sidebar-brand-info">
+          <div class="sidebar-brand-name">workDez</div>
+          <div class="sidebar-brand-role">Contractor</div>
+        </div>
+      </a>
+      <!-- Theme toggle -->
+      <div class="theme-toggle">
+        <button class="theme-toggle-btn active" data-mode="light" onclick="WD.applyTheme('light')" title="Light mode">☀️</button>
+        <button class="theme-toggle-btn" data-mode="dark" onclick="WD.applyTheme('dark')" title="Dark mode">🌙</button>
+      </div>
+    </div>
+
+    <div class="sidebar-nav">
+      <div class="nav-section-label">Workspace</div>
+
+      <a class="nav-item active" data-page="dashboard" onclick="navigate('dashboard');return false;" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+        </svg>
+        Dashboard
+      </a>
+
+      <a class="nav-item" data-page="contracts" onclick="navigate('contracts');return false;" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        Contracts
+        <span class="nav-dot" id="nav-contracts-dot"></span>
+      </a>
+
+      <a class="nav-item" data-page="clients" onclick="navigate('clients');return false;" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+        </svg>
+        Clients
+      </a>
+
+      <div class="nav-section-label">Finance</div>
+
+      <a class="nav-item disabled" data-page="invoices" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+        </svg>
+        Invoices
+        <span style="font-size:0.58rem;font-weight:700;padding:1px 6px;border-radius:999px;background:var(--bg-3);color:var(--ink-4);margin-left:auto;letter-spacing:.04em;">Soon</span>
+      </a>
+
+      <div class="nav-section-label">Account</div>
+
+      <a class="nav-item" data-page="settings" onclick="navigate('settings');return false;" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+        </svg>
+        Settings
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <!-- User menu popup -->
+      <div class="user-menu" id="user-menu">
+        <div class="user-menu-item" onclick="navigate('settings');WD.closeUserMenu();">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+          </svg>
+          Profile &amp; settings
+        </div>
+        <div class="user-menu-item" onclick="WD.showUpgradeModal();WD.closeUserMenu();">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+            <polyline points="17 6 23 6 23 12"/>
+          </svg>
+          Subscription
+        </div>
+        <div class="user-menu-divider"></div>
+        <div class="user-menu-item danger" onclick="WD.logout('contractor_logout')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+            <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Sign out
+        </div>
+      </div>
+
+      <div class="user-pill" id="user-pill" onclick="WD.toggleUserMenu()">
+        <div class="user-av" id="user-av">?</div>
+        <div class="user-info">
+          <div class="user-name" id="user-name">Loading…</div>
+          <div class="user-role">Contractor</div>
+        </div>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" style="color:var(--ink-4);flex-shrink:0;">
+          <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
+        </svg>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══════════════ MAIN ═══════════════ -->
+  <div id="main">
+
+    <!-- Subscription banner -->
+    <div id="sub-banner">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>You're on the free plan. Subscribe to create contracts.</span>
+      <a onclick="WD.showUpgradeModal()">View plans →</a>
+      <button id="sub-banner-close" onclick="document.getElementById('sub-banner').style.display='none'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Topbar -->
+    <header id="topbar">
+      <div class="topbar-left">
+        <button class="topbar-hamburger" onclick="WD.openSidebar()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round">
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
+        <span class="topbar-title" id="topbar-title">Dashboard</span>
+      </div>
+      <div class="topbar-right">
+        <!-- Notifications -->
+        <button class="btn btn-icon btn-secondary" onclick="openNotifications()" style="position:relative;" title="Notifications">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round">
+            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 01-3.46 0"/>
+          </svg>
+          <span class="notif-dot" id="notif-dot"></span>
+        </button>
+        <!-- Primary action button (changes per page) -->
+        <button class="btn btn-primary" id="topbar-action-btn"
+          onclick="triggerPageAction()" style="display:none;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5" stroke-linecap="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          <span id="topbar-action-label">New</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Page content injected here -->
+    <main id="page-content"></main>
+  </div>
+</div>
+
+<!-- Notification drawer -->
+<div id="notif-drawer">
+  <div class="notif-header">
+    <h3>Notifications</h3>
+    <button class="btn btn-icon btn-ghost" onclick="closeNotifications()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+  <div class="notif-list" id="notif-list">
+    <div class="notif-empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 01-3.46 0"/>
+      </svg>
+      No notifications yet.
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<!-- Load shared utilities -->
+<script src="../assets/workdez.js"></script>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// SHELL CONFIG
+// ═══════════════════════════════════════════════════════════
+const CONTRACTOR_API_URL = "https://script.google.com/macros/s/AKfycbzA7GlUiUGxuINThYj5ZtP2YFROyyjBwVWMpWbwfyUMow5oQeBDvUx3m4weV_UIwhJgWQ/exec";
+const API_KEY            = "f4b22d86-07b2-4f5b-b2fa-d2c6fb01395161ada23f-3e60-48ab-b657-8c6670c9991d";
+const LOGIN_URL          = "login.html";
+
+// Initialise WD utility namespace
+WD.init({
+  apiUrl:      CONTRACTOR_API_URL,
+  apiKey:      API_KEY,
+  storePrefix: "wd_contractor_",
+  loginUrl:    LOGIN_URL
+});
+
+// ═══════════════════════════════════════════════════════════
+// PAGE REGISTRY
+// page → { title, file, action?, actionLabel? }
+// ═══════════════════════════════════════════════════════════
+const PAGES = {
+  dashboard: {
+    title:       "Dashboard",
+    file:        "dashboard.html",
+    action:      null
+  },
+  contracts: {
+    title:       "Contracts",
+    file:        "contracts.html",
+    action:      "openNewContract",
+    actionLabel: "New contract"
+  },
+  clients: {
+    title:       "Clients",
+    file:        "clients.html",
+    action:      "openNewClient",
+    actionLabel: "Add client"
+  },
+  settings: {
+    title:       "Settings",
+    file:        "settings.html",
+    action:      null
+  }
+};
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let currentPage    = "";
+let currentUser    = null;
+let _pageActionFn  = null;
+let _pollTimer     = null;
+
+// ═══════════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════════
+WD.initTheme();
+
+// Validate token with contractor-specific action
+async function bootShell() {
+  const token = WD.getToken();
+  if (!token) {
+    const cached = WD.getUser();
+    if (cached) { finishBoot(cached); return; }
+    return WD.redirect();
+  }
+
+  try {
+    const controller = new AbortController();
+    const tid = setTimeout(() => controller.abort(), 10000);
+    const body = new Blob(
+      [JSON.stringify({ action: "contractor_validate_token", token, apiKey: API_KEY })],
+      { type: "text/plain" }
+    );
+    const res = await (await fetch(CONTRACTOR_API_URL, {
+      method: "POST", body, signal: controller.signal
+    })).json();
+    clearTimeout(tid);
+
+    if (res.success && res.contractor) {
+      const store = localStorage.getItem("wd_contractor_token")
+        ? localStorage : sessionStorage;
+      store.setItem("wd_contractor_user", JSON.stringify(res.contractor));
+      finishBoot(res.contractor);
+    } else {
+      const cached = WD.getUser();
+      if (cached) { finishBoot(cached); return; }
+      WD.redirect();
+    }
+  } catch(e) {
+    const cached = WD.getUser();
+    if (cached) { finishBoot(cached); return; }
+    WD.redirect();
+  }
+}
+
+function finishBoot(user) {
+  currentUser = user;
+  WD.bootSidebar(user);
+
+  // Show subscription banner if no active sub
+  if (!user.hasSubscription) {
+    const banner = document.getElementById("sub-banner");
+    if (banner) banner.classList.add("show");
+  }
+
+  // Hide auth gate, show app
+  document.getElementById("auth-gate").classList.add("hidden");
+  document.getElementById("app").classList.add("ready");
+
+  // Route to initial page
+  const hash = window.location.hash.replace("#", "");
+  navigate(PAGES[hash] ? hash : "dashboard", true);
+
+  // Start polling for contract changes
+  startPolling();
+}
+
+bootShell();
+
+// ═══════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════
+async function navigate(page, initial = false) {
+  if (page === currentPage && !initial) return;
+
+  const config = PAGES[page];
+  if (!config) return;
+
+  currentPage = page;
+
+  // Update URL hash without reload
+  if (!initial) {
+    history.pushState(null, "", "#" + page);
+  }
+
+  // Update sidebar active state
+  document.querySelectorAll(".nav-item[data-page]").forEach(item => {
+    item.classList.toggle("active", item.dataset.page === page);
+  });
+
+  // Update topbar title
+  document.getElementById("topbar-title").textContent = config.title;
+
+  // Update topbar action button
+  const actionBtn   = document.getElementById("topbar-action-btn");
+  const actionLabel = document.getElementById("topbar-action-label");
+  if (config.action) {
+    actionBtn.style.display = "";
+    actionLabel.textContent = config.actionLabel || "New";
+  } else {
+    actionBtn.style.display = "none";
+  }
+  _pageActionFn = config.action || null;
+
+  // Close sidebar on mobile
+  WD.closeSidebar();
+
+  // Load the page
+  await loadPage(config.file);
+}
+
+// Handle browser back/forward
+window.addEventListener("popstate", () => {
+  const hash = window.location.hash.replace("#", "");
+  if (PAGES[hash] && hash !== currentPage) {
+    navigate(hash, true);
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+// PAGE LOADER
+// ═══════════════════════════════════════════════════════════
+async function loadPage(file) {
+  const content = document.getElementById("page-content");
+
+  // Show loading bar
+  startLoadingBar();
+
+  // Show skeleton while loading
+  content.innerHTML = buildSkeleton();
+
+  try {
+    const res = await fetch(file + "?v=" + Date.now());
+
+    if (!res.ok) throw new Error("Page not found: " + file);
+
+    const html = await res.text();
+    finishLoadingBar();
+
+    // Inject HTML
+    content.innerHTML = html;
+    content.style.animation = "none";
+    content.offsetHeight; // reflow
+    content.style.animation = "";
+
+    // Execute any scripts in the injected HTML
+    content.querySelectorAll("script").forEach(oldScript => {
+      const newScript = document.createElement("script");
+      Array.from(oldScript.attributes).forEach(attr => {
+        newScript.setAttribute(attr.name, attr.value);
+      });
+      newScript.textContent = oldScript.textContent;
+      oldScript.parentNode.replaceChild(newScript, oldScript);
+    });
+
+    // Call page init if defined
+    if (typeof window.pageInit === "function") {
+      window.pageInit(currentUser);
+    }
+
+  } catch(e) {
+    finishLoadingBar();
+    content.innerHTML = buildErrorState(file);
+    console.error("Page load failed:", e);
+  }
+}
+
+function buildSkeleton() {
+  return `<div class="page-skeleton">
+    <div class="page-skeleton-header">
+      <div>
+        <div class="skeleton" style="height:28px;width:200px;border-radius:8px;margin-bottom:8px;"></div>
+        <div class="skeleton" style="height:14px;width:280px;border-radius:6px;"></div>
+      </div>
+      <div class="skeleton" style="height:36px;width:120px;border-radius:10px;"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px;">
+      ${[0,1,2,3].map(() => `<div class="skeleton-card">
+        <div class="skeleton" style="height:12px;width:60%;margin-bottom:10px;"></div>
+        <div class="skeleton" style="height:32px;width:40%;margin-bottom:6px;border-radius:4px;"></div>
+        <div class="skeleton" style="height:11px;width:50%;"></div>
+      </div>`).join("")}
+    </div>
+    <div class="skeleton-card">
+      <div class="skeleton" style="height:14px;width:30%;margin-bottom:14px;"></div>
+      ${[0,1,2].map(() => `<div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-2);">
+        <div class="skeleton" style="width:36px;height:36px;border-radius:50%;flex-shrink:0;"></div>
+        <div style="flex:1;">
+          <div class="skeleton" style="height:13px;width:55%;margin-bottom:6px;"></div>
+          <div class="skeleton" style="height:11px;width:38%;"></div>
+        </div>
+        <div class="skeleton" style="height:22px;width:60px;border-radius:999px;"></div>
+      </div>`).join("")}
+    </div>
+  </div>`;
+}
+
+function buildErrorState(file) {
+  return `<div class="empty-state" style="padding:80px 32px;">
+    <div class="empty-state-icon" style="background:var(--red-bg);border-color:var(--red-border);color:var(--red);">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+    </div>
+    <h3>Page failed to load</h3>
+    <p>Could not load <code>${WD.escHtml(file)}</code>. Check the file exists in your repo.</p>
+    <button class="btn btn-secondary" onclick="loadPage('${WD.escHtml(file)}')">Try again</button>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// TOPBAR ACTION
+// ═══════════════════════════════════════════════════════════
+function triggerPageAction() {
+  if (_pageActionFn && typeof window[_pageActionFn] === "function") {
+    window[_pageActionFn]();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// LOADING BAR
+// ═══════════════════════════════════════════════════════════
+function startLoadingBar() {
+  const bar = document.getElementById("loading-bar");
+  bar.className = "loading";
+}
+function finishLoadingBar() {
+  const bar = document.getElementById("loading-bar");
+  bar.className = "done";
+  setTimeout(() => { bar.className = ""; }, 400);
+}
+
+// ═══════════════════════════════════════════════════════════
+// NOTIFICATIONS
+// ═══════════════════════════════════════════════════════════
+function openNotifications() {
+  document.getElementById("notif-drawer").classList.add("open");
+  document.getElementById("notif-overlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+function closeNotifications() {
+  document.getElementById("notif-drawer").classList.remove("open");
+  document.getElementById("notif-overlay").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+// ═══════════════════════════════════════════════════════════
+// POLLING — check for contract updates every 30s
+// ═══════════════════════════════════════════════════════════
+function startPolling() {
+  _pollTimer = setInterval(async () => {
+    try {
+      const token = WD.getToken();
+      if (!token) return;
+      const res = await WD.api({ action: "get_contracts", token });
+      if (!res.success) return;
+
+      // Check for unseen client changes
+      const hasChanges = (res.contracts || []).some(c => {
+        const lastSeen = localStorage.getItem("wd_seen_" + c.id);
+        return lastSeen && lastSeen !== c.updatedAt;
+      });
+
+      const dot = document.getElementById("nav-contracts-dot");
+      if (dot) dot.classList.toggle("show", hasChanges);
+
+      // If contracts page is open, trigger a soft refresh
+      if (currentPage === "contracts" && typeof window.onPollUpdate === "function") {
+        window.onPollUpdate(res.contracts);
+      }
+    } catch(e) {}
+  }, 30000);
+}
+
+// ═══════════════════════════════════════════════════════════
+// GLOBAL HELPERS (available to injected pages)
+// ═══════════════════════════════════════════════════════════
+
+// Called by pages to update the topbar action button
+function setPageAction(label, fn) {
+  const btn = document.getElementById("topbar-action-btn");
+  const lbl = document.getElementById("topbar-action-label");
+  if (label && fn) {
+    btn.style.display = "";
+    lbl.textContent   = label;
+    _pageActionFn     = fn;
+    window[fn]        = fn; // ensure globally accessible
+  } else {
+    btn.style.display = "none";
+  }
+}
+
+// Mark a contract as seen
+function markContractSeen(contractId, updatedAt) {
+  localStorage.setItem("wd_seen_" + contractId, updatedAt);
+}
+
+// Check if contract has unseen client changes
+function contractHasChanges(contract) {
+  const lastSeen = localStorage.getItem("wd_seen_" + contract.id);
+  if (!lastSeen) return false;
+  return lastSeen !== contract.updatedAt;
+}
+
+// Clean up on unload
+window.addEventListener("beforeunload", () => {
+  clearInterval(_pollTimer);
+});
+
+// Keyboard shortcut: Escape closes everything
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") closeNotifications();
+});
+</script>
+</body>
+</html>
