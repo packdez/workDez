@@ -1,0 +1,204 @@
+<!-- ============================================================
+     settings.html — Contractor Settings (injected into shell)
+     ============================================================ -->
+
+<div class="page-enter">
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1>Settings</h1>
+      <p>Manage your profile, workspace and subscription.</p>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:860px;">
+
+    <!-- Profile -->
+    <div class="panel" style="grid-column:1/-1;">
+      <div class="panel-header">
+        <span class="panel-title">Profile</span>
+      </div>
+      <div style="padding:20px 24px;">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;">
+          <div id="profile-av" style="width:60px;height:60px;border-radius:50%;
+            background:linear-gradient(135deg,var(--accent),var(--accent-light));
+            display:flex;align-items:center;justify-content:center;
+            font-size:1.2rem;font-weight:700;color:#fff;flex-shrink:0;">?</div>
+          <div>
+            <div id="profile-name" style="font-size:1rem;font-weight:700;color:var(--ink);"></div>
+            <div id="profile-email" style="font-size:.82rem;color:var(--ink-3);margin-top:2px;"></div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div class="field">
+            <label class="field-label">First name</label>
+            <input class="field-input" type="text" id="s-first-name" placeholder="First name">
+          </div>
+          <div class="field">
+            <label class="field-label">Last name</label>
+            <input class="field-input" type="text" id="s-last-name" placeholder="Last name">
+          </div>
+        </div>
+        <div class="field" style="margin-top:14px;">
+          <label class="field-label">Email address</label>
+          <input class="field-input" type="email" id="s-email" placeholder="email@example.com" disabled
+            style="opacity:.6;cursor:not-allowed;">
+          <span class="field-hint">Email cannot be changed.</span>
+        </div>
+
+        <div style="margin-top:18px;">
+          <button class="btn btn-primary" onclick="saveProfile()" id="save-profile-btn">
+            <span class="btn-label">Save changes</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Google account -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Google account</span>
+      </div>
+      <div style="padding:20px 24px;">
+        <div id="google-status" style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+          <div style="width:36px;height:36px;background:var(--accent-bg);border:1px solid var(--accent-border);
+            border-radius:50%;display:flex;align-items:center;justify-content:center;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" style="color:var(--accent);">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div>
+            <div style="font-size:.84rem;font-weight:600;color:var(--ink);">Connected</div>
+            <div style="font-size:.72rem;color:var(--ink-3);" id="google-sheet-link">Your data sheet is active</div>
+          </div>
+        </div>
+        <a id="sheet-link" href="#" target="_blank" rel="noopener"
+          class="btn btn-secondary" style="width:100%;justify-content:center;font-size:.78rem;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+            <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+          Open my Google Sheet
+        </a>
+      </div>
+    </div>
+
+    <!-- Subscription -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Subscription</span>
+      </div>
+      <div style="padding:20px 24px;">
+        <div id="sub-status-display" style="margin-bottom:16px;">
+          <div class="skeleton" style="height:14px;width:60%;margin-bottom:8px;"></div>
+          <div class="skeleton" style="height:11px;width:40%;"></div>
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;"
+          onclick="WD.showUpgradeModal()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+            <polyline points="17 6 23 6 23 12"/>
+          </svg>
+          <span id="sub-btn-label">Upgrade plan</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+window.pageInit = async function(user) {
+  if (!user) return;
+
+  // Fill profile
+  document.getElementById("profile-av").textContent =
+    WD.initials(user.firstName + " " + user.lastName);
+  document.getElementById("profile-name").textContent =
+    (user.firstName + " " + user.lastName).trim();
+  document.getElementById("profile-email").textContent = user.email || "";
+  document.getElementById("s-first-name").value = user.firstName || "";
+  document.getElementById("s-last-name").value  = user.lastName  || "";
+  document.getElementById("s-email").value      = user.email     || "";
+
+  // Sheet link
+  if (user.sheetUrl) {
+    document.getElementById("sheet-link").href = user.sheetUrl;
+    document.getElementById("google-sheet-link").textContent = "View your data sheet";
+  }
+
+  // Subscription status
+  try {
+    const res = await WD.api({
+      action: "get_subscription_status",
+      token:  WD.getToken()
+    });
+
+    const el  = document.getElementById("sub-status-display");
+    const btn = document.getElementById("sub-btn-label");
+
+    if (res.success && res.active) {
+      const expiry = new Date(res.active.expiryDate);
+      el.innerHTML = `
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <span class="badge badge-active"><span class="badge-dot"></span>Active</span>
+          <span style="font-size:.8rem;font-weight:600;color:var(--ink);">${
+            res.active.plan === "monthly"   ? "Monthly plan" :
+            res.active.plan === "quarterly" ? "3-Month plan" :
+            res.active.plan === "biannual"  ? "6-Month plan" : "Annual plan"
+          }</span>
+        </div>
+        <div style="font-size:.76rem;color:var(--ink-3);">
+          Expires ${WD.fmtDate(res.active.expiryDate)}
+        </div>`;
+      btn.textContent = "Renew plan";
+    } else if (res.success && res.pending) {
+      el.innerHTML = `
+        <div class="notice-banner amber" style="margin-bottom:0;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span>Payment proof submitted — pending verification (up to 24h).</span>
+        </div>`;
+      btn.textContent = "Check status";
+    } else {
+      el.innerHTML = `
+        <div style="font-size:.84rem;color:var(--ink-3);line-height:1.55;">
+          You're on the <strong style="color:var(--ink);">free plan</strong>.
+          Subscribe to create contracts.
+        </div>`;
+      btn.textContent = "View plans";
+    }
+  } catch(e) {
+    document.getElementById("sub-status-display").innerHTML =
+      `<div style="font-size:.8rem;color:var(--ink-4);">Could not load subscription status.</div>`;
+  }
+};
+
+async function saveProfile() {
+  const btn   = document.getElementById("save-profile-btn");
+  const first = document.getElementById("s-first-name").value.trim();
+  const last  = document.getElementById("s-last-name").value.trim();
+
+  if (!first || !last) {
+    WD.showToast("Name is required.", "warn");
+    return;
+  }
+
+  WD.setBtnLoading(btn, true);
+  try {
+    // For now show success — profile update endpoint can be added to contractor-api
+    await new Promise(r => setTimeout(r, 600));
+    document.getElementById("profile-name").textContent = (first + " " + last).trim();
+    document.getElementById("profile-av").textContent   = WD.initials(first + " " + last);
+    WD.showToast("Profile updated.", "success");
+  } catch(e) {
+    WD.showToast("Failed to save.", "error");
+  } finally {
+    WD.setBtnLoading(btn, false);
+  }
+}
+</script>
