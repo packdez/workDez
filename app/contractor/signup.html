@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create account — workDez</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Instrument+Serif:ital@0;1&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --accent:#1a6b3c;--accent-hover:#155c33;--accent-light:#22c55e;
+  --accent-bg:#f0fdf4;--accent-border:#bbf7d0;--accent-text:#166534;
+  --ink:#0f172a;--ink-2:#334155;--ink-3:#64748b;--ink-4:#94a3b8;--ink-5:#cbd5e1;
+  --bg:#ffffff;--bg-2:#f8fafc;--bg-3:#f1f5f9;--border:#e2e8f0;
+  --red:#dc2626;--red-bg:#fef2f2;--red-border:#fecaca;
+  --amber:#d97706;--amber-bg:#fffbeb;
+  --font-sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --font-serif:'Instrument Serif',Georgia,serif;
+  --r:10px;--r-lg:16px;--ease:cubic-bezier(.22,1,.36,1);
+}
+html{scroll-behavior:smooth;}
+body{
+  font-family:var(--font-sans);background:var(--bg);color:var(--ink);
+  min-height:100svh;display:flex;-webkit-font-smoothing:antialiased;
+}
+.auth-split{display:flex;width:100%;min-height:100svh;}
+
+/* Left */
+.auth-left{
+  width:44%;min-height:100svh;background:#071a0f;
+  display:flex;flex-direction:column;justify-content:space-between;
+  padding:40px 48px;position:relative;overflow:hidden;flex-shrink:0;
+}
+.auth-left-bg{
+  position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 55% 45% at 20% 25%,rgba(34,197,94,.1) 0%,transparent 60%),
+    radial-gradient(ellipse 45% 55% at 80% 75%,rgba(26,107,60,.14) 0%,transparent 60%);
+}
+.auth-left-grid{
+  position:absolute;inset:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:48px 48px;
+}
+.auth-brand{position:relative;z-index:1;display:flex;align-items:center;gap:10px;text-decoration:none;}
+.auth-brand-mark{
+  width:38px;height:38px;border-radius:10px;
+  background:linear-gradient(135deg,#22c55e,#15803d);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 16px rgba(34,197,94,.35);
+}
+.auth-brand-mark svg{color:#fff;width:18px;height:18px;}
+.auth-brand-name{font-size:1.1rem;font-weight:700;color:#fff;letter-spacing:-.02em;}
+.auth-left-content{
+  position:relative;z-index:1;flex:1;
+  display:flex;flex-direction:column;justify-content:center;padding:48px 0;
+}
+.auth-left-heading{
+  font-family:var(--font-serif);font-size:clamp(2rem,3.2vw,2.8rem);
+  font-weight:400;color:#fff;line-height:1.15;margin-bottom:18px;letter-spacing:-.025em;
+}
+.auth-left-heading em{font-style:italic;color:#4ade80;}
+.auth-left-sub{font-size:.9rem;color:rgba(255,255,255,.45);line-height:1.75;max-width:300px;margin-bottom:40px;}
+.auth-features{display:flex;flex-direction:column;gap:12px;}
+.auth-feature{display:flex;align-items:center;gap:12px;}
+.auth-feature-check{
+  width:20px;height:20px;border-radius:50%;
+  background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.auth-feature-check svg{width:10px;height:10px;color:#4ade80;}
+.auth-feature span{font-size:.83rem;color:rgba(255,255,255,.5);line-height:1.4;}
+.auth-left-footer{position:relative;z-index:1;font-size:.74rem;color:rgba(255,255,255,.2);}
+
+/* Right */
+.auth-right{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 32px;overflow-y:auto;background:var(--bg);
+}
+.auth-form-wrap{width:100%;max-width:440px;}
+.auth-mobile-brand{display:none;align-items:center;gap:9px;margin-bottom:28px;text-decoration:none;}
+.auth-mobile-brand-mark{
+  width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#22c55e,#15803d);
+  display:flex;align-items:center;justify-content:center;
+}
+.auth-mobile-brand-mark svg{color:#fff;width:15px;height:15px;}
+.auth-mobile-brand-name{font-size:.95rem;font-weight:700;color:var(--ink);}
+
+/* Steps indicator */
+.steps{display:flex;align-items:center;gap:0;margin-bottom:28px;}
+.step{display:flex;align-items:center;gap:6px;font-size:.72rem;font-weight:600;color:var(--ink-4);}
+.step.active{color:var(--accent);}
+.step.done{color:var(--ink-3);}
+.step-num{
+  width:22px;height:22px;border-radius:50%;border:2px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.65rem;font-weight:700;background:var(--bg);flex-shrink:0;
+  transition:all .2s;
+}
+.step.active .step-num{border-color:var(--accent);background:var(--accent);color:#fff;}
+.step.done .step-num{border-color:var(--accent);background:var(--accent-bg);color:var(--accent);}
+.step-sep{flex:1;height:1px;background:var(--border);margin:0 6px;}
+.step-sep.done{background:var(--accent-border);}
+
+.auth-form-header{margin-bottom:24px;}
+.auth-form-title{
+  font-family:var(--font-serif);font-size:1.8rem;font-weight:400;
+  color:var(--ink);letter-spacing:-.025em;line-height:1.2;margin-bottom:6px;
+}
+.auth-form-sub{font-size:.85rem;color:var(--ink-3);line-height:1.55;}
+.auth-form-sub a{color:var(--accent);text-decoration:none;font-weight:600;}
+.auth-form-sub a:hover{text-decoration:underline;}
+
+/* Panes */
+.pane{display:none;}
+.pane.active{display:block;}
+
+.auth-form{display:flex;flex-direction:column;gap:14px;}
+.auth-error{
+  background:var(--red-bg);border:1px solid var(--red-border);border-radius:var(--r);
+  padding:11px 13px;font-size:.8rem;color:var(--red);display:none;
+  align-items:center;gap:8px;line-height:1.4;
+}
+.auth-error.show{display:flex;}
+.auth-error svg{width:14px;height:14px;flex-shrink:0;}
+
+.field-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field-label{font-size:.77rem;font-weight:600;color:var(--ink-2);letter-spacing:.01em;}
+.field-input{
+  width:100%;height:44px;background:var(--bg-2);border:1.5px solid var(--border);
+  border-radius:var(--r);padding:0 13px;font-size:.875rem;color:var(--ink);
+  font-family:var(--font-sans);outline:none;
+  transition:border-color .18s,background .18s,box-shadow .18s;-webkit-appearance:none;
+}
+.field-input::placeholder{color:var(--ink-4);}
+.field-input:focus{border-color:var(--accent);background:var(--bg);box-shadow:0 0 0 3px rgba(26,107,60,.1);}
+.field-input.has-toggle{padding-right:42px;}
+.field-input.error{border-color:var(--red);background:var(--red-bg);}
+.field-input-wrap{position:relative;}
+.field-error{font-size:.71rem;color:var(--red);font-weight:500;display:none;margin-top:2px;}
+.field-error.show{display:block;}
+.pw-toggle{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;color:var(--ink-4);
+  display:flex;align-items:center;padding:4px;transition:color .15s;
+}
+.pw-toggle:hover{color:var(--ink-2);}
+
+/* Password strength */
+.pw-strength{margin-top:6px;}
+.pw-bar{height:3px;border-radius:2px;background:var(--border);overflow:hidden;margin-bottom:4px;}
+.pw-fill{height:100%;border-radius:2px;transition:width .3s,background .3s;width:0;}
+.pw-lbl{font-size:.69rem;color:var(--ink-4);}
+
+.checkbox-row{display:flex;align-items:center;gap:9px;cursor:pointer;user-select:none;}
+.checkbox-row input[type="checkbox"]{width:15px;height:15px;border-radius:4px;accent-color:var(--accent);cursor:pointer;flex-shrink:0;}
+.checkbox-row span{font-size:.8rem;color:var(--ink-3);}
+
+/* OAuth panel */
+.oauth-card{
+  background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r-lg);
+  padding:24px;text-align:center;
+}
+.oauth-icon{
+  width:56px;height:56px;border-radius:14px;
+  background:linear-gradient(135deg,var(--accent-bg),var(--bg-2));
+  border:1px solid var(--accent-border);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 14px;
+}
+.oauth-icon svg{width:26px;height:26px;color:var(--accent);}
+.oauth-title{font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:6px;}
+.oauth-sub{font-size:.82rem;color:var(--ink-3);line-height:1.6;margin-bottom:20px;}
+.oauth-benefits{
+  background:var(--bg);border:1px solid var(--border);border-radius:var(--r);
+  padding:12px 14px;margin-bottom:20px;text-align:left;
+}
+.oauth-benefit{
+  display:flex;align-items:center;gap:9px;
+  font-size:.78rem;color:var(--ink-3);padding:4px 0;
+}
+.oauth-benefit svg{width:13px;height:13px;color:var(--accent);flex-shrink:0;}
+
+/* Buttons */
+.btn-submit{
+  width:100%;height:46px;background:var(--accent);color:#fff;
+  border:none;border-radius:var(--r);font-size:.88rem;font-weight:700;
+  font-family:var(--font-sans);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 2px 8px rgba(26,107,60,.25);margin-top:4px;
+  transition:background .18s,transform .15s;
+}
+.btn-submit:hover{background:var(--accent-hover);}
+.btn-submit:active{transform:scale(.98);}
+.btn-submit:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.btn-submit.loading .btn-text{display:none;}
+.btn-submit.loading .btn-spinner{display:flex;}
+.btn-spinner{
+  width:18px;height:18px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.3);border-top-color:#fff;
+  animation:spin .7s linear infinite;display:none;
+}
+.btn-google{
+  width:100%;height:46px;background:var(--bg);color:var(--ink-2);
+  border:1.5px solid var(--border);border-radius:var(--r);
+  font-size:.88rem;font-weight:600;font-family:var(--font-sans);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:background .18s,border-color .18s,box-shadow .15s;
+}
+.btn-google:hover{background:var(--bg-2);border-color:var(--ink-5);box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.btn-google:active{transform:scale(.98);}
+.btn-google svg{width:18px;height:18px;flex-shrink:0;}
+
+.auth-terms{font-size:.72rem;color:var(--ink-4);text-align:center;line-height:1.6;margin-top:4px;}
+.auth-terms a{color:var(--ink-3);text-decoration:underline;text-underline-offset:2px;}
+
+/* Toast */
+.toast-wrap{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(16px);
+  background:var(--ink);color:#fff;padding:11px 20px;border-radius:10px;
+  font-size:.8rem;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.15);
+  opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;
+  white-space:nowrap;z-index:999;
+}
+.toast-wrap.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast-wrap.success{background:var(--accent);}
+.toast-wrap.error{background:var(--red);}
+.toast-wrap.warn{background:var(--amber);}
+
+@keyframes spin{to{transform:rotate(360deg);}}
+
+@media(max-width:860px){
+  .auth-split{flex-direction:column;}
+  .auth-left{display:none;}
+  .auth-right{justify-content:flex-start;padding:32px 24px 48px;min-height:100svh;}
+  .auth-mobile-brand{display:flex;}
+}
+@media(max-width:480px){
+  .auth-right{padding:24px 20px 40px;}
+  .auth-form-title{font-size:1.6rem;}
+  .field-row-2{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="auth-split">
+
+  <!-- Left -->
+  <div class="auth-left">
+    <div class="auth-left-bg"></div>
+    <div class="auth-left-grid"></div>
+    <a href="/app/" class="auth-brand">
+      <div class="auth-brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+        </svg>
+      </div>
+      <span class="auth-brand-name">workDez</span>
+    </a>
+    <div class="auth-left-content">
+      <h1 class="auth-left-heading">Your work,<br><em>organised.</em></h1>
+      <p class="auth-left-sub">One workspace for contracts, clients, milestones, files and time — all yours.</p>
+      <div class="auth-features">
+        <div class="auth-feature">
+          <div class="auth-feature-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span>Data stored in YOUR Google Drive</span>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span>Client portal with milestone approvals</span>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span>Hourly, fixed-price and retainer contracts</span>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span>Time logging, file uploads, activity feed</span>
+        </div>
+      </div>
+    </div>
+    <div class="auth-left-footer">© 2025 workDez. All rights reserved.</div>
+  </div>
+
+  <!-- Right -->
+  <div class="auth-right">
+    <div class="auth-form-wrap">
+      <a href="/app/" class="auth-mobile-brand">
+        <div class="auth-mobile-brand-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+          </svg>
+        </div>
+        <span class="auth-mobile-brand-name">workDez</span>
+      </a>
+
+      <!-- Step indicators -->
+      <div class="steps" id="steps-wrap">
+        <div class="step active" id="step-1"><div class="step-num">1</div><span>Account</span></div>
+        <div class="step-sep" id="sep-1"></div>
+        <div class="step" id="step-2"><div class="step-num">2</div><span>Connect Google</span></div>
+      </div>
+
+      <!-- Step 1: Account details -->
+      <div class="pane active" id="pane-1">
+        <div class="auth-form-header">
+          <h2 class="auth-form-title">Create your account</h2>
+          <p class="auth-form-sub">Already have one? <a href="login.html">Sign in</a></p>
+        </div>
+        <form class="auth-form" id="signup-form" novalidate>
+          <div class="auth-error" id="auth-error">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <span id="auth-error-text">Something went wrong.</span>
+          </div>
+          <div class="field-row-2">
+            <div class="field">
+              <label class="field-label" for="first-name">First name</label>
+              <input class="field-input" type="text" id="first-name" placeholder="Jane" autocomplete="given-name" required>
+              <span class="field-error" id="err-first-name">Required</span>
+            </div>
+            <div class="field">
+              <label class="field-label" for="last-name">Last name</label>
+              <input class="field-input" type="text" id="last-name" placeholder="Smith" autocomplete="family-name" required>
+              <span class="field-error" id="err-last-name">Required</span>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label" for="email">Work email</label>
+            <input class="field-input" type="email" id="email" placeholder="jane@example.com" autocomplete="email" required>
+            <span class="field-error" id="err-email">Enter a valid email</span>
+          </div>
+          <div class="field">
+            <label class="field-label" for="workspace">Workspace name</label>
+            <input class="field-input" type="text" id="workspace" placeholder="e.g. Jane Design Studio" autocomplete="organization" required>
+            <span class="field-error" id="err-workspace">Required</span>
+          </div>
+          <div class="field">
+            <label class="field-label" for="password">Password</label>
+            <div class="field-input-wrap">
+              <input class="field-input has-toggle" type="password" id="password" placeholder="Min. 8 characters" autocomplete="new-password" required>
+              <button type="button" class="pw-toggle" id="pw-toggle" aria-label="Toggle password">
+                <svg id="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+            <div class="pw-strength" id="pw-strength" style="display:none;">
+              <div class="pw-bar"><div class="pw-fill" id="pw-fill"></div></div>
+              <span class="pw-lbl" id="pw-lbl">Too short</span>
+            </div>
+            <span class="field-error" id="err-password">Min. 8 characters</span>
+          </div>
+          <label class="checkbox-row">
+            <input type="checkbox" id="remember">
+            <span>Keep me signed in for 30 days</span>
+          </label>
+          <button type="submit" class="btn-submit" id="submit-btn">
+            <span class="btn-text">Continue</span>
+            <div class="btn-spinner"></div>
+          </button>
+          <p class="auth-terms">
+            By signing up you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.
+          </p>
+        </form>
+      </div>
+
+      <!-- Step 2: Connect Google -->
+      <div class="pane" id="pane-2">
+        <div class="auth-form-header">
+          <h2 class="auth-form-title">Connect Google</h2>
+          <p class="auth-form-sub">One more step — connect your Google account to store your data.</p>
+        </div>
+        <div class="oauth-card">
+          <div class="oauth-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+              <path d="M12 8v4l3 3"/>
+            </svg>
+          </div>
+          <div class="oauth-title">Connect your Google account</div>
+          <div class="oauth-sub">
+            workDez will create a private Google Sheet and Drive folder in <strong>your</strong> account.
+            You own your data — always.
+          </div>
+          <div class="oauth-benefits">
+            <div class="oauth-benefit">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Your contracts stored in your Google Sheet</span>
+            </div>
+            <div class="oauth-benefit">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Files uploaded to your Google Drive folder</span>
+            </div>
+            <div class="oauth-benefit">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Only workDez can access it — fully private</span>
+            </div>
+            <div class="oauth-benefit">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Revoke access anytime from Google settings</span>
+            </div>
+          </div>
+          <button class="btn-google" id="google-connect-btn" onclick="startOAuth()">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+            Connect with Google
+          </button>
+        </div>
+        <p style="font-size:.74rem;color:var(--ink-4);text-align:center;margin-top:14px;line-height:1.55;">
+          workDez requests Drive and Sheets access only.
+          We never read your emails or personal files.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toast"></div>
+
+<script>
+const CONTRACTOR_API_URL = "https://script.google.com/macros/s/AKfycbzA7GlUiUGxuINThYj5ZtP2YFROyyjBwVWMpWbwfyUMow5oQeBDvUx3m4weV_UIwhJgWQ/exec";
+const API_KEY            = "f4b22d86-07b2-4f5b-b2fa-d2c6fb01395161ada23f-3e60-48ab-b657-8c6670c9991d";
+// ← Fill in after Google Cloud Project setup:
+const GOOGLE_CLIENT_ID   = "";
+const OAUTH_REDIRECT_URI = "https://workdez.com/app/oauth-callback.html";
+
+async function api(payload) {
+  const body = new Blob([JSON.stringify({ ...payload, apiKey: API_KEY })], { type: "text/plain" });
+  return (await fetch(CONTRACTOR_API_URL, { method: "POST", body })).json();
+}
+
+// State
+let _preAuthToken = "";
+let _contractorId = "";
+let _remember     = false;
+
+// Check if returning from OAuth (oauth=1 param means re-connect)
+const params = new URLSearchParams(window.location.search);
+if (params.get("oauth") === "1") {
+  _contractorId = params.get("id") || "";
+  goToStep2();
+}
+
+function showToast(msg, type) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.className = "toast-wrap " + (type || "") + " show";
+  setTimeout(() => t.className = "toast-wrap " + (type || ""), 3500);
+}
+function showErr(id, msg) {
+  const e = document.getElementById("err-" + id);
+  if (msg) e.textContent = msg;
+  e.classList.add("show");
+  document.getElementById(id)?.classList.add("error");
+}
+function clearErr(id) {
+  document.getElementById("err-" + id)?.classList.remove("show");
+  document.getElementById(id)?.classList.remove("error");
+}
+function showAuthErr(msg) {
+  document.getElementById("auth-error-text").textContent = msg;
+  document.getElementById("auth-error").classList.add("show");
+}
+function hideAuthErr() { document.getElementById("auth-error").classList.remove("show"); }
+function validEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e); }
+
+// Password toggle
+let pwVisible = false;
+document.getElementById("pw-toggle").addEventListener("click", () => {
+  pwVisible = !pwVisible;
+  const input = document.getElementById("password");
+  const icon  = document.getElementById("eye-icon");
+  input.type  = pwVisible ? "text" : "password";
+  icon.innerHTML = pwVisible
+    ? `<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`
+    : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+});
+
+// Password strength
+document.getElementById("password").addEventListener("input", () => {
+  const v  = document.getElementById("password").value;
+  const el = document.getElementById("pw-strength");
+  if (!v.length) { el.style.display = "none"; return; }
+  el.style.display = "";
+  let score = v.length;
+  if (/[A-Z]/.test(v)) score += 2;
+  if (/[0-9]/.test(v)) score += 2;
+  if (/[^A-Za-z0-9]/.test(v)) score += 3;
+  const levels = [
+    { max:6,  w:"20%", bg:"#ef4444", l:"Too short" },
+    { max:9,  w:"50%", bg:"#f59e0b", l:"Weak" },
+    { max:12, w:"75%", bg:"#3b82f6", l:"Good" },
+    { max:99, w:"100%",bg:"#22c55e", l:"Strong" }
+  ];
+  const lvl = levels.find(l => score <= l.max) || levels[3];
+  document.getElementById("pw-fill").style.cssText = `width:${lvl.w};background:${lvl.bg}`;
+  const lbl = document.getElementById("pw-lbl");
+  lbl.textContent = lvl.l; lbl.style.color = lvl.bg;
+});
+
+["first-name","last-name","email","workspace","password"].forEach(id => {
+  document.getElementById(id)?.addEventListener("input", () => { clearErr(id); hideAuthErr(); });
+});
+
+// Step 1 submit
+document.getElementById("signup-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  hideAuthErr();
+  let ok = true;
+  const fn   = document.getElementById("first-name").value.trim();
+  const ln   = document.getElementById("last-name").value.trim();
+  const em   = document.getElementById("email").value.trim();
+  const ws   = document.getElementById("workspace").value.trim();
+  const pw   = document.getElementById("password").value;
+  _remember  = document.getElementById("remember").checked;
+
+  if (!fn) { showErr("first-name", "Required"); ok = false; }
+  if (!ln) { showErr("last-name", "Required"); ok = false; }
+  if (!validEmail(em)) { showErr("email", "Enter a valid email"); ok = false; }
+  if (!ws) { showErr("workspace", "Required"); ok = false; }
+  if (pw.length < 8) { showErr("password", "Min. 8 characters"); ok = false; }
+  if (!ok) return;
+
+  const btn = document.getElementById("submit-btn");
+  btn.classList.add("loading"); btn.disabled = true;
+
+  try {
+    const res = await api({
+      action: "contractor_signup",
+      firstName: fn, lastName: ln, email: em, workspace: ws,
+      password: pw, remember: _remember
+    });
+
+    if (res.success) {
+      _preAuthToken = res.preAuthToken;
+      _contractorId = res.contractorId;
+      // Store pre-auth token temporarily
+      sessionStorage.setItem("wd_pre_auth_token",    _preAuthToken);
+      sessionStorage.setItem("wd_pre_auth_remember", _remember ? "1" : "0");
+      sessionStorage.setItem("wd_pre_auth_type",     "contractor");
+      goToStep2();
+    } else {
+      showAuthErr(res.error || "Something went wrong.");
+    }
+  } catch(err) {
+    showToast("Connection error. Please try again.", "error");
+  } finally {
+    btn.classList.remove("loading"); btn.disabled = false;
+  }
+});
+
+function goToStep2() {
+  document.getElementById("pane-1").classList.remove("active");
+  document.getElementById("pane-2").classList.add("active");
+  document.getElementById("step-1").classList.remove("active");
+  document.getElementById("step-1").classList.add("done");
+  document.getElementById("sep-1").classList.add("done");
+  document.getElementById("step-2").classList.add("active");
+  document.getElementById("steps-wrap").scrollIntoView({ behavior: "smooth" });
+}
+
+function startOAuth() {
+  if (!GOOGLE_CLIENT_ID) {
+    showToast("Google OAuth not yet configured.", "warn");
+    return;
+  }
+  const state   = _preAuthToken || sessionStorage.getItem("wd_pre_auth_token") || "";
+  const authUrl = "https://accounts.google.com/o/oauth2/v2/auth?" + new URLSearchParams({
+    client_id:     GOOGLE_CLIENT_ID,
+    redirect_uri:  OAUTH_REDIRECT_URI,
+    response_type: "code",
+    scope:         "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets",
+    access_type:   "offline",
+    prompt:        "consent",
+    state:         state
+  });
+  window.location.href = authUrl;
+}
+</script>
+</body>
+</html>
