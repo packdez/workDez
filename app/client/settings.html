@@ -1,0 +1,119 @@
+<!-- client/settings.html — Client Settings Page -->
+<div class="page-enter">
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1>Settings</h1>
+      <p>Manage your profile and account preferences.</p>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:860px;">
+
+    <!-- Profile -->
+    <div class="panel" style="grid-column:1/-1;">
+      <div class="panel-header"><span class="panel-title">Profile</span></div>
+      <div style="padding:20px 24px;">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;">
+          <div id="profile-av" style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-light));display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;color:#fff;flex-shrink:0;">?</div>
+          <div>
+            <div id="profile-name" style="font-size:1rem;font-weight:700;color:var(--ink);"></div>
+            <div id="profile-email" style="font-size:.82rem;color:var(--ink-3);margin-top:2px;"></div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div class="field"><label class="field-label">First name</label><input class="field-input" type="text" id="s-first-name" placeholder="First name"></div>
+          <div class="field"><label class="field-label">Last name</label><input class="field-input" type="text" id="s-last-name" placeholder="Last name"></div>
+        </div>
+        <div class="field" style="margin-top:14px;">
+          <label class="field-label">Email address</label>
+          <input class="field-input" type="email" id="s-email" placeholder="email@example.com" disabled style="opacity:.6;cursor:not-allowed;">
+          <span class="field-hint">Email cannot be changed.</span>
+        </div>
+        <div style="margin-top:18px;">
+          <button class="btn btn-primary" onclick="saveProfile()" id="save-profile-btn"><span class="btn-label">Save changes</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Google account -->
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">Google account</span></div>
+      <div style="padding:20px 24px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+          <div style="width:36px;height:36px;background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:var(--accent);"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div>
+            <div style="font-size:.84rem;font-weight:600;color:var(--ink);">Connected</div>
+            <div style="font-size:.72rem;color:var(--ink-3);" id="google-sheet-link">Your files folder is active</div>
+          </div>
+        </div>
+        <a id="drive-link" href="#" target="_blank" rel="noopener" class="btn btn-secondary" style="width:100%;justify-content:center;font-size:.78rem;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Open my Drive folder
+        </a>
+      </div>
+    </div>
+
+    <!-- Contractors -->
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">Your contractors</span></div>
+      <div class="panel-body" id="settings-contractors-list">
+        <div class="panel-empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          No contractors yet.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+window.pageInit=async function(user){
+  if(!user)return;
+  document.getElementById("profile-av").textContent=WD.initials(user.firstName+" "+user.lastName);
+  document.getElementById("profile-name").textContent=(user.firstName+" "+user.lastName).trim();
+  document.getElementById("profile-email").textContent=user.email||"";
+  document.getElementById("s-first-name").value=user.firstName||"";
+  document.getElementById("s-last-name").value=user.lastName||"";
+  document.getElementById("s-email").value=user.email||"";
+  if(user.driveFolderUrl){document.getElementById("drive-link").href=user.driveFolderUrl;document.getElementById("google-sheet-link").textContent="Open your files folder";}
+
+  // Load contractor relationships
+  try{
+    const res=await WD.api({action:"get_contracts",token:WD.getToken()});
+    if(res.success&&res.contractors){
+      const el=document.getElementById("settings-contractors-list");
+      if(!res.contractors.length){el.innerHTML=`<div class="panel-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>No contractors yet.</div>`;return;}
+      el.innerHTML=res.contractors.map(c=>{
+        const color=WD.avatarColor(c.name||c.contractorName||"");
+        const init=WD.initials(c.name||c.contractorName||"?");
+        return`<div class="list-row">
+          <div class="list-av" style="background:${color}">${WD.escHtml(init)}</div>
+          <div class="list-info">
+            <div class="list-name">${WD.escHtml(c.name||c.contractorName||"")}</div>
+            <div class="list-sub">${WD.escHtml(c.workspace||"")}</div>
+          </div>
+          <span style="background:#dcfce7;color:#166634;font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:999px;">Active</span>
+        </div>`;
+      }).join("");
+    }
+  }catch(e){}
+};
+
+async function saveProfile(){
+  const btn=document.getElementById("save-profile-btn");
+  const first=document.getElementById("s-first-name").value.trim();
+  const last=document.getElementById("s-last-name").value.trim();
+  if(!first||!last){WD.showToast("Name is required.","warn");return;}
+  WD.setBtnLoading(btn,true);
+  try{
+    await new Promise(r=>setTimeout(r,600));
+    document.getElementById("profile-name").textContent=(first+" "+last).trim();
+    document.getElementById("profile-av").textContent=WD.initials(first+" "+last);
+    WD.showToast("Profile updated.","success");
+  }catch(e){WD.showToast("Failed to save.","error");}
+  finally{WD.setBtnLoading(btn,false);}
+}
+</script>
