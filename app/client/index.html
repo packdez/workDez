@@ -116,6 +116,13 @@
 
   <!-- MAIN -->
   <div id="main">
+
+    <div id="sub-banner" style="background:linear-gradient(135deg,var(--amber-bg),#fff8e7);border-bottom:1px solid var(--amber-border);padding:8px 24px;display:none;align-items:center;gap:10px;font-size:.8rem;color:var(--amber-text);">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+  <span>Your subscription is expiring soon.</span>
+  <a onclick="navigate('contracts');setTimeout(()=>typeof openSubRequiredModal==='function'&&openSubRequiredModal(),400);" style="font-weight:700;color:var(--amber-text);text-decoration:underline;cursor:pointer;margin-left:4px;">Renew →</a>
+</div>
+    
     <header id="topbar">
       <div class="topbar-left">
         <button class="topbar-hamburger" onclick="WD.openSidebar()">
