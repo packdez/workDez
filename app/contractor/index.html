@@ -531,6 +531,26 @@ function finishBoot(user) {
   document.getElementById("auth-gate").classList.add("hidden");
   document.getElementById("app").classList.add("ready");
 
+  // Check subscription expiry warning
+WD.api({ action: "get_subscription_status", token: WD.getToken() })
+  .then(function(res) {
+    if (!res.success) return;
+    if (res.active) {
+      var expiry = new Date(res.active.expiryDate);
+      var daysLeft = Math.ceil((expiry - Date.now()) / (1000 * 60 * 60 * 24));
+      if (daysLeft <= 7) {
+        var banner = document.getElementById("sub-banner");
+        if (banner) {
+          banner.classList.add("show");
+          banner.querySelector("span").textContent =
+            daysLeft <= 1
+              ? "⚠️ Your subscription expires tomorrow — renew now to keep creating contracts."
+              : "⚠️ Your subscription expires in " + daysLeft + " days.";
+        }
+      }
+    }
+  }).catch(function() {});
+
   // Route to initial page
   const hash = window.location.hash.replace("#", "");
   navigate(PAGES[hash] ? hash : "dashboard", true);
