@@ -219,6 +219,33 @@
   </div>
 </div>
 
+<!-- ARCHIVE CONFIRM MODAL -->
+<div class="modal-overlay" id="modal-archive" onclick="if(event.target===this)WD.closeModal('modal-archive')">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header">
+      <span class="modal-title">Archive client?</span>
+      <button class="modal-close" onclick="WD.closeModal('modal-archive')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:8px 0;">
+        <div style="width:52px;height:52px;border-radius:14px;background:var(--amber-bg);border:1px solid var(--amber-border);display:flex;align-items:center;justify-content:center;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="color:var(--amber);"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+        </div>
+        <div>
+          <div style="font-size:.9rem;font-weight:700;color:var(--ink);margin-bottom:4px;" id="archive-client-name">Archive this client?</div>
+          <p style="font-size:.83rem;color:var(--ink-3);line-height:1.6;">They'll be hidden from your active clients list. Their contracts and data are preserved — you can unarchive any time.</p>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="WD.closeModal('modal-archive')">Cancel</button>
+      <button class="btn btn-danger" id="archive-confirm-btn" onclick="executeArchive()"><span class="btn-label">Archive client</span></button>
+    </div>
+  </div>
+</div>
+
 <!-- INVITE MODAL -->
 <div class="modal-overlay" id="modal-invite" onclick="if(event.target===this)WD.closeModal('modal-invite')">
   <div class="modal" style="max-width:460px;">
@@ -521,17 +548,27 @@ async function sendInvite(){
 }
 
 // ═══════════════════════ ARCHIVE ═════════════════════════
-async function archiveClient(){
+function archiveClient(){
+  if(!_selectedClient)return;
+  document.getElementById("archive-client-name").textContent=`Archive "${_selectedClient.name}"?`;
+  WD.openModal("modal-archive");
+}
+
+async function executeArchive(){
   if(!_selectedClient)return;
   const name=_selectedClient.name;
-  if(!confirm(`Archive ${name}? They won't appear in your active clients list.`))return;
+  const btn=document.getElementById("archive-confirm-btn");
+  WD.setBtnLoading(btn,true);
   try{
     const res=await WD.api({action:"archive_client",token:WD.getToken(),clientId:_selectedClient.id});
     if(res.success){
       const idx=_clients.findIndex(c=>c.id===_selectedClient.id);
       if(idx>-1)_clients[idx].status="archived";
-      renderClients();closeClientDetail();WD.showToast(name+" archived.","success");
+      WD.closeModal("modal-archive");
+      renderClients();closeClientDetail();
+      WD.showToast(name+" archived.","success");
     }else WD.showToast(res.error||"Failed.","error");
   }catch(e){WD.showToast("Connection error.","error");}
+  finally{WD.setBtnLoading(btn,false);}
 }
 </script>
