@@ -555,3 +555,370 @@ function formatActivityDesc(e){
   }
 }
 </script>
+
+<!-- ══ CLIENT NEW CONTRACT WIZARD ══ -->
+<div class="modal-overlay" id="modal-client-contract" onclick="if(event.target===this)closeClientContractModal()">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <span class="modal-title">New contract request</span>
+      <button class="modal-close" onclick="closeClientContractModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div id="cc-wizard-dots" style="display:flex;gap:4px;padding:14px 24px 0;flex-shrink:0;">
+      <div id="cc-dot-0" style="flex:1;height:3px;border-radius:2px;background:var(--accent);transition:background .3s;"></div>
+      <div id="cc-dot-1" style="flex:1;height:3px;border-radius:2px;background:var(--border);transition:background .3s;"></div>
+      <div id="cc-dot-2" style="flex:1;height:3px;border-radius:2px;background:var(--border);transition:background .3s;"></div>
+    </div>
+    <div class="modal-body" id="cc-wizard-body" style="gap:14px;"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="cc-back-btn" onclick="ccWizBack()" style="display:none;">← Back</button>
+      <button class="btn btn-secondary" id="cc-cancel-btn" onclick="closeClientContractModal()">Cancel</button>
+      <button class="btn btn-primary" id="cc-next-btn" onclick="ccWizNext()">
+        <span id="cc-next-label">Continue →</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SUBSCRIPTION REQUIRED MODAL ══ -->
+<div class="modal-overlay" id="modal-sub-required" onclick="if(event.target===this)WD.closeModal('modal-sub-required')">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <span class="modal-title">Subscription required</span>
+      <button class="modal-close" onclick="WD.closeModal('modal-sub-required')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding:8px 0;">
+        <div style="width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,var(--amber-bg),#fff8e7);border:1px solid var(--amber-border);display:flex;align-items:center;justify-content:center;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="color:var(--amber);">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+        </div>
+        <div>
+          <div style="font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:6px;">Upgrade to create contracts</div>
+          <p style="font-size:.84rem;color:var(--ink-3);line-height:1.65;max-width:300px;">An active workDez subscription is required to create contract requests. Collaboration on existing contracts is always free.</p>
+        </div>
+        <div id="sub-plans-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-top:4px;">
+          <div class="skeleton" style="height:100px;border-radius:12px;"></div>
+          <div class="skeleton" style="height:100px;border-radius:12px;"></div>
+          <div class="skeleton" style="height:100px;border-radius:12px;"></div>
+          <div class="skeleton" style="height:100px;border-radius:12px;"></div>
+        </div>
+        <div id="sub-payment-section" style="display:none;width:100%;">
+          <div id="sub-payment-link-wrap" style="display:none;margin-bottom:10px;">
+            <a id="sub-payment-link" href="#" target="_blank" rel="noopener" class="btn btn-primary" style="width:100%;justify-content:center;">Pay via payment link →</a>
+          </div>
+          <div style="position:relative;margin:14px 0;">
+            <div style="position:absolute;inset:0;display:flex;align-items:center;"><div style="flex:1;height:1px;background:var(--border);"></div><span style="padding:0 12px;font-size:.72rem;color:var(--ink-4);">or upload payment proof</span><div style="flex:1;height:1px;background:var(--border);"></div></div>
+          </div>
+          <div style="margin-top:28px;display:flex;flex-direction:column;gap:10px;">
+            <div class="field"><label class="field-label">Payment proof</label><input type="file" id="sub-proof-file" accept="image/*,.pdf" class="field-input" style="height:auto;padding:10px;cursor:pointer;"></div>
+            <div class="field"><label class="field-label">Note <span style="font-weight:400;color:var(--ink-4);">(optional)</span></label><input type="text" id="sub-proof-note" placeholder="e.g. Transaction ID" class="field-input"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="WD.closeModal('modal-sub-required')">Maybe later</button>
+      <button class="btn btn-primary" id="sub-submit-btn" onclick="submitSubProof()" style="display:none;"><span class="btn-label">Submit payment proof</span></button>
+    </div>
+  </div>
+</div>
+
+<style>
+.cc-type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px;}
+.cc-type-card{border:2px solid var(--border);border-radius:var(--r-md);padding:14px 10px;cursor:pointer;text-align:center;transition:all .15s;user-select:none;}
+.cc-type-card:hover{border-color:var(--accent-border);background:var(--accent-bg);}
+.cc-type-card.selected{border-color:var(--accent);background:var(--accent-bg);}
+.cc-type-icon{font-size:1.3rem;margin-bottom:5px;}
+.cc-type-label{font-size:.75rem;font-weight:700;color:var(--ink);}
+.cc-type-desc{font-size:.64rem;color:var(--ink-4);margin-top:2px;line-height:1.3;}
+.sub-plan-card{border:2px solid var(--border);border-radius:var(--r-md);padding:14px;cursor:pointer;transition:all .15s;text-align:center;position:relative;}
+.sub-plan-card:hover{border-color:var(--accent);background:var(--accent-bg);}
+.sub-plan-card.selected{border-color:var(--accent);background:var(--accent-bg);}
+.sub-plan-card.best-value::before{content:"Best value";position:absolute;top:-1px;right:-1px;background:var(--accent);color:#fff;font-size:.6rem;font-weight:700;padding:3px 8px;border-radius:0 var(--r-sm) 0 var(--r-sm);letter-spacing:.04em;}
+</style>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// CLIENT CONTRACT WIZARD STATE
+// ══════════════════════════════════════════════════════════
+let _ccStep=0,_ccData={type:"one-off",currency:"USD"};
+let _ccContractors=[];
+let _subSelectedPlan=null;
+
+// ── Exposed to shell topbar ────────────────────────────────
+window.openNewClientContract=async function(){
+  // Check subscription first
+  const hasSub=await WD.checkSubscription();
+  if(!hasSub){openSubRequiredModal();return;}
+  // Check contractors
+  if(!_contractors||!_contractors.length){
+    // Try loading from API
+    try{
+      const res=await WD.api({action:"get_contracts",token:WD.getToken()});
+      if(res.success){_contractors=res.contractors||[];_contracts=res.contracts||[];}
+    }catch(e){}
+  }
+  _ccContractors=_contractors||[];
+  _ccStep=0;_ccData={type:"one-off",currency:"USD"};
+  renderCCStep();WD.openModal("modal-client-contract");
+};
+
+function closeClientContractModal(){WD.closeModal("modal-client-contract");}
+
+function renderCCStep(){
+  // Dots
+  [0,1,2].forEach(i=>{
+    const d=document.getElementById("cc-dot-"+i);
+    if(!d)return;
+    d.style.background=i===_ccStep?"var(--accent)":i<_ccStep?"var(--accent-border)":"var(--border)";
+  });
+  document.getElementById("cc-back-btn").style.display=_ccStep>0?"":"none";
+  document.getElementById("cc-cancel-btn").style.display=_ccStep>0?"none":"";
+  document.getElementById("cc-next-label").textContent=_ccStep===2?"Send request →":"Continue →";
+  const body=document.getElementById("cc-wizard-body");
+
+  if(_ccStep===0){
+    // Step 1: Contract type
+    body.innerHTML=`
+      <p style="font-size:.84rem;color:var(--ink-3);margin-bottom:14px;line-height:1.6;">What type of contract would you like to request?</p>
+      <div class="cc-type-grid">
+        <div class="cc-type-card ${_ccData.type==="one-off"?"selected":""}" onclick="ccSelectType('one-off',this)">
+          <div class="cc-type-icon">🎯</div>
+          <div class="cc-type-label">One-off</div>
+          <div class="cc-type-desc">Fixed scope & price</div>
+        </div>
+        <div class="cc-type-card ${_ccData.type==="hourly"?"selected":""}" onclick="ccSelectType('hourly',this)">
+          <div class="cc-type-icon">⏱️</div>
+          <div class="cc-type-label">Hourly</div>
+          <div class="cc-type-desc">Pay per hour</div>
+        </div>
+        <div class="cc-type-card ${_ccData.type==="retainer"?"selected":""}" onclick="ccSelectType('retainer',this)">
+          <div class="cc-type-icon">🔄</div>
+          <div class="cc-type-label">Retainer</div>
+          <div class="cc-type-desc">Ongoing monthly</div>
+        </div>
+      </div>`;
+  } else if(_ccStep===1){
+    // Step 2: Details
+    const isH=_ccData.type==="hourly",isR=_ccData.type==="retainer";
+    body.innerHTML=`
+      <div class="field">
+        <label class="field-label">Contract title *</label>
+        <input class="field-input" type="text" id="cc-title" value="${WD.escHtml(_ccData.title||"")}" placeholder="e.g. Website redesign" autocomplete="off">
+        <span id="err-cc-title" style="font-size:.71rem;color:var(--red);display:none;margin-top:2px;">Title is required</span>
+      </div>
+      <div class="field">
+        <label class="field-label">Description <span style="font-weight:400;color:var(--ink-4);">(optional)</span></label>
+        <textarea class="field-input" id="cc-desc" rows="3" placeholder="Describe what you need…" style="height:auto;padding:10px 12px;resize:vertical;min-height:80px;">${WD.escHtml(_ccData.desc||"")}</textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="field">
+          <label class="field-label">${isH?"Hourly rate":isR?"Monthly budget":"Budget"} <span style="font-weight:400;color:var(--ink-4);">(optional)</span></label>
+          <input class="field-input" type="number" id="cc-budget" value="${_ccData.budget||""}" placeholder="e.g. 5000" min="0">
+        </div>
+        <div class="field">
+          <label class="field-label">Currency</label>
+          <select class="field-input" id="cc-currency">
+            <option value="USD" ${(_ccData.currency||"USD")==="USD"?"selected":""}>USD $</option>
+            <option value="EUR" ${_ccData.currency==="EUR"?"selected":""}>EUR €</option>
+            <option value="GBP" ${_ccData.currency==="GBP"?"selected":""}>GBP £</option>
+            <option value="CAD" ${_ccData.currency==="CAD"?"selected":""}>CAD $</option>
+            <option value="AUD" ${_ccData.currency==="AUD"?"selected":""}>AUD $</option>
+          </select>
+        </div>
+      </div>
+      ${isH?`<div class="field"><label class="field-label">Estimated hours <span style="font-weight:400;color:var(--ink-4);">(optional)</span></label><input class="field-input" type="number" id="cc-est-hours" value="${_ccData.estimatedHours||""}" placeholder="e.g. 40" min="0"></div>`:""}
+      ${isR?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="field"><label class="field-label">Hours per week</label><input class="field-input" type="number" id="cc-workhours" value="${_ccData.workHours||""}" placeholder="e.g. 20"></div>
+        <div class="field"><label class="field-label">Notice period</label><input class="field-input" type="text" id="cc-notice" value="${WD.escHtml(_ccData.noticePeriod||"")}" placeholder="e.g. 30 days"></div>
+      </div>`:""}
+      ${!isR?`<div class="field"><label class="field-label">Due date <span style="font-weight:400;color:var(--ink-4);">(optional)</span></label><input class="field-input" type="date" id="cc-due" value="${_ccData.dueDate||""}"></div>`:""}
+      <div class="field"><label class="field-label">Start date <span style="font-weight:400;color:var(--ink-4);">(optional)</span></label><input class="field-input" type="date" id="cc-start" value="${_ccData.startDate||""}"></div>`;
+    setTimeout(()=>document.getElementById("cc-title")?.focus(),60);
+  } else if(_ccStep===2){
+    // Step 3: Select contractor
+    if(!_ccContractors.length){
+      body.innerHTML=`
+        <div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding:16px 0;">
+          <div style="width:56px;height:56px;border-radius:16px;background:var(--amber-bg);border:1px solid var(--amber-border);display:flex;align-items:center;justify-content:center;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="color:var(--amber);">
+              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+            </svg>
+          </div>
+          <div>
+            <div style="font-size:.9rem;font-weight:700;color:var(--ink);margin-bottom:6px;">No contractors yet</div>
+            <p style="font-size:.83rem;color:var(--ink-3);line-height:1.6;max-width:280px;">You need to be connected to a contractor first. Ask your contractor to send you a workspace invite.</p>
+          </div>
+        </div>`;
+      document.getElementById("cc-next-btn").style.display="none";
+      return;
+    }
+    document.getElementById("cc-next-btn").style.display="";
+    body.innerHTML=`
+      <p style="font-size:.84rem;color:var(--ink-3);line-height:1.6;margin-bottom:4px;">Which contractor is this request for?</p>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        ${_ccContractors.map(c=>`
+          <div class="cc-contractor-option ${_ccData.contractorId===c.contractorId?"selected":""}"
+            style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:2px solid ${_ccData.contractorId===c.contractorId?"var(--accent)":"var(--border)"};border-radius:var(--r-md);cursor:pointer;transition:all .15s;background:${_ccData.contractorId===c.contractorId?"var(--accent-bg)":"var(--bg)"};"
+            onclick="ccSelectContractor('${c.contractorId}',this)">
+            <div style="width:38px;height:38px;border-radius:50%;background:${WD.avatarColor(c.contractorName||"")};display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;color:#fff;flex-shrink:0;">${WD.escHtml(WD.initials(c.contractorName||"?"))}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:.86rem;font-weight:700;color:var(--ink);">${WD.escHtml(c.contractorName||"")}</div>
+              <div style="font-size:.72rem;color:var(--ink-4);">${WD.escHtml(c.workspace||"")}</div>
+            </div>
+            ${_ccData.contractorId===c.contractorId?`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>`:""}
+          </div>`).join("")}
+      </div>
+      <span id="err-cc-contractor" style="font-size:.71rem;color:var(--red);display:none;margin-top:2px;">Please select a contractor</span>`;
+  }
+}
+
+function ccSelectType(type,el){
+  _ccData.type=type;
+  document.querySelectorAll(".cc-type-card").forEach(c=>c.classList.remove("selected"));
+  el.classList.add("selected");
+}
+
+function ccSelectContractor(id,el){
+  _ccData.contractorId=id;
+  document.querySelectorAll(".cc-contractor-option").forEach(c=>{
+    c.style.borderColor="var(--border)";c.style.background="var(--bg)";
+    const check=c.querySelector("svg:last-child");if(check&&check.getAttribute("stroke")==="var(--accent)")check.remove();
+  });
+  el.style.borderColor="var(--accent)";el.style.background="var(--accent-bg)";
+  const chk=document.createElementNS("http://www.w3.org/2000/svg","svg");
+  chk.setAttribute("width","16");chk.setAttribute("height","16");chk.setAttribute("viewBox","0 0 24 24");
+  chk.setAttribute("fill","none");chk.setAttribute("stroke","var(--accent)");chk.setAttribute("stroke-width","2.5");chk.setAttribute("stroke-linecap","round");
+  const poly=document.createElementNS("http://www.w3.org/2000/svg","polyline");
+  poly.setAttribute("points","20 6 9 17 4 12");chk.appendChild(poly);el.appendChild(chk);
+  const err=document.getElementById("err-cc-contractor");if(err)err.style.display="none";
+}
+
+function ccWizNext(){
+  if(_ccStep===0){_ccStep++;renderCCStep();return;}
+  if(_ccStep===1){
+    const title=document.getElementById("cc-title")?.value.trim();
+    if(!title){const e=document.getElementById("err-cc-title");if(e)e.style.display="";document.getElementById("cc-title")?.focus();return;}
+    _ccData.title=title;
+    _ccData.desc=document.getElementById("cc-desc")?.value.trim()||"";
+    _ccData.budget=document.getElementById("cc-budget")?.value||"";
+    _ccData.currency=document.getElementById("cc-currency")?.value||"USD";
+    _ccData.dueDate=document.getElementById("cc-due")?.value||"";
+    _ccData.startDate=document.getElementById("cc-start")?.value||"";
+    _ccData.estimatedHours=document.getElementById("cc-est-hours")?.value||"";
+    _ccData.workHours=document.getElementById("cc-workhours")?.value||"";
+    _ccData.noticePeriod=document.getElementById("cc-notice")?.value.trim()||"";
+    _ccStep++;renderCCStep();return;
+  }
+  if(_ccStep===2){
+    if(!_ccData.contractorId){const e=document.getElementById("err-cc-contractor");if(e)e.style.display="";return;}
+    submitClientContract();
+  }
+}
+
+function ccWizBack(){_ccStep=Math.max(0,_ccStep-1);renderCCStep();}
+
+async function submitClientContract(){
+  const btn=document.getElementById("cc-next-btn");WD.setBtnLoading(btn,true);
+  try{
+    const res=await WD.api({
+      action:"client_create_contract",
+      token:WD.getToken(),
+      contractorId:_ccData.contractorId,
+      title:_ccData.title,
+      description:_ccData.desc||"",
+      type:_ccData.type,
+      budgetAmount:parseFloat(_ccData.budget)||0,
+      currency:_ccData.currency||"USD",
+      dueDate:_ccData.dueDate||"",
+      startDate:_ccData.startDate||"",
+      estimatedHours:parseFloat(_ccData.estimatedHours)||0,
+      workHoursPerWeek:parseFloat(_ccData.workHours)||0,
+      noticePeriod:_ccData.noticePeriod||""
+    });
+    if(res.success){
+      closeClientContractModal();
+      WD.showToast("Contract request sent to your contractor! 🎉","success");
+      // Reload contracts
+      const reload=await WD.api({action:"get_contracts",token:WD.getToken()});
+      if(reload.success){_contracts=reload.contracts||[];_contractors=reload.contractors||[];renderContracts();}
+    }else if(res.requiresSubscription){
+      closeClientContractModal();openSubRequiredModal();
+    }else{
+      WD.showToast(res.error||"Failed to send request.","error");
+    }
+  }catch(e){WD.showToast("Connection error.","error");}
+  finally{WD.setBtnLoading(btn,false);}
+}
+
+// ══════════════════════════════════════════════════════════
+// SUBSCRIPTION REQUIRED MODAL
+// ══════════════════════════════════════════════════════════
+async function openSubRequiredModal(){
+  WD.openModal("modal-sub-required");
+  document.getElementById("sub-submit-btn").style.display="none";
+  document.getElementById("sub-payment-section").style.display="none";
+  document.getElementById("sub-plans-grid").innerHTML=`
+    <div class="skeleton" style="height:100px;border-radius:12px;"></div>
+    <div class="skeleton" style="height:100px;border-radius:12px;"></div>
+    <div class="skeleton" style="height:100px;border-radius:12px;"></div>
+    <div class="skeleton" style="height:100px;border-radius:12px;"></div>`;
+  try{
+    const res=await WD.api({action:"get_plans"});
+    if(res.success)renderSubPlans(res.plans||[]);
+  }catch(e){}
+}
+
+function renderSubPlans(plans){
+  const grid=document.getElementById("sub-plans-grid");if(!grid)return;
+  const best=plans.find(p=>p.plan==="annual")||plans[plans.length-1];
+  grid.innerHTML=plans.map(p=>`
+    <div class="sub-plan-card ${p.id===best.id?"best-value":""}"
+      data-plan="${WD.escHtml(p.plan)}"
+      data-link="${WD.escHtml(p.paymentLink||"")}"
+      onclick="selectSubPlan(this,'${WD.escHtml(p.plan)}','${WD.escHtml(p.paymentLink||"")}')">
+      <div style="font-size:.72rem;font-weight:700;color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;">${WD.escHtml(p.label)}</div>
+      <div style="font-family:var(--font-serif);font-size:1.8rem;color:var(--ink);line-height:1;margin-bottom:3px;">$${p.amount}<span style="font-family:var(--font-sans);font-size:.9rem;color:var(--ink-3);"> ${WD.escHtml(p.currency||"USD")}</span></div>
+      <div style="font-size:.7rem;color:var(--ink-4);">${p.durationMonths===1?"per month":"for "+p.durationMonths+" months"}</div>
+    </div>`).join("");
+}
+
+function selectSubPlan(el,plan,paymentLink){
+  _subSelectedPlan=plan;
+  document.querySelectorAll(".sub-plan-card").forEach(c=>c.classList.remove("selected"));
+  el.classList.add("selected");
+  document.getElementById("sub-payment-section").style.display="";
+  document.getElementById("sub-submit-btn").style.display="";
+  const lw=document.getElementById("sub-payment-link-wrap"),la=document.getElementById("sub-payment-link");
+  if(paymentLink&&lw&&la){lw.style.display="";la.href=paymentLink;}
+  else if(lw)lw.style.display="none";
+}
+
+async function submitSubProof(){
+  if(!_subSelectedPlan){WD.showToast("Please select a plan.","warn");return;}
+  const btn=document.getElementById("sub-submit-btn");WD.setBtnLoading(btn,true);
+  try{
+    const fileInput=document.getElementById("sub-proof-file");
+    const note=document.getElementById("sub-proof-note")?.value.trim()||"";
+    const payload={action:"submit_subscription",token:WD.getToken(),plan:_subSelectedPlan,paymentMethod:"manual",paymentNote:note};
+    if(fileInput?.files[0]){
+      const file=fileInput.files[0];
+      payload.proofBase64=await WD.fileToBase64(file);
+      payload.proofFileName=file.name;
+      payload.proofMimeType=file.type;
+    }
+    const res=await WD.api(payload);
+    if(res.success){
+      WD.closeModal("modal-sub-required");
+      WD.showToast("Payment proof submitted! We'll activate your plan within 24h.","success");
+    }else WD.showToast(res.error||"Failed to submit.","error");
+  }catch(e){WD.showToast("Connection error.","error");}
+  finally{WD.setBtnLoading(btn,false);}
+}
+</script>
