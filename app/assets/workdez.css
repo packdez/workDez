@@ -266,7 +266,7 @@ button { cursor: pointer; border: none; background: none; }
   top: 0;
   left: 0;
   bottom: 0;
-  z-index: 200;
+  z-index: 50;
   transition: transform var(--t-slow) var(--ease),
               background var(--t) var(--ease),
               border-color var(--t) var(--ease);
@@ -541,7 +541,7 @@ button { cursor: pointer; border: none; background: none; }
   padding: 0 24px;
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 40;
   flex-shrink: 0;
   gap: 12px;
   transition: background var(--t) var(--ease), border-color var(--t) var(--ease);
@@ -1084,13 +1084,13 @@ select.field-input {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  z-index: 500;
+  z-index: 1000;
   background: rgba(0,0,0,0.4);
   backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: max(24px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--t) var(--ease);
@@ -1105,7 +1105,7 @@ select.field-input {
   box-shadow: var(--sh-xl);
   width: 100%;
   max-width: 500px;
-  max-height: 90vh;
+  max-height: min(90vh, 860px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -1149,10 +1149,13 @@ select.field-input {
 .modal-body {
   padding: 20px 24px;
   overflow-y: auto;
+  overflow-x: hidden;
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 14px;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
 }
 .modal-footer {
   padding: 14px 24px 20px;
@@ -1290,7 +1293,7 @@ select.field-input {
   max-width: 100vw;
   background: var(--bg);
   border-left: 1px solid var(--border);
-  z-index: 300;
+  z-index: 60;
   display: flex;
   flex-direction: column;
   transform: translateX(100%);
@@ -1302,7 +1305,7 @@ select.field-input {
 .detail-overlay {
   position: fixed;
   inset: 0;
-  z-index: 299;
+  z-index: 59;
   background: rgba(0,0,0,0.4);
   backdrop-filter: blur(3px);
   opacity: 0;
@@ -1709,7 +1712,8 @@ select.field-input {
   .modal {
     max-width: 100%;
     border-radius: var(--r-xl) var(--r-xl) 0 0;
-    max-height: 94svh;
+    max-height: 92svh;
+    margin-bottom: 0;
   }
 
   /* Detail panel full width */
