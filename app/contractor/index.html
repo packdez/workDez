@@ -670,24 +670,19 @@ async function loadPage(file) {
     finishLoadingBar();
 
     // Inject HTML
-const parser = new DOMParser();
-const doc = parser.parseFromString(html, "text/html");
+    content.innerHTML = html;
+    content.style.animation = "none";
+    content.offsetHeight; // reflow
+    content.style.animation = "";
 
-content.innerHTML = "";
-content.style.animation = "none";
-
-Array.from(doc.body.childNodes).forEach(node => {
-  content.appendChild(document.importNode(node, true));
-});
-
-content.offsetHeight;
-content.style.animation = "";
-
-content.querySelectorAll("script").forEach(old => {
-  const s = document.createElement("script");
-  s.textContent = old.textContent;
-  document.body.appendChild(s);
-  document.body.removeChild(s);
+    // Execute any scripts in the injected HTML
+    content.querySelectorAll("script").forEach(oldScript => {
+  const newScript = document.createElement("script");
+  Array.from(oldScript.attributes).forEach(attr => {
+    newScript.setAttribute(attr.name, attr.value);
+  });
+  newScript.appendChild(document.createTextNode(oldScript.textContent));
+  oldScript.parentNode.replaceChild(newScript, oldScript);
 });
 
     // Call page init if defined
