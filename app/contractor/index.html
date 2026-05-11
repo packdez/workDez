@@ -677,13 +677,13 @@ async function loadPage(file) {
 
     // Execute any scripts in the injected HTML
     content.querySelectorAll("script").forEach(oldScript => {
-      const newScript = document.createElement("script");
-      Array.from(oldScript.attributes).forEach(attr => {
-        newScript.setAttribute(attr.name, attr.value);
-      });
-      newScript.textContent = oldScript.textContent;
-      oldScript.parentNode.replaceChild(newScript, oldScript);
-    });
+  const newScript = document.createElement("script");
+  Array.from(oldScript.attributes).forEach(attr => {
+    newScript.setAttribute(attr.name, attr.value);
+  });
+  newScript.appendChild(document.createTextNode(oldScript.textContent));
+  oldScript.parentNode.replaceChild(newScript, oldScript);
+});
 
     // Call page init if defined
     if (typeof window.pageInit === "function") {
