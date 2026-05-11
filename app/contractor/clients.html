@@ -42,13 +42,20 @@
 }
 </style>
 
-<div class="page-enter">
-  <div class="page-header">
-    <div class="page-header-left">
-      <h1>Clients</h1>
-      <p id="clients-count-label">Manage all your client relationships.</p>
-    </div>
+<div class="page-header">
+  <div class="page-header-left">
+    <h1>Clients</h1>
+    <p id="clients-count-label">Manage all your client relationships.</p>
   </div>
+  <div class="page-header-actions">
+    <button class="btn btn-primary" onclick="openNewClient()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Add client
+    </button>
+  </div>
+</div>
 
   <div class="clients-toolbar">
     <div class="client-search-wrap">
@@ -288,7 +295,7 @@ let _clientFilter="all",_clientSearchTimer=null;
 
 // ═══════════════════════ INIT ════════════════════════════
 window.pageInit=async function(user){await loadClients();};
-window.openNewClient=function(){openClientModal("new");};
+function openNewClient(){openClientModal("new");}
 
 async function loadClients() {
   const cachedClients   = window._shellCache?.cacheGet('clients');
