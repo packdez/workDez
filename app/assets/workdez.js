@@ -209,10 +209,16 @@ const WD = (function () {
   }
 
   // ── Modal helpers ─────────────────────────────────────────────
-  function openModal(id) {
-    document.getElementById(id)?.classList.add("open");
-    document.body.style.overflow = "hidden";
+function openModal(id) {
+  const modal = document.getElementById(id);
+  if (!modal) return;
+  // Move modal to body level if not already there
+  if (modal.parentElement !== document.body) {
+    document.body.appendChild(modal);
   }
+  modal.classList.add("open");
+  document.body.style.overflow = "hidden";
+}
   function closeModal(id) {
     document.getElementById(id)?.classList.remove("open");
     document.body.style.overflow = "";
