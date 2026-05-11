@@ -489,7 +489,7 @@ button { cursor: pointer; border: none; background: none; }
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   box-shadow: var(--sh-lg);
-  z-index: 300;
+  z-index: 55;
   overflow: hidden;
   opacity: 0;
   pointer-events: none;
