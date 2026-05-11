@@ -670,13 +670,20 @@ async function loadPage(file) {
     finishLoadingBar();
 
     // Inject HTML
-    content.innerHTML = html;
-    content.style.animation = "none";
-    content.offsetHeight; // reflow
-    content.style.animation = "";
+const parser = new DOMParser();
+const doc = parser.parseFromString(html, "text/html");
 
-    // Execute any scripts in the injected HTML
-    content.querySelectorAll("script").forEach(oldScript => {
+content.innerHTML = "";
+content.style.animation = "none";
+
+Array.from(doc.body.childNodes).forEach(node => {
+  content.appendChild(document.importNode(node, true));
+});
+
+content.offsetHeight;
+content.style.animation = "";
+
+content.querySelectorAll("script").forEach(oldScript => {
   const newScript = document.createElement("script");
   Array.from(oldScript.attributes).forEach(attr => {
     newScript.setAttribute(attr.name, attr.value);
