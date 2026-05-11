@@ -51,11 +51,9 @@
 
   <div id="contracts-loading">
     <div class="contracts-grid">
-      <div class="contracts-grid">
         <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:18px;"><div class="skeleton" style="height:14px;width:65%;margin-bottom:8px;"></div><div class="skeleton" style="height:11px;width:40%;margin-bottom:16px;"></div><div class="skeleton" style="height:4px;margin-bottom:8px;"></div><div class="skeleton" style="height:11px;width:55%;"></div></div>
         <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:18px;"><div class="skeleton" style="height:14px;width:65%;margin-bottom:8px;"></div><div class="skeleton" style="height:11px;width:40%;margin-bottom:16px;"></div><div class="skeleton" style="height:4px;margin-bottom:8px;"></div><div class="skeleton" style="height:11px;width:55%;"></div></div>
         <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:18px;"><div class="skeleton" style="height:14px;width:65%;margin-bottom:8px;"></div><div class="skeleton" style="height:11px;width:40%;margin-bottom:16px;"></div><div class="skeleton" style="height:4px;margin-bottom:8px;"></div><div class="skeleton" style="height:11px;width:55%;"></div></div>
-      </div>
     </div>
   </div>
   <div id="contracts-container"></div>
@@ -222,16 +220,48 @@ window.pageInit=async function(user){await loadAll();};
 window.onPollUpdate=function(c){_contracts=c;renderContracts();};
 
 async function loadAll(){
+  const cached=window._shellCache?.cacheGet('client_contracts');
+  if(cached){
+    _contracts=cached;
+    _contractors=window._shellCache?.cacheGet('client_contractors')||[];
+    document.getElementById("contracts-loading").style.display="none";
+    renderContracts();
+    refreshInBackground();
+    return;
+  }
   try{
     const res=await WD.api({action:"get_contracts",token:WD.getToken()});
     if(res.success){
       _contracts=res.contracts||[];
       _contractors=res.contractors||[];
+      window._shellCache?.cacheSet('client_contracts',_contracts);
+      window._shellCache?.cacheSet('client_contractors',_contractors);
     }
     document.getElementById("contracts-loading").style.display="none";
     renderContracts();
-  }catch(e){document.getElementById("contracts-loading").style.display="none";WD.showToast("Failed to load contracts.","error");}
+  }catch(e){
+    document.getElementById("contracts-loading").style.display="none";
+    WD.showToast("Failed to load contracts.","error");
+  }
 }
+
+
+
+
+async function refreshInBackground(){
+  try{
+    const res=await WD.api({action:"get_contracts",token:WD.getToken()});
+    if(res.success){
+      _contracts=res.contracts||[];
+      _contractors=res.contractors||[];
+      window._shellCache?.cacheSet('client_contracts',_contracts);
+      window._shellCache?.cacheSet('client_contractors',_contractors);
+      if(!_selectedContract)renderContracts();
+    }
+  }catch(e){}
+}
+
+  
 
 // ══════════════════════════════════════════════════════════
 // RENDER
@@ -656,8 +686,7 @@ let _subSelectedPlan=null;
 
 // ── Exposed to shell topbar ────────────────────────────────
 window.openNewClientContract=async function(){
-  // Check subscription first
-  const hasSub=await WD.checkSubscription();
+  const hasSub=window._hasSub===true;
   if(!hasSub){openSubRequiredModal();return;}
   // Check contractors
   if(!_contractors||!_contractors.length){
