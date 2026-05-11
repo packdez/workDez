@@ -267,6 +267,7 @@ button { cursor: pointer; border: none; background: none; }
   left: 0;
   bottom: 0;
   z-index: 50;
+  isolation: isolate;
   transition: transform var(--t-slow) var(--ease),
               background var(--t) var(--ease),
               border-color var(--t) var(--ease);
@@ -1084,7 +1085,7 @@ select.field-input {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  z-index: 9999;
   background: rgba(0,0,0,0.4);
   backdrop-filter: blur(6px);
   display: flex;
