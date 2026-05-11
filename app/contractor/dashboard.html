@@ -73,11 +73,9 @@
       </div>
       <div class="panel-body" id="dash-contracts-list">
         <div style="display:flex;flex-direction:column;gap:0;">
-          <div class="panel-body" id="dash-contracts-list">
             <div style="display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border-2);"><div class="skeleton" style="width:36px;height:36px;border-radius:50%;flex-shrink:0;"></div><div style="flex:1;"><div class="skeleton" style="height:13px;width:55%;margin-bottom:6px;"></div><div class="skeleton" style="height:11px;width:35%;"></div></div><div class="skeleton" style="height:22px;width:60px;border-radius:999px;"></div></div>
             <div style="display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border-2);"><div class="skeleton" style="width:36px;height:36px;border-radius:50%;flex-shrink:0;"></div><div style="flex:1;"><div class="skeleton" style="height:13px;width:55%;margin-bottom:6px;"></div><div class="skeleton" style="height:11px;width:35%;"></div></div><div class="skeleton" style="height:22px;width:60px;border-radius:999px;"></div></div>
             <div style="display:flex;align-items:center;gap:12px;padding:12px 20px;"><div class="skeleton" style="width:36px;height:36px;border-radius:50%;flex-shrink:0;"></div><div style="flex:1;"><div class="skeleton" style="height:13px;width:55%;margin-bottom:6px;"></div><div class="skeleton" style="height:11px;width:35%;"></div></div><div class="skeleton" style="height:22px;width:60px;border-radius:999px;"></div></div>
-          </div>
         </div>
       </div>
     </div>
@@ -141,6 +139,17 @@ window.pageInit = async function(user) {
 };
 
 async function loadDashboard() {
+  // Serve from cache instantly
+  const cachedContracts = window._shellCache?.cacheGet('contracts');
+  const cachedClients   = window._shellCache?.cacheGet('clients');
+  if (cachedContracts) {
+    renderDashboardStats(cachedContracts, cachedClients || []);
+    renderRecentContracts(cachedContracts);
+    if (cachedClients) renderRecentClients(cachedClients);
+    // Refresh in background
+    refreshDashboardInBackground();
+    return;
+  }
   try {
     const token = WD.getToken();
 
@@ -149,41 +158,57 @@ async function loadDashboard() {
       WD.api({ action: "get_contracts", token }),
       WD.api({ action: "get_clients",   token })
     ]);
-
-    if (contractsRes.success) {
-      const stats = contractsRes.contracts ? {
-        active:    contractsRes.contracts.filter(c => c.status === "active").length,
-        approvals: contractsRes.contracts.reduce((n, c) =>
-          n + (c.milestones||[]).filter(m => m.status==="done" && m.approvalStatus==="pending").length, 0),
-        revisions: contractsRes.contracts.reduce((n, c) =>
-          n + (c.milestones||[]).filter(m => m.approvalStatus==="revision_requested").length, 0)
-      } : { active: 0, approvals: 0, revisions: 0 };
-
-      document.getElementById("stat-active").textContent    = stats.active;
-      document.getElementById("stat-active-sub").textContent =
-        stats.active === 0 ? "No active contracts" : stats.active + " in progress";
-      document.getElementById("stat-approvals").textContent  = stats.approvals;
-      document.getElementById("stat-approvals-sub").textContent =
-        stats.approvals === 0 ? "Nothing pending" : "Awaiting your review";
-      document.getElementById("stat-revisions").textContent  = stats.revisions;
-      document.getElementById("stat-revisions-sub").textContent =
-        stats.revisions === 0 ? "All good" : "Client feedback pending";
-
-      renderRecentContracts(contractsRes.contracts || []);
-    }
-
-    if (clientsRes.success) {
-      document.getElementById("stat-clients").textContent    =
-        (clientsRes.clients||[]).filter(c => c.status === "active").length;
-      document.getElementById("stat-clients-sub").textContent = "Total clients";
-      renderRecentClients(clientsRes.clients || []);
-    }
+       
+    if (contractsRes.success) renderDashboardStats(contractsRes.contracts || [], clientsRes.clients || []);
+    if (clientsRes.success)   renderRecentClients(clientsRes.clients || []);       
 
   } catch(e) {
     console.error("Dashboard load error:", e);
   }
 }
 
+
+function renderDashboardStats(contracts, clients) {
+  const stats = {
+    active:    contracts.filter(c => c.status === "active").length,
+    approvals: contracts.reduce((n, c) =>
+      n + (c.milestones||[]).filter(m => m.status==="done" && m.approvalStatus==="pending").length, 0),
+    revisions: contracts.reduce((n, c) =>
+      n + (c.milestones||[]).filter(m => m.approvalStatus==="revision_requested").length, 0)
+  };
+
+  document.getElementById("stat-active").textContent         = stats.active;
+  document.getElementById("stat-active-sub").textContent     = stats.active === 0 ? "No active contracts" : stats.active + " in progress";
+  document.getElementById("stat-approvals").textContent      = stats.approvals;
+  document.getElementById("stat-approvals-sub").textContent  = stats.approvals === 0 ? "Nothing pending" : "Awaiting your review";
+  document.getElementById("stat-revisions").textContent      = stats.revisions;
+  document.getElementById("stat-revisions-sub").textContent  = stats.revisions === 0 ? "All good" : "Client feedback pending";
+  document.getElementById("stat-clients").textContent        = clients.filter(c => c.status === "active").length;
+  document.getElementById("stat-clients-sub").textContent    = "Total clients";
+
+  renderRecentContracts(contracts);
+}
+     
+async function refreshDashboardInBackground() {
+  try {
+    const token = WD.getToken();
+    const [cr, clr] = await Promise.all([
+      WD.api({ action: "get_contracts", token }),
+      WD.api({ action: "get_clients",   token })
+    ]);
+    if (cr.success) {
+      window._shellCache?.cacheSet('contracts', cr.contracts || []);
+      renderDashboardStats(cr.contracts || [], clr.clients || []);
+      renderRecentContracts(cr.contracts || []);
+    }
+    if (clr.success) {
+      window._shellCache?.cacheSet('clients', clr.clients || []);
+      renderRecentClients(clr.clients || []);
+    }
+  } catch(e) {}
+}
+
+     
 function renderRecentContracts(contracts) {
   const el = document.getElementById("dash-contracts-list");
   if (!el) return;
