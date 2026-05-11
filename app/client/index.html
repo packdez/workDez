@@ -298,7 +298,19 @@ function buildSkeleton(){
 function startLoadingBar(){const b=document.getElementById("loading-bar");b.className="loading";}
 function finishLoadingBar(){const b=document.getElementById("loading-bar");b.className="done";setTimeout(()=>{b.className="";},400);}
 
-function triggerPageAction(){if(_pageActionFn&&typeof window[_pageActionFn]==="function")window[_pageActionFn]();}
+function triggerPageAction() {
+  if (!_pageActionFn) return;
+  if (typeof window[_pageActionFn] === "function") {
+    window[_pageActionFn]();
+    return;
+  }
+  // Page still loading — wait for it then retry once
+  const fn = _pageActionFn;
+  setTimeout(() => {
+    if (typeof window[fn] === "function") window[fn]();
+    else WD.showToast("Page is still loading, please try again.","warn");
+  }, 800);
+}
 
 // ── Polling for contractor updates ─────────────────────────
 function startPolling(){
