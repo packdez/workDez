@@ -747,9 +747,17 @@ function buildErrorState(file) {
 // TOPBAR ACTION
 // ═══════════════════════════════════════════════════════════
 function triggerPageAction() {
-  if (_pageActionFn && typeof window[_pageActionFn] === "function") {
+  if (!_pageActionFn) return;
+  if (typeof window[_pageActionFn] === "function") {
     window[_pageActionFn]();
+    return;
   }
+  // Page still loading — wait for it then retry once
+  const fn = _pageActionFn;
+  setTimeout(() => {
+    if (typeof window[fn] === "function") window[fn]();
+    else WD.showToast("Page is still loading, please try again.","warn");
+  }, 800);
 }
 
 // ═══════════════════════════════════════════════════════════
