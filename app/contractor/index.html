@@ -491,18 +491,6 @@ window._shellCache = { cacheSet, cacheGet };
 
 
 
-function finishBoot(user) {
-  currentUser = user;
-  WD.bootSidebar(user);
-  document.getElementById("auth-gate").classList.add("hidden");
-  document.getElementById("app").classList.add("ready");
-  const hash = window.location.hash.replace("#", "");
-  navigate(PAGES[hash] ? hash : "dashboard", true);
-  startPolling();
-
-  // Pre-fetch all data immediately in background
-  prefetchAll();
-}
 
 async function prefetchAll() {
   try {
@@ -607,10 +595,25 @@ WD.api({ action: "get_subscription_status", token: WD.getToken() })
 
   // Start polling for contract changes
   startPolling();
+  window._hasSub = user.hasSubscription === true;
+  prefetchAll();
 }
 
 bootShell();
 
+
+async function prefetchAll() {
+  try {
+    const token = WD.getToken();
+    const [cr, clr] = await Promise.all([
+      WD.api({ action: "get_contracts", token }),
+      WD.api({ action: "get_clients",   token })
+    ]);
+    if (cr.success)  window._shellCache?.cacheSet('contracts', cr.contracts  || []);
+    if (clr.success) window._shellCache?.cacheSet('clients',   clr.clients   || []);
+  } catch(e) {}
+}
+  
 // ═══════════════════════════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════════════════════════
