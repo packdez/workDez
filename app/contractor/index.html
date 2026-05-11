@@ -489,21 +489,7 @@ function cacheGet(key) {
 
 window._shellCache = { cacheSet, cacheGet };
 
-
-
-
-async function prefetchAll() {
-  try {
-    const token = WD.getToken();
-    const [cr, clr] = await Promise.all([
-      WD.api({ action: "get_contracts", token }),
-      WD.api({ action: "get_clients",   token })
-    ]);
-    if (cr.success)  window._shellCache?.cacheSet('contracts', cr.contracts  || []);
-    if (clr.success) window._shellCache?.cacheSet('clients',   clr.clients   || []);
-  } catch(e) {}
-}
-  
+ 
 // ═══════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════
