@@ -163,6 +163,11 @@ const PAGES={
   settings: {title:"Settings", file:"settings.html", action:null}
 };
 
+const _cache={contracts:null,clients:null,ttl:30000,timestamps:{}};
+function cacheSet(key,data){_cache[key]=data;_cache.timestamps[key]=Date.now();}
+function cacheGet(key){if(!_cache[key])return null;if(Date.now()-(_cache.timestamps[key]||0)>_cache.ttl)return null;return _cache[key];}
+window._shellCache={cacheSet,cacheGet};
+  
 let currentPage="",currentUser=null,_pageActionFn=null,_pollTimer=null;
 
 WD.initTheme();
@@ -188,14 +193,47 @@ async function bootShell(){
 function finishBoot(user){
   currentUser=user;
   WD.bootSidebar(user);
+  window._hasSub=user.hasSubscription===true;
   document.getElementById("auth-gate").classList.add("hidden");
   document.getElementById("app").classList.add("ready");
+
+  // Expiry warning
+  WD.api({action:"get_subscription_status",token:WD.getToken()}).then(function(res){
+    if(!res.success)return;
+    if(res.active){
+      var expiry=new Date(res.active.expiryDate);
+      var daysLeft=Math.ceil((expiry-Date.now())/(1000*60*60*24));
+      if(daysLeft<=7){
+        var banner=document.getElementById("sub-banner");
+        if(banner){
+          banner.style.display="flex";
+          banner.querySelector("span").textContent=daysLeft<=1
+            ?"⚠️ Your subscription expires tomorrow — renew now."
+            :"⚠️ Your subscription expires in "+daysLeft+" days.";
+        }
+      }
+    }
+  }).catch(function(){});
+
   const hash=window.location.hash.replace("#","");
   navigate(PAGES[hash]?hash:"dashboard",true);
   startPolling();
+  prefetchAll();
 }
 
 bootShell();
+
+
+async function prefetchAll(){
+  try{
+    const token=WD.getToken();
+    const res=await WD.api({action:"get_contracts",token});
+    if(res.success){
+      window._shellCache?.cacheSet('client_contracts',res.contracts||[]);
+      window._shellCache?.cacheSet('client_contractors',res.contractors||[]);
+    }
+  }catch(e){}
+}
 
 // ── Navigation ─────────────────────────────────────────────
 async function navigate(page,initial=false){
