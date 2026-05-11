@@ -148,9 +148,9 @@
 
   <div id="contracts-loading">
   <div class="contracts-grid">
-    <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:18px;">...</div>
-    <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:18px;">...</div>
-    <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:18px;">...</div>
+    <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:18px;"><div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:18px;"><div class="skeleton" style="height:14px;width:65%;margin-bottom:8px;"></div><div class="skeleton" style="height:11px;width:40%;margin-bottom:16px;"></div><div class="skeleton" style="height:4px;margin-bottom:8px;"></div><div class="skeleton" style="height:11px;width:55%;"></div></div></div>
+    <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:18px;"><div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:18px;"><div class="skeleton" style="height:14px;width:65%;margin-bottom:8px;"></div><div class="skeleton" style="height:11px;width:40%;margin-bottom:16px;"></div><div class="skeleton" style="height:4px;margin-bottom:8px;"></div><div class="skeleton" style="height:11px;width:55%;"></div></div></div>
+    <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:18px;"><div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:18px;"><div class="skeleton" style="height:14px;width:65%;margin-bottom:8px;"></div><div class="skeleton" style="height:11px;width:40%;margin-bottom:16px;"></div><div class="skeleton" style="height:4px;margin-bottom:8px;"></div><div class="skeleton" style="height:11px;width:55%;"></div></div></div>
   </div>
 </div>
   
@@ -417,7 +417,10 @@ let _wizStep=0,_wizData={},_wizMode="new";
 let _searchTimer=null,_saveTimer=null;
 
 window.pageInit=async function(user){await loadAll();};
-window.openNewContract=function(){openContractWizard("new");};
+window.openNewContract=function(){
+  if(window._hasSub===false){WD.showUpgradeModal();return;}
+  openContractWizard("new");
+};
 window.onPollUpdate=function(c){_contracts=c;renderContracts();};
 
 async function loadAll() {
@@ -458,8 +461,15 @@ async function refreshInBackground() {
       WD.api({ action: "get_contracts", token }),
       WD.api({ action: "get_clients",   token })
     ]);
-    if (cr.success)  { _contracts = cr.contracts  || []; window._shellCache?.cacheSet('contracts', _contracts); renderContracts(); }
-    if (clr.success) { _clients   = clr.clients   || []; window._shellCache?.cacheSet('clients',   _clients); }
+    if (cr.success) {
+      _contracts = cr.contracts || [];
+      window._shellCache?.cacheSet('contracts', _contracts);
+      if (!_selectedContract) renderContracts();
+    }
+    if (clr.success) {
+      _clients = clr.clients || [];
+      window._shellCache?.cacheSet('clients', _clients);
+    }
   } catch(e) {}
 }
 
