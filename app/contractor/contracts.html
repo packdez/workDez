@@ -420,15 +420,47 @@ window.pageInit=async function(user){await loadAll();};
 window.openNewContract=function(){openContractWizard("new");};
 window.onPollUpdate=function(c){_contracts=c;renderContracts();};
 
-async function loadAll(){
-  try{
-    const token=WD.getToken();
-    const[cr,clr]=await Promise.all([WD.api({action:"get_contracts",token}),WD.api({action:"get_clients",token})]);
-    if(cr.success)_contracts=cr.contracts||[];
-    if(clr.success)_clients=clr.clients||[];
-    document.getElementById("contracts-loading").style.display="none";
+async function loadAll() {
+  // Show cached data instantly if available
+  const cachedContracts = window._shellCache?.cacheGet('contracts');
+  const cachedClients   = window._shellCache?.cacheGet('clients');
+
+  if (cachedContracts) {
+    _contracts = cachedContracts;
+    _clients   = cachedClients || [];
+    document.getElementById("contracts-loading").style.display = "none";
     renderContracts();
-  }catch(e){document.getElementById("contracts-loading").style.display="none";WD.showToast("Failed to load.","error");}
+    // Refresh in background silently
+    refreshInBackground();
+    return;
+  }
+  // No cache — fetch normally
+  try {
+    const token = WD.getToken();
+    const [cr, clr] = await Promise.all([
+      WD.api({ action: "get_contracts", token }),
+      WD.api({ action: "get_clients",   token })
+    ]);
+    if (cr.success)  { _contracts = cr.contracts  || []; window._shellCache?.cacheSet('contracts', _contracts); }
+    if (clr.success) { _clients   = clr.clients   || []; window._shellCache?.cacheSet('clients',   _clients);   }
+    document.getElementById("contracts-loading").style.display = "none";
+    renderContracts();
+  } catch(e) {
+    document.getElementById("contracts-loading").style.display = "none";
+    WD.showToast("Failed to load.", "error");
+  }
+}
+
+async function refreshInBackground() {
+  try {
+    const token = WD.getToken();
+    const [cr, clr] = await Promise.all([
+      WD.api({ action: "get_contracts", token }),
+      WD.api({ action: "get_clients",   token })
+    ]);
+    if (cr.success)  { _contracts = cr.contracts  || []; window._shellCache?.cacheSet('contracts', _contracts); renderContracts(); }
+    if (clr.success) { _clients   = clr.clients   || []; window._shellCache?.cacheSet('clients',   _clients); }
+  } catch(e) {}
 }
 
 function renderContracts(){
