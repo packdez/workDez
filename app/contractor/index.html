@@ -467,6 +467,29 @@ const PAGES = {
   }
 };
 
+
+const _cache = {
+  contracts: null,
+  clients: null,
+  dashboard: null,
+  ttl: 30000, // 30 seconds
+  timestamps: {}
+};
+
+function cacheSet(key, data) {
+  _cache[key] = data;
+  _cache.timestamps[key] = Date.now();
+}
+
+function cacheGet(key) {
+  if (!_cache[key]) return null;
+  if (Date.now() - (_cache.timestamps[key] || 0) > _cache.ttl) return null;
+  return _cache[key];
+}
+
+window._shellCache = { cacheSet, cacheGet };
+
+  
 // ═══════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════
