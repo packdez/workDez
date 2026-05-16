@@ -371,7 +371,7 @@ async function api(payload) {
 // Redirect if already logged in
 const existingToken = localStorage.getItem("wd_contractor_token")
   || sessionStorage.getItem("wd_contractor_token");
-if (existingToken) window.location.href = "shell.html";
+if (existingToken) window.location.href = "index.html";
 
 // Auto-fill returning user email
 try {
@@ -441,7 +441,7 @@ document.getElementById("login-form").addEventListener("submit", async e => {
       store.setItem("wd_contractor_token", res.token);
       store.setItem("wd_contractor_user",  JSON.stringify(res.contractor));
       showToast("Welcome back!", "success");
-      setTimeout(() => { window.location.href = "shell.html"; }, 900);
+      setTimeout(() => { window.location.href = "index.html"; }, 900);
     } else if (res.requiresOAuth) {
       showToast("Please complete your Google account setup.", "warn");
       setTimeout(() => { window.location.href = "signup.html?oauth=1&id=" + res.contractorId; }, 1200);
