@@ -676,13 +676,11 @@ async function loadPage(file) {
     content.style.animation = "";
 
     // Execute any scripts in the injected HTML
-    content.querySelectorAll("script").forEach(oldScript => {
-  const newScript = document.createElement("script");
-  Array.from(oldScript.attributes).forEach(attr => {
-    newScript.setAttribute(attr.name, attr.value);
-  });
-  newScript.appendChild(document.createTextNode(oldScript.textContent));
-  oldScript.parentNode.replaceChild(newScript, oldScript);
+content.querySelectorAll("script").forEach(old => {
+  const s = document.createElement("script");
+  s.textContent = old.textContent;
+  document.body.appendChild(s);
+  document.body.removeChild(s);
 });
 
     // Call page init if defined
