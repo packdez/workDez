@@ -678,7 +678,7 @@ async function loadPage(file) {
     // Execute any scripts in the injected HTML
 content.querySelectorAll("script").forEach(old => {
   const s = document.createElement("script");
-  s.textContent = old.textContent;
+  s.text = old.innerHTML;
   document.body.appendChild(s);
   document.body.removeChild(s);
 });
