@@ -1293,7 +1293,7 @@ select.field-input {
   max-width: 100vw;
   background: var(--bg);
   border-left: 1px solid var(--border);
-  z-index: 200;
+  z-index: 9999;
   display: flex;
   flex-direction: column;
   transform: translateX(100%);
@@ -1305,7 +1305,7 @@ select.field-input {
 .detail-overlay {
   position: fixed;
   inset: 0;
-  z-index: 199;
+  z-index: 9999;
   background: rgba(0,0,0,0.4);
   backdrop-filter: blur(3px);
   opacity: 0;
