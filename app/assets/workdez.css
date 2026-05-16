@@ -267,7 +267,6 @@ button { cursor: pointer; border: none; background: none; }
   left: 0;
   bottom: 0;
   z-index: 50;
-  isolation: isolate;
   transition: transform var(--t-slow) var(--ease),
               background var(--t) var(--ease),
               border-color var(--t) var(--ease);
