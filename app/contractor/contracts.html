@@ -1,869 +1,615 @@
-<!-- contracts.html — Part 1: Styles + HTML Structure -->
+<!-- clients.html — Contractor Clients Page -->
 <style>
-.contracts-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
-.search-wrap{position:relative;flex:1;min-width:200px;}
-.search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--ink-4);pointer-events:none;width:14px;height:14px;}
-.search-input{width:100%;height:37px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);padding:0 12px 0 34px;font-size:.83rem;color:var(--ink);font-family:var(--font-sans);outline:none;transition:border-color .18s;}
-.search-input:focus{border-color:var(--accent);}
-.search-input::placeholder{color:var(--ink-4);}
-.filter-btn{height:37px;padding:0 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);font-size:.79rem;font-weight:600;color:var(--ink-3);cursor:pointer;font-family:var(--font-sans);transition:all .15s;white-space:nowrap;}
-.filter-btn:hover{border-color:var(--ink-5);color:var(--ink-2);}
-.filter-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-bg);}
-.view-toggle{display:flex;gap:2px;background:var(--bg-3);border-radius:8px;padding:3px;margin-left:auto;}
-.view-btn{width:30px;height:28px;border-radius:6px;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink-4);transition:all .15s;}
-.view-btn svg{width:14px;height:14px;}
-.view-btn.active{background:var(--bg);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08);}
-.contracts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
-.contract-card{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:18px;cursor:pointer;transition:border-color .2s,box-shadow .2s,transform .2s;animation:cardIn .3s var(--ease) both;}
-.contract-card:hover{border-color:var(--accent-border);box-shadow:var(--sh-md);transform:translateY(-2px);}
-.contract-card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;}
-.contract-card-title{font-size:.88rem;font-weight:700;color:var(--ink);line-height:1.3;flex:1;}
-.contract-card-client{font-size:.73rem;color:var(--ink-4);margin-bottom:10px;display:flex;align-items:center;gap:5px;}
-.contract-card-client svg{width:11px;height:11px;}
-.contract-card-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
-.budget-label{font-size:.73rem;font-weight:600;color:var(--ink-3);}
-.due-label{font-size:.71rem;color:var(--ink-4);margin-left:auto;}
-.due-label.overdue{color:var(--red);font-weight:600;}
-.card-notice{display:flex;align-items:center;gap:6px;padding:6px 9px;border-radius:7px;font-size:.7rem;font-weight:600;margin-top:10px;border:1px solid transparent;}
-.card-notice svg{width:11px;height:11px;flex-shrink:0;}
-.card-notice.pending-client{background:var(--blue-bg);border-color:var(--blue-border);color:var(--blue-text);}
-.card-notice.revision{background:var(--purple-bg);border-color:var(--purple-border);color:var(--purple-text);}
-.card-notice.client-request{background:var(--amber-bg);border-color:var(--amber-border);color:var(--amber-text);}
-.contracts-list{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);overflow:hidden;}
-.contract-row{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--border-2);cursor:pointer;transition:background .12s;}
-.contract-row:last-child{border-bottom:none;}
-.contract-row:hover{background:var(--bg-2);}
-.kanban-board{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;align-items:start;}
-.kanban-col-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 4px;}
-.kanban-col-title{font-size:.72rem;font-weight:700;color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase;}
-.kanban-col-count{font-size:.67rem;color:var(--ink-4);background:var(--bg-3);padding:1px 7px;border-radius:999px;}
-.kanban-card{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);padding:12px 14px;cursor:pointer;margin-bottom:8px;transition:all .18s;}
-.kanban-card:hover{border-color:var(--accent-border);box-shadow:var(--sh);transform:translateY(-1px);}
-.status-dropdown-wrap{position:relative;display:inline-block;}
-.status-trigger{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:8px;cursor:pointer;border:1.5px solid var(--border);background:var(--bg);font-size:.8rem;font-weight:600;font-family:var(--font-sans);transition:all .15s;min-width:130px;}
-.status-trigger:hover{border-color:var(--ink-5);background:var(--bg-2);}
-.status-trigger .sdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-.status-trigger .schev{width:12px;height:12px;color:var(--ink-4);margin-left:auto;transition:transform .2s;}
-.status-trigger.open .schev{transform:rotate(180deg);}
-.status-menu{position:absolute;top:calc(100% + 6px);left:0;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--sh-md);z-index:400;min-width:190px;overflow:hidden;opacity:0;pointer-events:none;transform:translateY(-6px);transition:opacity .2s var(--ease),transform .2s var(--ease);}
-.status-menu.open{opacity:1;pointer-events:all;transform:translateY(0);}
-.status-opt{display:flex;align-items:center;gap:9px;padding:9px 14px;font-size:.82rem;cursor:pointer;transition:background .1s;font-family:var(--font-sans);}
-.status-opt:hover{background:var(--bg-2);}
-.status-opt.current{background:var(--bg-3);font-weight:700;}
-.status-opt .sdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-.milestone-item{border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:6px;transition:border-color .15s;}
-.milestone-header-row{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;background:none;width:100%;text-align:left;font-family:var(--font-sans);transition:background .12s;}
-.milestone-header-row:hover{background:var(--bg-2);}
-.ms-check{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;background:none;}
-.ms-check.done{background:var(--accent);border-color:var(--accent);}
-.ms-check svg{display:none;width:10px;height:10px;}
-.ms-check.done svg{display:block;}
-.ms-chevron{color:var(--ink-4);flex-shrink:0;transition:transform .2s;margin-left:auto;}
-.ms-chevron.open{transform:rotate(90deg);}
-.ms-chevron svg{width:12px;height:12px;}
-.ms-title-input{font-size:.83rem;font-weight:600;color:var(--ink);background:none;border:none;outline:none;font-family:var(--font-sans);flex:1;padding:0;border-bottom:1.5px solid transparent;transition:border-color .15s;}
-.ms-title-input:focus{border-bottom-color:var(--accent);}
-.ms-title-input.done{color:var(--ink-4);text-decoration:line-through;}
-.ms-amount-input{width:72px;height:26px;background:var(--bg-2);border:1px solid var(--border);border-radius:6px;padding:0 7px;font-size:.75rem;color:var(--ink);font-family:var(--font-sans);outline:none;text-align:right;}
-.ms-amount-input:focus{border-color:var(--accent);}
-.ms-body{padding:0 12px 12px 40px;display:none;flex-direction:column;gap:6px;}
-.ms-body.open{display:flex;}
-.subtask-row{display:flex;align-items:center;gap:8px;}
-.subtask-check{width:15px;height:15px;border-radius:4px;border:1.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;background:none;}
-.subtask-check.done{background:var(--accent);border-color:var(--accent);}
-.subtask-check svg{display:none;width:8px;height:8px;}
-.subtask-check.done svg{display:block;}
-.subtask-input{font-size:.77rem;color:var(--ink-2);flex:1;background:none;border:none;outline:none;font-family:var(--font-sans);padding:0;border-bottom:1px solid transparent;transition:border-color .15s;}
-.subtask-input:focus{border-bottom-color:var(--accent);}
-.subtask-input.done{text-decoration:line-through;color:var(--ink-4);}
-.revision-box{padding:10px;background:var(--purple-bg);border:1px solid var(--purple-border);border-radius:var(--r);margin-top:6px;}
-.revision-box-title{font-size:.74rem;font-weight:700;color:var(--purple-text);margin-bottom:5px;display:flex;align-items:center;gap:5px;}
-.revision-box-notes{font-size:.73rem;color:var(--purple-text);line-height:1.5;}
-.attach-row{display:flex;align-items:center;gap:7px;padding:6px 8px;background:var(--bg-2);border:1px solid var(--border);border-radius:6px;transition:border-color .15s;margin-bottom:5px;}
-.attach-row:hover{border-color:var(--accent-border);}
-.attach-name{font-size:.74rem;color:var(--ink-2);font-weight:500;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.attach-open{font-size:.68rem;color:var(--accent);font-weight:700;background:var(--accent-bg);border:none;border-radius:4px;padding:2px 8px;cursor:pointer;flex-shrink:0;}
-.time-month-row{background:var(--bg-2);border:1.5px solid var(--border);border-radius:var(--r);padding:11px 14px;display:flex;align-items:center;gap:10px;margin-bottom:6px;cursor:pointer;transition:border-color .15s;}
-.time-month-row:hover{border-color:var(--accent-border);}
-.time-month-label{font-size:.82rem;font-weight:700;color:var(--ink);flex:1;}
-.time-month-sub{font-size:.71rem;color:var(--ink-4);}
-.time-month-hours{font-family:var(--font-serif);font-size:1.1rem;color:var(--ink);}
-.time-month-earned{font-size:.73rem;font-weight:600;color:var(--accent);margin-left:6px;}
-.del-item{padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:6px;cursor:pointer;transition:border-color .15s,background .12s;}
-.del-item:hover{border-color:var(--accent-border);}
-.del-item.approved{border-color:var(--accent-border);background:var(--accent-bg);}
-.wizard-step-dots{display:flex;gap:4px;padding:14px 24px 0;flex-shrink:0;}
-.wizard-dot{flex:1;height:3px;border-radius:2px;background:var(--border);transition:background .3s;}
-.wizard-dot.active{background:var(--accent);}
-.wizard-dot.done{background:var(--accent-border);}
-.type-card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px;}
-.type-card{border:2px solid var(--border);border-radius:var(--r-md);padding:14px 10px;cursor:pointer;text-align:center;transition:all .15s;user-select:none;}
-.type-card:hover{border-color:var(--accent-border);background:var(--accent-bg);}
-.type-card.selected{border-color:var(--accent);background:var(--accent-bg);}
-.type-card-icon{font-size:1.3rem;margin-bottom:5px;}
-.type-card-label{font-size:.75rem;font-weight:700;color:var(--ink);}
-.type-card-desc{font-size:.64rem;color:var(--ink-4);margin-top:2px;line-height:1.3;}
-.tab-pane{display:none;}
-.tab-pane.active{display:block;}
+.clients-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+.client-search-wrap{position:relative;flex:1;min-width:200px;}
+.client-search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--ink-4);pointer-events:none;width:14px;height:14px;}
+.client-search-input{width:100%;height:37px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);padding:0 12px 0 34px;font-size:.83rem;color:var(--ink);font-family:var(--font-sans);outline:none;transition:border-color .18s;}
+.client-search-input:focus{border-color:var(--accent);}
+.client-search-input::placeholder{color:var(--ink-4);}
+.client-filter-btn{height:37px;padding:0 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);font-size:.79rem;font-weight:600;color:var(--ink-3);cursor:pointer;font-family:var(--font-sans);transition:all .15s;white-space:nowrap;}
+.client-filter-btn:hover{border-color:var(--ink-5);color:var(--ink-2);}
+.client-filter-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-bg);}
+.clients-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+.client-card{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:20px;cursor:pointer;transition:border-color .2s,box-shadow .2s,transform .2s;animation:cardIn .3s var(--ease) both;}
+.client-card:hover{border-color:var(--accent-border);box-shadow:var(--sh-md);transform:translateY(-2px);}
+.client-card-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;}
+.client-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;color:#fff;flex-shrink:0;}
+.client-card-info{flex:1;min-width:0;}
+.client-card-name{font-size:.9rem;font-weight:700;color:var(--ink);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.client-card-company{font-size:.74rem;color:var(--ink-4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.client-card-email{font-size:.73rem;color:var(--ink-4);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.client-stats{display:flex;gap:8px;}
+.client-stat{flex:1;background:var(--bg-2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;text-align:center;}
+.client-stat-val{font-family:var(--font-serif);font-size:1.1rem;color:var(--ink);line-height:1;}
+.client-stat-lbl{font-size:.6rem;font-weight:700;color:var(--ink-4);letter-spacing:.06em;text-transform:uppercase;margin-top:3px;}
+.client-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid var(--border-2);}
+.invite-badge{display:inline-flex;align-items:center;gap:5px;font-size:.65rem;font-weight:700;padding:3px 8px;border-radius:999px;}
+.invite-badge.pending{background:var(--amber-bg);color:var(--amber-text);border:1px solid var(--amber-border);}
+.invite-badge.accepted{background:var(--accent-bg);color:var(--accent-text);border:1px solid var(--accent-border);}
+.invite-badge.none{background:var(--bg-3);color:var(--ink-4);}
+.client-detail-avatar{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;color:#fff;flex-shrink:0;margin:0 auto 4px;}
+.contract-mini-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-2);cursor:pointer;transition:background .12s;}
+.contract-mini-row:last-child{border-bottom:none;}
+.contract-mini-row:hover{background:var(--bg-2);}
+.invite-code-box{background:var(--bg-2);border:2px dashed var(--accent-border);border-radius:var(--r);padding:14px 16px;text-align:center;}
+.invite-code-val{font-family:var(--font-serif);font-size:1.8rem;color:var(--accent);letter-spacing:.1em;margin:4px 0;}
+.invite-code-hint{font-size:.72rem;color:var(--ink-4);line-height:1.5;}
 @media(max-width:768px){
-  .contracts-grid{grid-template-columns:1fr;}
-  .kanban-board{grid-template-columns:1fr 1fr;}
-  .type-card-grid{grid-template-columns:1fr;}
-}
-@media(max-width:480px){
-  .kanban-board{grid-template-columns:1fr;}
-  .view-toggle{margin-left:0;}
+  .clients-grid{grid-template-columns:1fr;}
+  .client-card-top{gap:10px;}
 }
 </style>
 
-<div class="page-enter">
-  <div class="page-header">
-    <div class="page-header-left">
-      <h1>Contracts</h1>
-      <p id="contracts-count-label">Track every contract from kickoff to completion.</p>
-    </div>
+<div class="page-header">
+  <div class="page-header-left">
+    <h1>Clients</h1>
+    <p id="clients-count-label">Manage all your client relationships.</p>
   </div>
-
-  <div class="contracts-toolbar">
-    <div class="search-wrap">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input class="search-input" type="text" id="search-input" placeholder="Search contracts…" oninput="handleSearch()">
-    </div>
-    <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
-    <button class="filter-btn" onclick="setFilter('active',this)">Active</button>
-    <button class="filter-btn" onclick="setFilter('draft',this)">Draft</button>
-    <button class="filter-btn" onclick="setFilter('completed',this)">Done</button>
-    <div class="view-toggle">
-      <button class="view-btn active" id="view-card" onclick="setView('card',this)" title="Cards">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      </button>
-      <button class="view-btn" id="view-list" onclick="setView('list',this)" title="List">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-      </button>
-      <button class="view-btn" id="view-kanban" onclick="setView('kanban',this)" title="Kanban">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="5" height="18"/><rect x="10" y="3" width="5" height="12"/><rect x="17" y="3" width="5" height="15"/></svg>
-      </button>
-    </div>
-  </div>
-
-  <div id="contracts-loading">
-  <div class="contracts-grid">
-    <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:18px;"><div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:18px;"><div class="skeleton" style="height:14px;width:65%;margin-bottom:8px;"></div><div class="skeleton" style="height:11px;width:40%;margin-bottom:16px;"></div><div class="skeleton" style="height:4px;margin-bottom:8px;"></div><div class="skeleton" style="height:11px;width:55%;"></div></div></div>
-    <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:18px;"><div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:18px;"><div class="skeleton" style="height:14px;width:65%;margin-bottom:8px;"></div><div class="skeleton" style="height:11px;width:40%;margin-bottom:16px;"></div><div class="skeleton" style="height:4px;margin-bottom:8px;"></div><div class="skeleton" style="height:11px;width:55%;"></div></div></div>
-    <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:18px;"><div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:18px;"><div class="skeleton" style="height:14px;width:65%;margin-bottom:8px;"></div><div class="skeleton" style="height:11px;width:40%;margin-bottom:16px;"></div><div class="skeleton" style="height:4px;margin-bottom:8px;"></div><div class="skeleton" style="height:11px;width:55%;"></div></div></div>
-  </div>
-</div>
-  
-  <div id="contracts-container"></div>
-  <div id="contracts-empty" style="display:none;">
-    <div class="empty-state">
-      <div class="empty-state-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-      </div>
-      <h3>No contracts yet</h3>
-      <p>Create your first contract and assign it to a client.</p>
-      <button class="btn btn-primary" onclick="openNewContract()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        New contract
-      </button>
-    </div>
+  <div class="page-header-actions">
+    <button class="btn btn-primary" onclick="openNewClient()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Add client
+    </button>
   </div>
 </div>
 
-<!-- DETAIL PANEL -->
-<div class="detail-panel" id="contract-detail">
+<div class="clients-toolbar">
+  <div class="client-search-wrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input class="client-search-input" type="text" id="client-search" placeholder="Search clients..." oninput="handleClientSearch()">
+  </div>
+  <button class="client-filter-btn active" onclick="setClientFilter('all',this)">All</button>
+  <button class="client-filter-btn" onclick="setClientFilter('active',this)">Active</button>
+  <button class="client-filter-btn" onclick="setClientFilter('invited',this)">Invited</button>
+  <button class="client-filter-btn" onclick="setClientFilter('archived',this)">Archived</button>
+</div>
+
+<div id="clients-loading">
+  <div class="clients-grid">
+    <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:20px;"><div style="display:flex;gap:12px;margin-bottom:14px;"><div class="skeleton" style="width:44px;height:44px;border-radius:50%;flex-shrink:0;"></div><div style="flex:1;"><div class="skeleton" style="height:14px;width:60%;margin-bottom:6px;"></div><div class="skeleton" style="height:11px;width:80%;"></div></div></div><div style="display:flex;gap:8px;"><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div></div></div>
+    <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:20px;"><div style="display:flex;gap:12px;margin-bottom:14px;"><div class="skeleton" style="width:44px;height:44px;border-radius:50%;flex-shrink:0;"></div><div style="flex:1;"><div class="skeleton" style="height:14px;width:60%;margin-bottom:6px;"></div><div class="skeleton" style="height:11px;width:80%;"></div></div></div><div style="display:flex;gap:8px;"><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div></div></div>
+    <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:20px;"><div style="display:flex;gap:12px;margin-bottom:14px;"><div class="skeleton" style="width:44px;height:44px;border-radius:50%;flex-shrink:0;"></div><div style="flex:1;"><div class="skeleton" style="height:14px;width:60%;margin-bottom:6px;"></div><div class="skeleton" style="height:11px;width:80%;"></div></div></div><div style="display:flex;gap:8px;"><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div></div></div>
+  </div>
+</div>
+<div id="clients-container"></div>
+<div id="clients-empty" style="display:none;">
+  <div class="empty-state">
+    <div class="empty-state-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+    </div>
+    <h3>No clients yet</h3>
+    <p>Add your first client to start creating contracts and inviting them to your workspace.</p>
+    <button class="btn btn-primary" onclick="openNewClient()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add client
+    </button>
+  </div>
+</div>
+
+<!-- CLIENT DETAIL PANEL -->
+<div class="detail-panel" id="client-detail">
   <div class="detail-topbar">
-    <span class="detail-topbar-title" id="detail-title">Contract</span>
+    <span class="detail-topbar-title" id="cd-name">Client</span>
     <div class="detail-topbar-actions">
-      <button class="btn btn-sm btn-primary" id="detail-send-btn" onclick="sendContractRequest()" style="display:none;">
+      <button class="btn btn-sm btn-secondary" id="cd-invite-btn" onclick="openInviteModal()" style="display:none;">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        <span class="btn-label">Send to client</span>
+        <span class="btn-label">Invite</span>
       </button>
-      <button class="btn btn-icon btn-secondary" onclick="editContract()" title="Edit">
+      <button class="btn btn-icon btn-secondary" onclick="openEditClient()" title="Edit">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
       </button>
-      <button class="btn btn-icon btn-secondary" id="detail-delete-btn" onclick="confirmDelete()" title="Delete" style="color:var(--red);">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
-      </button>
-      <button class="btn btn-icon btn-ghost" onclick="closeDetail()">
+      <button class="btn btn-icon btn-ghost" onclick="closeClientDetail()">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </button>
     </div>
   </div>
-  <div class="detail-tabs">
-    <button class="detail-tab active" data-tab="overview" onclick="switchTab('overview',this)">Overview</button>
-    <button class="detail-tab" data-tab="work" id="tab-work" onclick="switchTab('work',this)">Milestones</button>
-    <button class="detail-tab" data-tab="files" onclick="switchTab('files',this)">Files</button>
-    <button class="detail-tab" data-tab="activity" onclick="switchTab('activity',this)">Activity <span class="detail-tab-badge" id="activity-badge">0</span></button>
-  </div>
-  <div class="detail-scroll" id="detail-scroll">
-
-    <!-- OVERVIEW TAB -->
-    <div class="tab-pane active" id="pane-overview">
-      <div class="detail-section" id="detail-notice-section" style="display:none;padding:12px 16px;"></div>
-      <div class="detail-section">
-        <div class="detail-section-title">Status</div>
-        <div class="status-dropdown-wrap">
-          <button class="status-trigger" id="status-trigger" onclick="toggleStatusMenu()">
-            <span class="sdot" id="status-dot"></span>
-            <span id="status-text">—</span>
-            <svg class="schev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
-          </button>
-          <div class="status-menu" id="status-menu"></div>
+  <div class="detail-scroll">
+    <div class="detail-section" style="text-align:center;padding:24px 18px 16px;">
+      <div class="client-detail-avatar" id="cd-avatar">?</div>
+      <div style="font-family:var(--font-serif);font-size:1.4rem;color:var(--ink);letter-spacing:-.02em;margin-bottom:2px;" id="cd-fullname">-</div>
+      <div style="font-size:.8rem;color:var(--ink-4);" id="cd-company-line">-</div>
+      <div style="margin-top:10px;" id="cd-invite-status-wrap"></div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Contact</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div id="cd-email-row" style="display:none;">
+          <div class="detail-field-label">Email</div>
+          <a id="cd-email-link" href="#" style="font-size:.84rem;color:var(--accent);font-weight:500;text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">-</a>
         </div>
-      </div>
-      <div class="detail-section">
-        <div class="detail-section-title">Details</div>
-        <div class="detail-grid">
-          <div><div class="detail-field-label">Client</div><div class="detail-field-val" id="detail-client">—</div></div>
-          <div><div class="detail-field-label">Type</div><div id="detail-type-wrap"></div></div>
-          <div><div class="detail-field-label" id="detail-budget-label-el">Budget</div><div class="detail-field-val" id="detail-budget">—</div></div>
-          <div><div class="detail-field-label">Created</div><div class="detail-field-val" id="detail-created">—</div></div>
-          <div id="detail-due-wrap"><div class="detail-field-label">Due date</div><div class="detail-field-val" id="detail-due">—</div></div>
-          <div><div class="detail-field-label">Start date</div><div class="detail-field-val" id="detail-start">—</div></div>
-          <div id="detail-workhours-wrap" style="display:none;"><div class="detail-field-label">Hrs/week</div><div class="detail-field-val" id="detail-workhours">—</div></div>
-          <div id="detail-notice-wrap" style="display:none;"><div class="detail-field-label">Notice period</div><div class="detail-field-val" id="detail-notice-period">—</div></div>
+        <div id="cd-phone-row" style="display:none;">
+          <div class="detail-field-label">Phone</div>
+          <div class="detail-field-val" id="cd-phone">-</div>
         </div>
-        <div id="detail-desc-wrap" style="display:none;margin-top:8px;">
-          <div class="detail-field-label" style="margin-bottom:3px;">Description</div>
-          <div class="detail-field-val" id="detail-desc" style="font-size:.82rem;color:var(--ink-3);line-height:1.6;font-weight:400;"></div>
-        </div>
-      </div>
-      <div class="detail-section" id="detail-progress-section">
-        <div class="detail-section-title">Progress</div>
-        <div style="font-family:var(--font-serif);font-size:2.4rem;color:var(--ink);line-height:1;margin-bottom:8px;" id="detail-progress-num">0%</div>
-        <div style="height:7px;background:var(--border);border-radius:4px;overflow:hidden;"><div id="detail-progress-fill" style="height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent-light));transition:width .6s var(--ease);width:0%"></div></div>
-        <div style="font-size:.7rem;color:var(--ink-4);margin-top:5px;" id="detail-ms-summary">—</div>
-      </div>
-      <div class="detail-section" id="detail-hourly-stats" style="display:none;">
-        <div class="detail-section-title">Time &amp; cost</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
-          <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;"><div style="font-size:.65rem;font-weight:700;color:var(--ink-4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Logged</div><div style="font-family:var(--font-serif);font-size:1.2rem;" id="hourly-hours">—</div></div>
-          <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;"><div style="font-size:.65rem;font-weight:700;color:var(--ink-4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Rate</div><div style="font-family:var(--font-serif);font-size:1.2rem;" id="hourly-rate">—</div></div>
-          <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;"><div style="font-size:.65rem;font-weight:700;color:var(--ink-4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Earned</div><div style="font-family:var(--font-serif);font-size:1.2rem;color:var(--accent);" id="hourly-cost">—</div></div>
-        </div>
-      </div>
-      <div class="detail-section" id="detail-retainer-stats" style="display:none;">
-        <div class="detail-section-title">This month</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
-          <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;"><div style="font-size:.65rem;font-weight:700;color:var(--ink-4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Reports</div><div style="font-family:var(--font-serif);font-size:1.2rem;" id="ret-total">—</div></div>
-          <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;"><div style="font-size:.65rem;font-weight:700;color:var(--ink-4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Approved</div><div style="font-family:var(--font-serif);font-size:1.2rem;color:var(--accent);" id="ret-done">—</div></div>
-          <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;"><div style="font-size:.65rem;font-weight:700;color:var(--ink-4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Pending</div><div style="font-family:var(--font-serif);font-size:1.2rem;" id="ret-pending">—</div></div>
+        <div id="cd-notes-row" style="display:none;">
+          <div class="detail-field-label">Notes</div>
+          <div class="detail-field-val" id="cd-notes" style="font-size:.82rem;color:var(--ink-3);line-height:1.6;font-weight:400;white-space:pre-wrap;">-</div>
         </div>
       </div>
     </div>
-
-    <!-- WORK TAB -->
-    <div class="tab-pane" id="pane-work">
-      <div class="detail-section" id="milestones-section">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-          <div class="detail-section-title" style="margin-bottom:0;">Milestones</div>
-          <button class="btn btn-sm btn-secondary" onclick="addMilestone()">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add
-          </button>
+    <div class="detail-section">
+      <div class="detail-section-title">Contracts</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <div style="flex:1;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);padding:10px;text-align:center;">
+          <div style="font-family:var(--font-serif);font-size:1.3rem;color:var(--ink);" id="cd-stat-total">-</div>
+          <div style="font-size:.6rem;font-weight:700;color:var(--ink-4);text-transform:uppercase;letter-spacing:.06em;margin-top:3px;">Total</div>
         </div>
-        <div id="milestone-list"></div>
-      </div>
-      <div class="detail-section" id="timelogs-section" style="display:none;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-          <div class="detail-section-title" style="margin-bottom:0;">Time logs</div>
-          <button class="btn btn-sm btn-secondary" onclick="openLogTimeModal()">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Log time
-          </button>
+        <div style="flex:1;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);padding:10px;text-align:center;">
+          <div style="font-family:var(--font-serif);font-size:1.3rem;color:var(--accent);" id="cd-stat-active">-</div>
+          <div style="font-size:.6rem;font-weight:700;color:var(--ink-4);text-transform:uppercase;letter-spacing:.06em;margin-top:3px;">Active</div>
         </div>
-        <div id="time-monthly-wrap"></div>
-        <div id="time-empty" style="text-align:center;padding:16px 0;font-size:.78rem;color:var(--ink-4);display:none;">No time logged yet.</div>
-        <div id="time-grand" style="display:none;margin-top:4px;">
-          <div style="background:var(--bg);border:2px solid var(--accent-border);border-radius:var(--r);padding:11px 14px;display:flex;align-items:center;justify-content:space-between;">
-            <span style="font-size:.71rem;font-weight:700;color:var(--ink-4);letter-spacing:.08em;text-transform:uppercase;">Grand total</span>
-            <div style="text-align:right;"><div style="font-family:var(--font-serif);font-size:1.4rem;color:var(--ink);" id="time-grand-val">0h</div><div style="font-size:.74rem;color:var(--accent);font-weight:600;" id="time-grand-earned"></div></div>
-          </div>
+        <div style="flex:1;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);padding:10px;text-align:center;">
+          <div style="font-family:var(--font-serif);font-size:1.3rem;color:var(--ink);" id="cd-stat-done">-</div>
+          <div style="font-size:.6rem;font-weight:700;color:var(--ink-4);text-transform:uppercase;letter-spacing:.06em;margin-top:3px;">Done</div>
         </div>
       </div>
-      <div class="detail-section" id="retainer-section" style="display:none;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-          <div class="detail-section-title" style="margin-bottom:0;">Deliverable reports</div>
-          <button class="btn btn-sm btn-secondary" onclick="addDeliverable()">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add
-          </button>
-        </div>
-        <div id="deliverable-list"></div>
-      </div>
+      <div id="cd-contracts-list"></div>
     </div>
-
-    <!-- FILES TAB -->
-    <div class="tab-pane" id="pane-files">
-      <div class="detail-section">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-          <div class="detail-section-title" style="margin-bottom:0;">Files &amp; links</div>
-          <div style="display:flex;gap:8px;">
-            <button class="btn btn-sm btn-secondary" onclick="triggerFileUpload()">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload
-            </button>
-            <button class="btn btn-sm btn-secondary" onclick="toggleLinkInput()">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>Link
-            </button>
-          </div>
-        </div>
-        <div id="link-input-wrap" style="display:none;flex-direction:column;gap:6px;margin-bottom:10px;">
-          <input type="url" id="link-url" placeholder="https://…" class="field-input" style="height:36px;" onkeydown="if(event.key==='Enter')saveLink()">
-          <input type="text" id="link-label" placeholder="Label (optional)" class="field-input" style="height:36px;">
-          <div style="display:flex;gap:6px;">
-            <button class="btn btn-sm btn-primary" onclick="saveLink()">Save link</button>
-            <button class="btn btn-sm btn-secondary" onclick="toggleLinkInput()">Cancel</button>
-          </div>
-        </div>
-        <div id="files-list"></div>
-        <div id="files-empty" style="font-size:.76rem;color:var(--ink-4);">No files added yet.</div>
-      </div>
+    <div class="detail-section" id="cd-invite-section" style="display:none;">
+      <div class="detail-section-title">Workspace invite</div>
+      <div id="cd-invite-box"></div>
     </div>
-
-    <!-- ACTIVITY TAB -->
-    <div class="tab-pane" id="pane-activity">
-      <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:32px;color:var(--ink-4);font-size:.8rem;" id="activity-loading"><div class="spinner"></div>Loading…</div>
-      <div class="activity-feed" id="activity-feed" style="display:none;"></div>
-      <div id="activity-empty" style="display:none;padding:40px 20px;text-align:center;font-size:.8rem;color:var(--ink-4);">No activity yet.</div>
+    <div class="detail-section">
+      <div class="detail-section-title">Actions</div>
+      <button class="btn btn-secondary" style="width:100%;justify-content:center;margin-bottom:8px;" onclick="openInviteModal()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Send workspace invite
+      </button>
+      <button class="btn btn-secondary" style="width:100%;justify-content:center;color:var(--red);border-color:var(--red-border);" onclick="archiveClient()" onmouseover="this.style.background='var(--red-bg)'" onmouseout="this.style.background=''">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+        Archive client
+      </button>
     </div>
   </div>
 </div>
-<div class="detail-overlay" id="detail-overlay" onclick="closeDetail()"></div>
+<div class="detail-overlay" id="client-detail-overlay" onclick="closeClientDetail()"></div>
 
-<!-- CONTRACT WIZARD MODAL -->
-<div class="modal-overlay" id="modal-contract" onclick="if(event.target===this)closeContractModal()">
-  <div class="modal modal-lg">
+<!-- ADD / EDIT CLIENT MODAL -->
+<div class="modal-overlay" id="modal-client" onclick="if(event.target===this)WD.closeModal('modal-client')">
+  <div class="modal" style="max-width:480px;">
     <div class="modal-header">
-      <span class="modal-title" id="contract-modal-title">New contract</span>
-      <button class="modal-close" onclick="closeContractModal()">
+      <span class="modal-title" id="client-modal-title">Add client</span>
+      <button class="modal-close" onclick="WD.closeModal('modal-client')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </button>
     </div>
-    <div class="wizard-step-dots">
-      <div class="wizard-dot active" id="wdot-0"></div>
-      <div class="wizard-dot" id="wdot-1"></div>
-      <div class="wizard-dot" id="wdot-2"></div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-client-id">
+      <div class="auth-error" id="client-modal-error" style="display:none;align-items:center;gap:8px;padding:10px 12px;background:var(--red-bg);border:1px solid var(--red-border);border-radius:var(--r);font-size:.8rem;color:var(--red);">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>
+        <span id="client-modal-error-text">Error</span>
+      </div>
+      <div class="field">
+        <label class="field-label">Full name *</label>
+        <input class="field-input" type="text" id="c-name" placeholder="e.g. Jane Smith" autocomplete="off">
+        <span class="field-error" id="err-c-name" style="display:none;font-size:.71rem;color:var(--red);margin-top:2px;">Required</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="field">
+          <label class="field-label">Email <span style="font-weight:400;color:var(--ink-4);">(optional)</span></label>
+          <input class="field-input" type="email" id="c-email" placeholder="jane@company.com" autocomplete="off">
+          <span class="field-error" id="err-c-email" style="display:none;font-size:.71rem;color:var(--red);margin-top:2px;">Invalid email</span>
+        </div>
+        <div class="field">
+          <label class="field-label">Phone <span style="font-weight:400;color:var(--ink-4);">(optional)</span></label>
+          <input class="field-input" type="tel" id="c-phone" placeholder="+1 555 000 0000">
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">Company <span style="font-weight:400;color:var(--ink-4);">(optional)</span></label>
+        <input class="field-input" type="text" id="c-company" placeholder="e.g. Acme Corp" autocomplete="off">
+      </div>
+      <div class="field">
+        <label class="field-label">Notes <span style="font-weight:400;color:var(--ink-4);">(optional)</span></label>
+        <textarea class="field-input" id="c-notes" rows="2" placeholder="Any notes about this client..." style="height:auto;padding:10px 12px;resize:vertical;min-height:68px;"></textarea>
+      </div>
     </div>
-    <div class="modal-body" id="wizard-body" style="gap:14px;"></div>
     <div class="modal-footer">
-      <button class="btn btn-secondary" id="wiz-back" onclick="wizBack()" style="display:none;">← Back</button>
-      <button class="btn btn-secondary" id="wiz-cancel" onclick="closeContractModal()">Cancel</button>
-      <button class="btn btn-primary" id="wiz-next" onclick="wizNext()"><span id="wiz-next-label">Continue →</span></button>
+      <button class="btn btn-secondary" onclick="WD.closeModal('modal-client')">Cancel</button>
+      <button class="btn btn-primary" id="client-save-btn" onclick="saveClient()">
+        <span class="btn-label" id="client-save-label">Add client</span>
+      </button>
     </div>
   </div>
 </div>
 
-<!-- DELETE MODAL -->
-<div class="modal-overlay" id="modal-delete" onclick="if(event.target===this)WD.closeModal('modal-delete')">
+<!-- ARCHIVE CONFIRM MODAL -->
+<div class="modal-overlay" id="modal-archive" onclick="if(event.target===this)WD.closeModal('modal-archive')">
   <div class="modal" style="max-width:400px;">
     <div class="modal-header">
-      <span class="modal-title">Delete contract?</span>
-      <button class="modal-close" onclick="WD.closeModal('modal-delete')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
-    </div>
-    <div class="modal-body"><p style="font-size:.84rem;color:var(--ink-3);line-height:1.6;">This action cannot be undone. The contract and all its milestones will be permanently deleted.</p></div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="WD.closeModal('modal-delete')">Keep it</button>
-      <button class="btn btn-danger" id="delete-confirm-btn" onclick="executeDelete()"><span class="btn-label">Delete</span></button>
-    </div>
-  </div>
-</div>
-
-<!-- LOG TIME MODAL -->
-<div class="modal-overlay" id="modal-log-time" onclick="if(event.target===this)WD.closeModal('modal-log-time')">
-  <div class="modal" style="max-width:420px;">
-    <div class="modal-header">
-      <span class="modal-title">Log time</span>
-      <button class="modal-close" onclick="WD.closeModal('modal-log-time')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      <span class="modal-title">Archive client?</span>
+      <button class="modal-close" onclick="WD.closeModal('modal-archive')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
     </div>
     <div class="modal-body">
-      <div class="field"><label class="field-label">Date</label><input class="field-input" type="date" id="log-date"></div>
-      <div class="field"><label class="field-label">Hours</label><input class="field-input" type="number" id="log-hours" placeholder="e.g. 2.5" min="0.25" step="0.25"></div>
-      <div class="field"><label class="field-label">Description</label><textarea class="field-input" id="log-desc" placeholder="What did you work on?" style="height:auto;padding:10px 12px;min-height:72px;resize:vertical;"></textarea></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="WD.closeModal('modal-log-time')">Cancel</button>
-      <button class="btn btn-primary" id="log-save-btn" onclick="saveTimeLog()"><span class="btn-label">Log time</span></button>
-    </div>
-  </div>
-</div>
-
-<!-- DELIVERABLE MODAL -->
-<div class="modal-overlay" id="modal-deliverable" onclick="if(event.target===this)WD.closeModal('modal-deliverable')">
-  <div class="modal" style="max-width:500px;">
-    <div class="modal-header">
-      <span class="modal-title">Deliverable report</span>
-      <button class="modal-close" onclick="WD.closeModal('modal-deliverable')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="del-edit-id">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div class="field"><label class="field-label">Date</label><input class="field-input" type="date" id="del-date"></div>
-        <div class="field"><label class="field-label">Title *</label><input class="field-input" type="text" id="del-title" placeholder="e.g. Weekly report"></div>
+      <div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:8px 0;">
+        <div style="width:52px;height:52px;border-radius:14px;background:var(--amber-bg);border:1px solid var(--amber-border);display:flex;align-items:center;justify-content:center;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="color:var(--amber);"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+        </div>
+        <div>
+          <div style="font-size:.9rem;font-weight:700;color:var(--ink);margin-bottom:4px;" id="archive-client-name">Archive this client?</div>
+          <p style="font-size:.83rem;color:var(--ink-3);line-height:1.6;">They'll be hidden from your active clients list. Their contracts and data are preserved — you can unarchive any time.</p>
+        </div>
       </div>
-      <div class="field"><label class="field-label">Content</label><textarea class="field-input" id="del-content" placeholder="Describe what was delivered…" style="height:auto;padding:10px 12px;min-height:120px;resize:vertical;"></textarea></div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="WD.closeModal('modal-deliverable')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveDeliverable()"><span class="btn-label">Save report</span></button>
+      <button class="btn btn-secondary" onclick="WD.closeModal('modal-archive')">Cancel</button>
+      <button class="btn btn-danger" id="archive-confirm-btn" onclick="executeArchive()"><span class="btn-label">Archive client</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- INVITE MODAL -->
+<div class="modal-overlay" id="modal-invite" onclick="if(event.target===this)WD.closeModal('modal-invite')">
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-header">
+      <span class="modal-title">Invite to workspace</span>
+      <button class="modal-close" onclick="WD.closeModal('modal-invite')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:.84rem;color:var(--ink-3);line-height:1.6;margin-bottom:4px;">
+        Send <strong id="invite-client-name">this client</strong> a link to join your workDez workspace. They'll be able to view contracts, approve milestones and upload files.
+      </p>
+      <div id="invite-existing-box" style="display:none;margin-bottom:4px;"></div>
+      <div class="field">
+        <label class="field-label">Client email</label>
+        <input class="field-input" type="email" id="invite-email" placeholder="client@example.com">
+        <span class="field-hint">We'll send the invite link to this address.</span>
+      </div>
+      <div class="notice-banner blue" style="margin-top:4px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <span>The client will see contracts and milestones assigned to them — nothing else.</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="WD.closeModal('modal-invite')">Cancel</button>
+      <button class="btn btn-primary" id="invite-send-btn" onclick="sendInvite()">
+        <span class="btn-label">Send invite</span>
+      </button>
     </div>
   </div>
 </div>
 
 <script>
-// ═══════════════════════ STATE ═══════════════════════════
-let _contracts=[],_clients=[],_currentFilter="all",_currentView="card";
-let _selectedContract=null,_currentTab="overview";
-let _milestonesDirty=false,_timeLogs=[],_attachments=[];
-let _activityCache={},_statusMenuOpen=false;
-let _wizStep=0,_wizData={},_wizMode="new";
-let _searchTimer=null,_saveTimer=null;
+var _clients = [], _contracts = [], _selectedClient = null;
+var _clientFilter = "all", _clientSearchTimer = null;
 
-window.pageInit=async function(user){await loadAll();};
-window.openNewContract=function(){
-  if(window._hasSub===false){WD.showUpgradeModal();return;}
-  openContractWizard("new");
-};
-window.onPollUpdate=function(c){_contracts=c;renderContracts();};
+window.pageInit = function(user) { loadClients(); };
+function openNewClient() { openClientModal("new"); }
 
-async function loadAll() {
-  // Show cached data instantly if available
-  const cachedContracts = window._shellCache?.cacheGet('contracts');
-  const cachedClients   = window._shellCache?.cacheGet('clients');
-
-  if (cachedContracts) {
-    _contracts = cachedContracts;
-    _clients   = cachedClients || [];
-    document.getElementById("contracts-loading").style.display = "none";
-    renderContracts();
-    // Refresh in background silently
-    refreshInBackground();
+function loadClients() {
+  var cachedClients   = window._shellCache && window._shellCache.cacheGet("clients");
+  var cachedContracts = window._shellCache && window._shellCache.cacheGet("contracts");
+  if (cachedClients) {
+    _clients   = cachedClients;
+    _contracts = cachedContracts || [];
+    document.getElementById("clients-loading").style.display = "none";
+    renderClients();
+    refreshClientsInBackground();
     return;
   }
-  // No cache — fetch normally
-  try {
-    const token = WD.getToken();
-    const [cr, clr] = await Promise.all([
-      WD.api({ action: "get_contracts", token }),
-      WD.api({ action: "get_clients",   token })
-    ]);
-    if (cr.success)  { _contracts = cr.contracts  || []; window._shellCache?.cacheSet('contracts', _contracts); }
-    if (clr.success) { _clients   = clr.clients   || []; window._shellCache?.cacheSet('clients',   _clients);   }
-    document.getElementById("contracts-loading").style.display = "none";
-    renderContracts();
-  } catch(e) {
-    document.getElementById("contracts-loading").style.display = "none";
-    WD.showToast("Failed to load.", "error");
-  }
+  var token = WD.getToken();
+  Promise.all([
+    WD.api({ action: "get_clients",   token: token }),
+    WD.api({ action: "get_contracts", token: token })
+  ]).then(function(r) {
+    if (r[0].success) { _clients   = r[0].clients   || []; window._shellCache && window._shellCache.cacheSet("clients",   _clients); }
+    if (r[1].success) { _contracts = r[1].contracts || []; window._shellCache && window._shellCache.cacheSet("contracts", _contracts); }
+    document.getElementById("clients-loading").style.display = "none";
+    renderClients();
+  }).catch(function() {
+    document.getElementById("clients-loading").style.display = "none";
+    WD.showToast("Failed to load clients.", "error");
+  });
 }
 
-async function refreshInBackground() {
-  try {
-    const token = WD.getToken();
-    const [cr, clr] = await Promise.all([
-      WD.api({ action: "get_contracts", token }),
-      WD.api({ action: "get_clients",   token })
-    ]);
-    if (cr.success) {
-      _contracts = cr.contracts || [];
-      window._shellCache?.cacheSet('contracts', _contracts);
-      if (!_selectedContract) renderContracts();
+function refreshClientsInBackground() {
+  var token = WD.getToken();
+  Promise.all([
+    WD.api({ action: "get_clients",   token: token }),
+    WD.api({ action: "get_contracts", token: token })
+  ]).then(function(r) {
+    if (r[0].success) {
+      _clients = r[0].clients || [];
+      window._shellCache && window._shellCache.cacheSet("clients", _clients);
+      if (!_selectedClient) renderClients();
     }
-    if (clr.success) {
-      _clients = clr.clients || [];
-      window._shellCache?.cacheSet('clients', _clients);
+    if (r[1].success) {
+      _contracts = r[1].contracts || [];
+      window._shellCache && window._shellCache.cacheSet("contracts", _contracts);
     }
-  } catch(e) {}
+  }).catch(function() {});
 }
 
-function renderContracts(){
-  const q=(document.getElementById("search-input")?.value||"").toLowerCase();
-  const filtered=_contracts.filter(c=>{
-    if(c.status==="deleted")return false;
-    if(_currentFilter!=="all"&&c.status!==_currentFilter)return false;
-    if(q&&!WD.fuzzyMatch(c.title,q)&&!WD.fuzzyMatch(c.clientName||"",q))return false;
+function renderClients() {
+  var q = (document.getElementById("client-search") ? document.getElementById("client-search").value : "").toLowerCase();
+  var filtered = _clients.filter(function(c) {
+    if (c.status === "deleted") return false;
+    if (_clientFilter === "active"   && c.status !== "active")        return false;
+    if (_clientFilter === "archived" && c.status !== "archived")      return false;
+    if (_clientFilter === "invited"  && c.inviteStatus !== "pending") return false;
+    if (q && !WD.fuzzyMatch(c.name, q) && !WD.fuzzyMatch(c.company || "", q) && !WD.fuzzyMatch(c.email || "", q)) return false;
     return true;
   });
-  const total=_contracts.filter(c=>c.status!=="deleted").length;
-  const lbl=document.getElementById("contracts-count-label");
-  if(lbl)lbl.textContent=total===0?"Create your first contract.":total+" contract"+(total!==1?"s":"")+" in your workspace.";
-  const container=document.getElementById("contracts-container"),empty=document.getElementById("contracts-empty");
-  if(!filtered.length){container.innerHTML="";empty.style.display="";return;}
-  empty.style.display="none";
-  if(_currentView==="card")container.innerHTML=renderCardView(filtered);
-  else if(_currentView==="list")container.innerHTML=renderListView(filtered);
-  else container.innerHTML=renderKanbanView(filtered);
+  var total = _clients.filter(function(c){ return c.status !== "deleted"; }).length;
+  var lbl = document.getElementById("clients-count-label");
+  if (lbl) lbl.textContent = total === 0 ? "Add your first client." : total + " client" + (total !== 1 ? "s" : "") + " in your workspace.";
+  var container = document.getElementById("clients-container");
+  var empty     = document.getElementById("clients-empty");
+  if (!filtered.length) { container.innerHTML = ""; empty.style.display = ""; return; }
+  empty.style.display = "none";
+  var rows = [];
+  filtered.forEach(function(c, i) {
+    var clientContracts = _contracts.filter(function(p){ return p.clientId === c.id && p.status !== "deleted"; });
+    var activeC  = clientContracts.filter(function(p){ return p.status === "active"; }).length;
+    var doneC    = clientContracts.filter(function(p){ return p.status === "completed"; }).length;
+    var invStat  = c.inviteStatus || "none";
+    var invLabel = invStat === "accepted" ? "Joined" : invStat === "pending" ? "Invited" : "Not invited";
+    var invClass = invStat === "accepted" ? "accepted" : invStat === "pending" ? "pending" : "none";
+    var isArch   = c.status === "archived";
+    var card = document.createElement("div");
+    card.className = "client-card";
+    card.style.animationDelay = (i * 0.04) + "s";
+    if (isArch) card.style.opacity = "0.6";
+    card.setAttribute("onclick", "openClientDetail('" + c.id + "')");
+    var top = '<div class="client-card-top">'
+      + '<div class="client-avatar" style="background:' + WD.avatarColor(c.name) + '">' + WD.escHtml(WD.initials(c.name)) + '</div>'
+      + '<div class="client-card-info">'
+      + '<div class="client-card-name">' + WD.escHtml(c.name) + '</div>'
+      + (c.company ? '<div class="client-card-company">' + WD.escHtml(c.company) + '</div>' : '')
+      + (c.email   ? '<div class="client-card-email">'   + WD.escHtml(c.email)   + '</div>' : '')
+      + '</div>'
+      + (isArch ? '<span style="background:var(--bg-3);color:var(--ink-4);font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:999px;flex-shrink:0;">Archived</span>' : '')
+      + '</div>';
+    var stats = '<div class="client-stats">'
+      + '<div class="client-stat"><div class="client-stat-val">' + clientContracts.length + '</div><div class="client-stat-lbl">Total</div></div>'
+      + '<div class="client-stat"><div class="client-stat-val" style="color:var(--accent);">' + activeC + '</div><div class="client-stat-lbl">Active</div></div>'
+      + '<div class="client-stat"><div class="client-stat-val">' + doneC + '</div><div class="client-stat-lbl">Done</div></div>'
+      + '</div>';
+    var footer = '<div class="client-card-footer">'
+      + '<span class="invite-badge ' + invClass + '">' + invLabel + '</span>'
+      + '<span style="font-size:.73rem;color:var(--ink-4);">Since ' + WD.fmtDateShort(c.createdAt) + '</span>'
+      + '</div>';
+    card.innerHTML = top + stats + footer;
+    rows.push(card);
+  });
+  var grid = document.createElement("div");
+  grid.className = "clients-grid";
+  rows.forEach(function(r){ grid.appendChild(r); });
+  container.innerHTML = "";
+  container.appendChild(grid);
 }
 
-function renderCardView(contracts){
-  return`<div class="contracts-grid">${contracts.map(c=>{
-    const due=c.dueDate?new Date(c.dueDate):null;
-    const isOver=due&&due<new Date()&&!["completed","ended","cancelled"].includes(c.status);
-    const doneM=(c.milestones||[]).filter(m=>m.approvalStatus==="approved"||m.status==="done").length;
-    const totalM=(c.milestones||[]).length;
-    const hasRev=(c.milestones||[]).some(m=>m.approvalStatus==="revision_requested");
-    const hasPendC=c.requestStatus==="pending_client";
-    const hasClientReq=c.requestStatus==="pending";
-    const hasChange=typeof contractHasChanges==="function"&&contractHasChanges(c);
-    return`<div class="contract-card" onclick="openDetail('${c.id}')">
-      <div class="contract-card-header"><div class="contract-card-title">${WD.escHtml(c.title)}${hasChange?'<span class="change-dot"></span>':''}</div>${WD.badgeHtml(c.status)}</div>
-      <div class="contract-card-client"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>${WD.escHtml(c.clientName||"No client")}</div>
-      <div class="contract-card-meta">${WD.typePillHtml(c.type)}${c.budgetAmount>0?`<span class="budget-label">${WD.fmtCurrency(c.budgetAmount,c.currency)}${c.type==="hourly"?"/hr":c.type==="retainer"?"/mo":""}</span>`:""}${due&&c.type!=="retainer"?`<span class="due-label${isOver?" overdue":""}">${isOver?"Overdue":"Due"} ${WD.fmtDateShort(c.dueDate)}</span>`:""}</div>
-      ${c.type!=="retainer"?`<div class="progress-bar"><div class="progress-fill" style="width:${c.progress||0}%"></div></div><div class="progress-label"><span>${c.type==="hourly"?(c.totalHours||0)+"h logged":totalM>0?doneM+"/"+totalM+" milestones":"No milestones"}</span><span>${c.progress||0}%</span></div>`:""}
-      ${hasPendC?`<div class="card-notice pending-client"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Awaiting client acceptance</div>`:""}
-      ${hasClientReq?`<div class="card-notice client-request"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>Client request — <button onclick="event.stopPropagation();respondRequest('${c.id}','accepted')" style="background:var(--accent);color:#fff;border:none;border-radius:4px;padding:1px 8px;cursor:pointer;font-size:.67rem;font-weight:700;font-family:var(--font-sans);margin-left:4px;">Accept</button><button onclick="event.stopPropagation();respondRequest('${c.id}','declined')" style="background:var(--red-bg);color:var(--red);border:none;border-radius:4px;padding:1px 8px;cursor:pointer;font-size:.67rem;font-weight:700;font-family:var(--font-sans);margin-left:3px;">Decline</button></div>`:""}
-      ${hasRev?`<div class="card-notice revision"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>Client requested revision</div>`:""}
-    </div>`;
-  }).join("")}</div>`;
+function setClientFilter(f, el) {
+  _clientFilter = f;
+  document.querySelectorAll(".client-filter-btn").forEach(function(b){ b.classList.remove("active"); });
+  el.classList.add("active");
+  renderClients();
+}
+function handleClientSearch() {
+  clearTimeout(_clientSearchTimer);
+  _clientSearchTimer = setTimeout(renderClients, 150);
 }
 
-function renderListView(contracts){
-  const hdr=`<div style="display:flex;align-items:center;gap:12px;padding:9px 18px;background:var(--bg-2);border-bottom:1px solid var(--border);font-size:.67rem;font-weight:700;color:var(--ink-4);letter-spacing:.06em;text-transform:uppercase;"><div style="flex:1;">Contract</div><div style="width:120px;">Client</div><div style="width:72px;">Status</div><div style="width:90px;text-align:right;">Budget</div><div style="width:72px;text-align:right;">Progress</div></div>`;
-  const rows=contracts.map(c=>`<div class="contract-row" onclick="openDetail('${c.id}')"><div style="flex:1;font-size:.84rem;font-weight:600;display:flex;align-items:center;gap:6px;overflow:hidden;">${WD.escHtml(c.title)} ${WD.typePillHtml(c.type)}</div><div style="width:120px;font-size:.74rem;color:var(--ink-4);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${WD.escHtml(c.clientName||"—")}</div><div style="width:72px;">${WD.badgeHtml(c.status)}</div><div style="width:90px;font-size:.78rem;font-weight:600;text-align:right;">${c.budgetAmount>0?WD.fmtCurrency(c.budgetAmount,c.currency)+(c.type==="hourly"?"/hr":c.type==="retainer"?"/mo":""):"—"}</div><div style="width:72px;">${c.type==="retainer"?"—":`<div class="progress-bar" style="height:5px;"><div class="progress-fill" style="width:${c.progress||0}%"></div></div><div style="font-size:.65rem;color:var(--ink-4);text-align:right;">${c.progress||0}%</div>`}</div></div>`).join("");
-  return`<div class="contracts-list">${hdr}${rows}</div>`;
+function openClientDetail(id) {
+  _selectedClient = null;
+  for (var i = 0; i < _clients.length; i++) { if (_clients[i].id === id) { _selectedClient = _clients[i]; break; } }
+  if (!_selectedClient) return;
+  populateClientDetail(_selectedClient);
+  document.getElementById("client-detail").classList.add("open");
+  document.getElementById("client-detail-overlay").classList.add("open");
 }
 
-function renderKanbanView(contracts){
-  const cols=[{key:"draft",label:"Draft"},{key:"active",label:"Active"},{key:"paused",label:"Paused"},{key:"completed",label:"Done"}];
-  return`<div class="kanban-board">${cols.map(col=>{const cp=contracts.filter(c=>c.status===col.key||(c.status==="ended"&&col.key==="completed"));return`<div class="kanban-col"><div class="kanban-col-header"><span class="kanban-col-title">${col.label}</span><span class="kanban-col-count">${cp.length}</span></div>${cp.map(c=>`<div class="kanban-card" onclick="openDetail('${c.id}')"><div style="font-size:.82rem;font-weight:700;color:var(--ink);margin-bottom:4px;">${WD.escHtml(c.title)}</div><div style="margin-bottom:6px;">${WD.typePillHtml(c.type)}</div><div style="font-size:.7rem;color:var(--ink-4);margin-bottom:8px;">${WD.escHtml(c.clientName||"")}</div><div style="display:flex;justify-content:space-between;">${c.budgetAmount>0?`<span style="font-size:.7rem;font-weight:600;color:var(--ink-3);">${WD.fmtCurrency(c.budgetAmount,c.currency)}</span>`:"<span></span>"}<span style="font-size:.7rem;color:var(--ink-4);">${c.type==="retainer"?"—":c.progress+"%"}</span></div></div>`).join("")}${!cp.length?`<div style="border:1.5px dashed var(--border);border-radius:var(--r);padding:20px;text-align:center;font-size:.76rem;color:var(--ink-4);">Empty</div>`:""}</div>`;}).join("")}</div>`;
-}
+function populateClientDetail(c) {
+  var av = document.getElementById("cd-avatar");
+  av.textContent = WD.initials(c.name);
+  av.style.background = WD.avatarColor(c.name);
+  document.getElementById("cd-name").textContent        = c.name;
+  document.getElementById("cd-fullname").textContent    = c.name;
+  document.getElementById("cd-company-line").textContent = c.company || c.email || "";
+  if (c.email) {
+    document.getElementById("cd-email-row").style.display  = "";
+    document.getElementById("cd-email-link").textContent   = c.email;
+    document.getElementById("cd-email-link").href          = "mailto:" + c.email;
+  } else { document.getElementById("cd-email-row").style.display = "none"; }
+  if (c.phone) {
+    document.getElementById("cd-phone-row").style.display  = "";
+    document.getElementById("cd-phone").textContent        = c.phone;
+  } else { document.getElementById("cd-phone-row").style.display = "none"; }
+  if (c.notes) {
+    document.getElementById("cd-notes-row").style.display  = "";
+    document.getElementById("cd-notes").textContent        = c.notes;
+  } else { document.getElementById("cd-notes-row").style.display = "none"; }
 
-function setFilter(f,el){_currentFilter=f;document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));el.classList.add("active");renderContracts();}
-function setView(v,el){_currentView=v;document.querySelectorAll(".view-btn").forEach(b=>b.classList.remove("active"));el.classList.add("active");renderContracts();}
-function handleSearch(){clearTimeout(_searchTimer);_searchTimer=setTimeout(renderContracts,150);}
+  var invStat = c.inviteStatus || "none";
+  var sw = document.getElementById("cd-invite-status-wrap");
+  if (invStat === "accepted")       sw.innerHTML = '<span class="invite-badge accepted">Joined workspace</span>';
+  else if (invStat === "pending")   sw.innerHTML = '<span class="invite-badge pending">Invite pending</span>';
+  else                              sw.innerHTML = '<span class="invite-badge none">Not yet invited</span>';
 
-async function openDetail(id){
-  if(_milestonesDirty)await saveNow();
-  _selectedContract=_contracts.find(c=>c.id===id);if(!_selectedContract)return;
-  if(typeof markContractSeen==="function")markContractSeen(_selectedContract.id,_selectedContract.updatedAt);
-  renderContracts();
-  switchTab("overview",document.querySelector('.detail-tab[data-tab="overview"]'));
-  populateDetail(_selectedContract);
-  document.getElementById("contract-detail").classList.add("open");
-  document.getElementById("detail-overlay").classList.add("open");
-}
+  var invBtn = document.getElementById("cd-invite-btn");
+  if (invBtn) invBtn.style.display = invStat === "accepted" ? "none" : "";
 
-function populateDetail(c){
-  document.getElementById("detail-title").textContent=c.title;
-  document.getElementById("detail-client").textContent=c.clientName||"—";
-  document.getElementById("detail-type-wrap").innerHTML=WD.typePillHtml(c.type);
-  const bl=document.getElementById("detail-budget-label-el");if(bl)bl.textContent=c.type==="hourly"?"Hourly rate":c.type==="retainer"?"Monthly rate":"Budget";
-  document.getElementById("detail-budget").textContent=c.budgetAmount>0?WD.fmtCurrency(c.budgetAmount,c.currency)+(c.type==="hourly"?"/hr":c.type==="retainer"?"/mo":""):"—";
-  document.getElementById("detail-created").textContent=WD.fmtDate(c.createdAt);
-  const isR=c.type==="retainer",isH=c.type==="hourly",isM=!isR&&!isH;
-  const dueW=document.getElementById("detail-due-wrap");if(dueW)dueW.style.display=isR?"none":"";
-  document.getElementById("detail-due").textContent=c.dueDate?WD.fmtDate(c.dueDate):"—";
-  document.getElementById("detail-start").textContent=c.startDate?WD.fmtDate(c.startDate):"—";
-  const whW=document.getElementById("detail-workhours-wrap"),npW=document.getElementById("detail-notice-wrap");
-  if(isR){if(whW){whW.style.display="";document.getElementById("detail-workhours").textContent=c.workHoursPerWeek?c.workHoursPerWeek+"h/week":"Not set";}if(npW){npW.style.display="";document.getElementById("detail-notice-period").textContent=c.noticePeriod||"Not set";}}
-  else{if(whW)whW.style.display="none";if(npW)npW.style.display="none";}
-  const dw=document.getElementById("detail-desc-wrap");
-  if(c.description){dw.style.display="";document.getElementById("detail-desc").textContent=c.description;}else dw.style.display="none";
-  document.getElementById("detail-progress-section").style.display=isM?"":"none";
-  if(isM)updateProgress(c);
-  document.getElementById("detail-retainer-stats").style.display=isR?"":"none";
-  if(isR)updateRetainerStats(c);
-  document.getElementById("detail-hourly-stats").style.display=isH?"":"none";
-  if(isH){const h=parseFloat(c.totalHours)||0,r=parseFloat(c.budgetAmount)||0;document.getElementById("hourly-hours").textContent=h.toFixed(1)+"h";document.getElementById("hourly-rate").textContent=r>0?WD.fmtCurrency(r,c.currency)+"/hr":"—";document.getElementById("hourly-cost").textContent=r>0&&h>0?WD.fmtCurrency(r*h,c.currency):"—";}
-  const tw=document.getElementById("tab-work");if(tw)tw.childNodes[0].textContent=isH?"Time ":isR?"Deliverables ":"Milestones ";
-  renderNoticeBanner(c);
-  const sb=document.getElementById("detail-send-btn");sb.style.display=(c.status==="draft"&&(!c.requestStatus||c.requestStatus==="declined"))?"":"none";
-  const db=document.getElementById("detail-delete-btn");if(db)db.style.display=["active","completed"].includes(c.status)?"none":"";
-  renderStatusDropdown(c);renderWorkTab(c);
-  _attachments=Array.isArray(c.attachments)?c.attachments:[];renderFiles();
-  document.getElementById("activity-loading").style.display="flex";
-  document.getElementById("activity-feed").style.display="none";
-  document.getElementById("activity-empty").style.display="none";
-  document.getElementById("activity-badge").textContent="0";
-  _milestonesDirty=false;
-}
+  var cc = _contracts.filter(function(p){ return p.clientId === c.id && p.status !== "deleted"; });
+  document.getElementById("cd-stat-total").textContent  = cc.length;
+  document.getElementById("cd-stat-active").textContent = cc.filter(function(p){ return p.status === "active"; }).length;
+  document.getElementById("cd-stat-done").textContent   = cc.filter(function(p){ return p.status === "completed"; }).length;
 
-function renderNoticeBanner(c){
-  const sec=document.getElementById("detail-notice-section");
-  if(c.requestStatus==="pending_client"){sec.style.display="";sec.innerHTML=`<div class="notice-banner blue"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span><strong>Sent to client</strong> — awaiting acceptance.</span></div>`;}
-  else if(c.requestStatus==="pending"){sec.style.display="";sec.innerHTML=`<div class="notice-banner amber"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg><span><strong>Client requested this contract</strong> — accept or decline.</span></div>`;}
-  else sec.style.display="none";
-}
+  var cl = document.getElementById("cd-contracts-list");
+  if (!cc.length) {
+    cl.innerHTML = '<div style="font-size:.78rem;color:var(--ink-4);text-align:center;padding:12px 0;">No contracts yet.</div>';
+  } else {
+    var clHtml = "";
+    cc.slice(0, 5).forEach(function(p) {
+      clHtml += '<div class="contract-mini-row" onclick="closeClientDetail();navigate(\'contracts\');setTimeout(function(){if(typeof openDetail===\'function\')openDetail(\'' + p.id + '\');},300);">';
+      clHtml += '<div style="flex:1;min-width:0;"><div style="font-size:.83rem;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + WD.escHtml(p.title) + '</div>';
+      clHtml += '<div style="font-size:.7rem;color:var(--ink-4);margin-top:1px;">' + WD.typePillHtml(p.type) + '</div></div>';
+      clHtml += '<div>' + WD.badgeHtml(p.status) + '</div>';
+      clHtml += '<div style="font-size:.72rem;color:var(--ink-4);flex-shrink:0;">' + (p.type !== "retainer" ? (p.progress || 0) + "%" : "") + '</div>';
+      clHtml += '</div>';
+    });
+    if (cc.length > 5) {
+      clHtml += '<div style="font-size:.74rem;color:var(--accent);text-align:center;padding:8px 0;cursor:pointer;font-weight:600;" onclick="closeClientDetail();navigate(\'contracts\');">View all ' + cc.length + ' contracts</div>';
+    }
+    cl.innerHTML = clHtml;
+  }
 
-function closeDetail(){if(_milestonesDirty)saveNow();document.getElementById("contract-detail").classList.remove("open");document.getElementById("detail-overlay").classList.remove("open");closeStatusMenu();_selectedContract=null;}
-
-function switchTab(tab,el){
-  _currentTab=tab;
-  document.querySelectorAll(".detail-tab").forEach(b=>b.classList.remove("active"));
-  if(el)el.classList.add("active");
-  document.querySelectorAll(".tab-pane").forEach(p=>p.classList.remove("active"));
-  document.getElementById("pane-"+tab)?.classList.add("active");
-  if(tab==="activity"&&_selectedContract)loadActivity(_selectedContract.id);
-}
-
-const STATUS_META={draft:{dot:"#94a3b8",text:"Draft"},active:{dot:"#16a34a",text:"Active"},paused:{dot:"#9ca3af",text:"Paused"},completed:{dot:"#2563eb",text:"Completed"},cancelled:{dot:"#dc2626",text:"Cancelled"},ended:{dot:"#64748b",text:"Ended"}};
-
-function renderStatusDropdown(c){
-  const meta=STATUS_META[c.status]||STATUS_META.draft;
-  document.getElementById("status-dot").style.background=meta.dot;
-  document.getElementById("status-text").textContent=meta.text;
-  document.getElementById("status-trigger").classList.remove("open");_statusMenuOpen=false;
-  const opts=c.type==="retainer"?["draft","active","paused","ended"]:["draft","active","paused","completed","cancelled"];
-  document.getElementById("status-menu").innerHTML=opts.map(s=>{const m=STATUS_META[s];return`<div class="status-opt ${s===c.status?"current":""}" onclick="doChangeStatus('${s}')"><span class="sdot" style="background:${m.dot};"></span><span>${m.text}</span>${s===c.status?`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" style="margin-left:auto;"><polyline points="20 6 9 17 4 12"/></svg>`:""}</div>`;}).join("");
-}
-function toggleStatusMenu(){_statusMenuOpen=!_statusMenuOpen;document.getElementById("status-trigger").classList.toggle("open",_statusMenuOpen);document.getElementById("status-menu").classList.toggle("open",_statusMenuOpen);}
-function closeStatusMenu(){_statusMenuOpen=false;document.getElementById("status-trigger")?.classList.remove("open");document.getElementById("status-menu")?.classList.remove("open");}
-document.addEventListener("click",e=>{if(!e.target.closest(".status-dropdown-wrap"))closeStatusMenu();});
-
-async function doChangeStatus(status){
-  closeStatusMenu();if(!_selectedContract||status===_selectedContract.status)return;
-  const old=_selectedContract.status;_selectedContract.status=status;renderStatusDropdown(_selectedContract);
-  const idx=_contracts.findIndex(c=>c.id===_selectedContract.id);if(idx>-1)_contracts[idx].status=status;renderContracts();
-  try{const res=await WD.api({action:"update_contract",token:WD.getToken(),contractId:_selectedContract.id,status});if(!res.success){_selectedContract.status=old;renderStatusDropdown(_selectedContract);WD.showToast(res.error||"Failed","error");}else WD.showToast("Status updated","success");}
-  catch(e){_selectedContract.status=old;renderStatusDropdown(_selectedContract);WD.showToast("Connection error.","error");}
-}
-
-function renderWorkTab(c){
-  const isR=c.type==="retainer",isH=c.type==="hourly";
-  document.getElementById("milestones-section").style.display=(!isR&&!isH)?"":"none";
-  document.getElementById("timelogs-section").style.display=isH?"":"none";
-  document.getElementById("retainer-section").style.display=isR?"":"none";
-  if(!isR&&!isH)renderMilestones(c.milestones||[]);
-  if(isR)renderRetainerSection(c);
-  if(isH)renderTimeLogSummary([]);
-}
-
-function renderMilestones(milestones){
-  const list=document.getElementById("milestone-list");if(!list)return;
-  if(!milestones.length){list.innerHTML=`<div style="text-align:center;padding:20px 0;font-size:.78rem;color:var(--ink-4);">No milestones yet.</div>`;return;}
-  list.innerHTML=milestones.map((m,mi)=>{
-    const ap=m.approvalStatus||"pending",isDone=m.status==="done"||ap==="approved";
-    const revNotes=m.revisionNotes||{};
-    const bc=ap==="approved"?"var(--accent-border)":ap==="revision_requested"?"var(--purple-border)":"var(--border)";
-    return`<div class="milestone-item" style="border-color:${bc}">
-      <button class="milestone-header-row" onclick="toggleMsOpen(this,${mi})">
-        <button class="ms-check ${isDone?"done":""}" onclick="event.stopPropagation();toggleMs(${mi})"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></button>
-        <input class="ms-title-input ${isDone?"done":""}" value="${WD.escHtml(m.title)}" onclick="event.stopPropagation()" onchange="editMsTitle(${mi},this.value)" placeholder="Milestone title">
-        <input class="ms-amount-input" type="number" value="${m.amount||""}" placeholder="0" min="0" step="0.01" onclick="event.stopPropagation()" onchange="editMsAmount(${mi},this.value)">
-        ${ap==="approved"?`<span style="background:#dcfce7;color:#166634;font-size:.6rem;padding:2px 6px;border-radius:999px;font-weight:700;flex-shrink:0;">✓ Approved</span>`:""}
-        ${ap==="revision_requested"?`<span style="background:var(--purple-bg);color:var(--purple-text);font-size:.6rem;padding:2px 6px;border-radius:999px;font-weight:700;flex-shrink:0;">↩ Revision</span>`:""}
-        <button onclick="event.stopPropagation();deleteMs(${mi})" style="width:22px;height:22px;border-radius:5px;border:none;cursor:pointer;color:var(--ink-4);background:none;display:flex;align-items:center;justify-content:center;flex-shrink:0;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--ink-4)'"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
-        <span class="ms-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></span>
-      </button>
-      <div class="ms-body">
-        ${(m.subtasks||[]).map((s,si)=>`<div class="subtask-row"><button class="subtask-check ${s.status==="done"?"done":""}" onclick="toggleSubtask(${mi},${si})"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></button><input class="subtask-input ${s.status==="done"?"done":""}" value="${WD.escHtml(s.title)}" onchange="editSubtask(${mi},${si},this.value)" placeholder="Subtask"><button onclick="deleteSubtask(${mi},${si})" style="width:18px;height:18px;border:none;cursor:pointer;color:var(--ink-4);background:none;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:0;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>`).join("")}
-        <button onclick="addSubtask(${mi})" style="display:flex;align-items:center;gap:5px;padding:5px 0;font-size:.72rem;color:var(--ink-4);cursor:pointer;background:none;border:none;font-family:var(--font-sans);" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--ink-4)'"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add subtask</button>
-        ${ap==="revision_requested"&&revNotes.checklist?`<div class="revision-box"><div class="revision-box-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="11" height="11"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>Client requested revision</div><div class="revision-box-notes">${(revNotes.checklist||[]).map(x=>"• "+x.replace(/_/g," ")).join("<br>")}${revNotes.notes?"<br><em>"+WD.escHtml(revNotes.notes)+"</em>":""}</div><button class="btn btn-sm btn-secondary" style="margin-top:8px;" onclick="clearRevision('${m.id}',${mi})">Mark done</button></div>`:""}
-      </div>
-    </div>`;
-  }).join("");
-}
-
-function toggleMsOpen(hdr,mi){
-  const body=hdr.nextElementSibling,chev=hdr.querySelector(".ms-chevron"),isOpen=body?.classList.contains("open");
-  document.querySelectorAll("#milestone-list .ms-body").forEach(b=>b.classList.remove("open"));
-  document.querySelectorAll("#milestone-list .ms-chevron").forEach(c=>c.classList.remove("open"));
-  if(!isOpen&&body){body.classList.add("open");chev?.classList.add("open");}
-}
-function toggleMs(mi){if(!_selectedContract)return;const m=_selectedContract.milestones[mi];m.status=m.status==="done"?"pending":"done";m.completedAt=m.status==="done"?new Date().toISOString():"";_milestonesDirty=true;updateProgress(_selectedContract);renderMilestones(_selectedContract.milestones);scheduleSave();}
-function toggleSubtask(mi,si){if(!_selectedContract)return;const s=_selectedContract.milestones[mi].subtasks[si];s.status=s.status==="done"?"pending":"done";_milestonesDirty=true;renderMilestones(_selectedContract.milestones);scheduleSave();}
-function editMsTitle(mi,val){if(!_selectedContract||!val.trim())return;_selectedContract.milestones[mi].title=val.trim();_milestonesDirty=true;scheduleSave();}
-function editMsAmount(mi,val){if(!_selectedContract)return;_selectedContract.milestones[mi].amount=parseFloat(val)||0;_milestonesDirty=true;scheduleSave();}
-function editSubtask(mi,si,val){if(!_selectedContract||!val.trim())return;_selectedContract.milestones[mi].subtasks[si].title=val.trim();_milestonesDirty=true;scheduleSave();}
-function deleteMs(mi){if(!_selectedContract)return;_selectedContract.milestones.splice(mi,1);_milestonesDirty=true;renderMilestones(_selectedContract.milestones);updateProgress(_selectedContract);scheduleSave();}
-function deleteSubtask(mi,si){if(!_selectedContract)return;_selectedContract.milestones[mi].subtasks.splice(si,1);_milestonesDirty=true;renderMilestones(_selectedContract.milestones);scheduleSave();}
-function addMilestone(){
-  if(!_selectedContract)return;
-  _selectedContract.milestones.push({id:"tmp-"+Date.now(),title:"New milestone",status:"pending",subtasks:[],amount:0,approvalStatus:"pending",revisionNotes:{}});
-  _milestonesDirty=true;renderMilestones(_selectedContract.milestones);
-  const list=document.getElementById("milestone-list"),input=list.lastElementChild?.querySelector(".ms-title-input");
-  if(input){input.focus();input.select();}
-}
-function addSubtask(mi){
-  if(!_selectedContract)return;
-  _selectedContract.milestones[mi].subtasks.push({id:"tmp-"+Date.now(),title:"New subtask",status:"pending"});
-  _milestonesDirty=true;renderMilestones(_selectedContract.milestones);
-  const list=document.getElementById("milestone-list"),msEl=list?.children[mi],body=msEl?.querySelector(".ms-body"),chev=msEl?.querySelector(".ms-chevron");
-  if(body&&!body.classList.contains("open")){body.classList.add("open");chev?.classList.add("open");}
-  const inputs=msEl?.querySelectorAll(".subtask-input"),last=inputs?.[inputs.length-1];
-  if(last){last.focus();last.select();}
-}
-function updateProgress(c){
-  const ms=c.milestones||[],total=ms.length,done=ms.filter(m=>m.status==="done"||m.approvalStatus==="approved").length;
-  const prog=total>0?Math.round((done/total)*100):0;c.progress=prog;
-  const numEl=document.getElementById("detail-progress-num");if(numEl)numEl.textContent=prog+"%";
-  const fill=document.getElementById("detail-progress-fill");if(fill)fill.style.width=prog+"%";
-  const sumEl=document.getElementById("detail-ms-summary");if(sumEl)sumEl.textContent=total>0?done+"/"+total+" milestones":"No milestones";
-  const idx=_contracts.findIndex(x=>x.id===c.id);if(idx>-1)_contracts[idx].progress=prog;renderContracts();
-}
-async function clearRevision(milestoneId,mi){
-  if(!_selectedContract)return;
-  try{const res=await WD.api({action:"clear_revision",token:WD.getToken(),milestoneId});if(res.success){const m=_selectedContract.milestones[mi];if(m){m.approvalStatus="pending";m.status="done";}renderMilestones(_selectedContract.milestones);WD.showToast("Revision cleared.","success");}else WD.showToast(res.error||"Failed","error");}
-  catch(e){WD.showToast("Connection error.","error");}
-}
-function scheduleSave(){clearTimeout(_saveTimer);_saveTimer=setTimeout(saveMilestones,6000);}
-function saveNow(){clearTimeout(_saveTimer);return saveMilestones();}
-async function saveMilestones(){
-  if(!_selectedContract||!_milestonesDirty)return;_milestonesDirty=false;
-  try{const res=await WD.api({action:"save_milestones",token:WD.getToken(),contractId:_selectedContract.id,milestones:_selectedContract.milestones});if(res.success){_selectedContract.progress=res.progress;const idx=_contracts.findIndex(c=>c.id===_selectedContract.id);if(idx>-1)_contracts[idx].progress=res.progress;renderContracts();}}
-  catch(e){_milestonesDirty=true;}
-}
-window.addEventListener("beforeunload",()=>{if(_milestonesDirty)saveMilestones();});
-
-function updateRetainerStats(c){
-  const ms=c.milestones||[],now=new Date();
-  const mon=ms.filter(m=>{if(!m.dueDate)return false;const d=new Date(m.dueDate);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();});
-  const done=mon.filter(m=>m.approvalStatus==="approved").length;
-  document.getElementById("ret-total").textContent=mon.length||"—";document.getElementById("ret-done").textContent=done||"—";document.getElementById("ret-pending").textContent=(mon.length-done)||"—";
-}
-function renderRetainerSection(c){
-  const ms=c.milestones||[],list=document.getElementById("deliverable-list");
-  if(!ms.length){list.innerHTML=`<div style="text-align:center;padding:16px 0;font-size:.78rem;color:var(--ink-4);">No reports yet.</div>`;return;}
-  list.innerHTML=ms.slice(0,10).map((m,mi)=>{
-    const isApproved=m.approvalStatus==="approved";
-    return`<div class="del-item ${isApproved?"approved":""}" onclick="openDeliverableDetail(${mi})"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;"><div><div style="font-size:.84rem;font-weight:600;color:var(--ink);">${WD.escHtml(m.title)}</div>${m.dueDate?`<div style="font-size:.7rem;color:var(--ink-4);margin-top:2px;">${new Date(m.dueDate).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"})}</div>`:""}</div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">${isApproved?`<span style="background:#dcfce7;color:#166634;font-size:.6rem;padding:2px 6px;border-radius:999px;font-weight:700;">Approved</span>`:""}<button onclick="event.stopPropagation();deleteDeliverable(${mi})" style="width:22px;height:22px;border:none;cursor:pointer;color:var(--ink-4);background:none;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--ink-4)'"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button></div></div>${m.description?`<div style="font-size:.76rem;color:var(--ink-3);line-height:1.55;margin-top:6px;">${WD.escHtml(m.description.slice(0,200))}${m.description.length>200?"…":""}</div>`:""}</div>`;
-  }).join("");
-}
-function addDeliverable(){document.getElementById("del-date").value=new Date().toISOString().slice(0,10);document.getElementById("del-title").value="";document.getElementById("del-content").value="";document.getElementById("del-edit-id").value="";WD.openModal("modal-deliverable");setTimeout(()=>document.getElementById("del-title")?.focus(),100);}
-function openDeliverableDetail(mi){if(!_selectedContract)return;const m=_selectedContract.milestones[mi];if(!m)return;document.getElementById("del-date").value=m.dueDate||new Date().toISOString().slice(0,10);document.getElementById("del-title").value=m.title||"";document.getElementById("del-content").value=m.description||"";document.getElementById("del-edit-id").value=m.id;WD.openModal("modal-deliverable");}
-function saveDeliverable(){
-  const title=document.getElementById("del-title").value.trim(),date=document.getElementById("del-date").value,content=document.getElementById("del-content").value.trim(),editId=document.getElementById("del-edit-id").value;
-  if(!title){WD.showToast("Title required.","warn");return;}if(!_selectedContract)return;
-  if(editId){const idx=_selectedContract.milestones.findIndex(m=>m.id===editId);if(idx>-1){_selectedContract.milestones[idx].title=title;_selectedContract.milestones[idx].dueDate=date;_selectedContract.milestones[idx].description=content;}}
-  else _selectedContract.milestones.unshift({id:"tmp-"+Date.now(),title,status:"pending",subtasks:[],dueDate:date,completedAt:"",order:0,amount:0,approvalStatus:"pending",revisionNotes:{},description:content,createdAt:new Date().toISOString()});
-  _milestonesDirty=true;renderRetainerSection(_selectedContract);updateRetainerStats(_selectedContract);WD.closeModal("modal-deliverable");saveNow();WD.showToast(editId?"Updated.":"Added.","success");
-}
-function deleteDeliverable(mi){if(!_selectedContract)return;_selectedContract.milestones.splice(mi,1);_milestonesDirty=true;renderRetainerSection(_selectedContract);updateRetainerStats(_selectedContract);saveNow();}
-
-function renderTimeLogSummary(logs){
-  _timeLogs=logs||[];
-  const wrap=document.getElementById("time-monthly-wrap"),empty=document.getElementById("time-empty"),grand=document.getElementById("time-grand");
-  if(!_timeLogs.length){if(wrap)wrap.innerHTML="";if(empty)empty.style.display="";if(grand)grand.style.display="none";return;}
-  if(empty)empty.style.display="none";
-  const byMonth={};_timeLogs.forEach(l=>{const key=(l.date||"").slice(0,7);const label=l.date?new Date(l.date).toLocaleDateString(undefined,{month:"long",year:"numeric"}):"Unknown";if(!byMonth[key])byMonth[key]={label,hours:0,entries:0};byMonth[key].hours+=parseFloat(l.hours)||0;byMonth[key].entries+=1;});
-  const totalH=_timeLogs.reduce((s,l)=>s+(parseFloat(l.hours)||0),0),rate=parseFloat(_selectedContract?.budgetAmount)||0;
-  if(wrap)wrap.innerHTML=Object.entries(byMonth).sort(([a],[b])=>b.localeCompare(a)).map(([,m])=>`<div class="time-month-row"><div><div class="time-month-label">${m.label}</div><div class="time-month-sub">${m.entries} entr${m.entries===1?"y":"ies"}</div></div><div style="text-align:right;"><div class="time-month-hours">${m.hours.toFixed(1)}h</div>${rate>0?`<div class="time-month-earned">${WD.fmtCurrency(rate*m.hours,"USD")}</div>`:""}</div></div>`).join("");
-  if(grand){grand.style.display="";document.getElementById("time-grand-val").textContent=totalH.toFixed(1)+"h";document.getElementById("time-grand-earned").textContent=rate>0?WD.fmtCurrency(rate*totalH,"USD"):"";}
-}
-function openLogTimeModal(){document.getElementById("log-date").value=new Date().toISOString().slice(0,10);document.getElementById("log-hours").value="";document.getElementById("log-desc").value="";WD.openModal("modal-log-time");}
-async function saveTimeLog(){
-  const date=document.getElementById("log-date").value,hours=parseFloat(document.getElementById("log-hours").value)||0,desc=document.getElementById("log-desc").value.trim();
-  if(!date||hours<=0){WD.showToast("Enter valid date and hours.","warn");return;}if(!_selectedContract){WD.showToast("No contract.","warn");return;}
-  const btn=document.getElementById("log-save-btn");WD.setBtnLoading(btn,true);
-  try{const res=await WD.api({action:"log_time",token:WD.getToken(),contractId:_selectedContract.id,date,hours,description:desc});if(res.success){_timeLogs.unshift({date,hours,description:desc,id:res.logId});renderTimeLogSummary(_timeLogs);WD.closeModal("modal-log-time");WD.showToast("Time logged.","success");_selectedContract.totalHours=res.totalHours;document.getElementById("hourly-hours").textContent=(res.totalHours||0).toFixed(1)+"h";const r=parseFloat(_selectedContract?.budgetAmount)||0;document.getElementById("hourly-cost").textContent=r>0?WD.fmtCurrency(r*(res.totalHours||0),_selectedContract.currency):"—";}else WD.showToast(res.error||"Failed","error");}
-  catch(e){WD.showToast("Connection error.","error");}finally{WD.setBtnLoading(btn,false);}
-}
-
-function renderFiles(){
-  const list=document.getElementById("files-list"),empty=document.getElementById("files-empty");
-  if(!_attachments.length){list.innerHTML="";empty.style.display="";return;}empty.style.display="none";
-  list.innerHTML=_attachments.map((a,i)=>`<div class="attach-row"><span style="font-size:.9rem;flex-shrink:0;">${WD.fileIcon(a.type)}</span><span class="attach-name" title="${WD.escHtml(a.name)}">${WD.escHtml(a.name)}</span>${a.url?`<button class="attach-open" onclick="window.open('${WD.escHtml(a.url)}','_blank','noopener')">Open</button>`:""}<button onclick="removeFile(${i})" style="background:none;border:none;cursor:pointer;color:var(--ink-4);display:flex;align-items:center;padding:2px;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--ink-4)'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>`).join("");
-}
-function toggleLinkInput(){const w=document.getElementById("link-input-wrap");const v=w.style.display==="flex";w.style.display=v?"none":"flex";w.style.flexDirection="column";if(!v)setTimeout(()=>document.getElementById("link-url")?.focus(),50);}
-async function saveLink(){
-  const url=document.getElementById("link-url")?.value.trim(),label=document.getElementById("link-label")?.value.trim();
-  if(!url)return;try{new URL(url);}catch(e){WD.showToast("Invalid URL.","warn");return;}
-  _attachments.push({type:"link",name:label||url,url,uploadedAt:new Date().toISOString()});renderFiles();toggleLinkInput();document.getElementById("link-url").value="";document.getElementById("link-label").value="";await saveAttachments();WD.showToast("Link saved.","success");
-}
-function triggerFileUpload(){const input=document.createElement("input");input.type="file";input.onchange=e=>handleFileUpload(e.target.files[0]);input.click();}
-async function handleFileUpload(file){
-  if(!file||!_selectedContract)return;WD.showToast("Uploading…");
-  try{const base64=await WD.fileToBase64(file);const res=await WD.api({action:"upload_file",token:WD.getToken(),contractId:_selectedContract.id,fileName:file.name,mimeType:file.type||"application/octet-stream",base64Data:base64});if(res.success){_attachments.push({type:file.type,name:file.name,url:res.viewUrl,uploadedAt:new Date().toISOString()});renderFiles();await saveAttachments();WD.showToast("Uploaded.","success");}else WD.showToast(res.error||"Upload failed.","error");}
-  catch(e){WD.showToast("Upload error.","error");}
-}
-async function removeFile(i){_attachments.splice(i,1);renderFiles();await saveAttachments();}
-async function saveAttachments(){if(!_selectedContract)return;try{await WD.api({action:"save_contract_attachments",token:WD.getToken(),contractId:_selectedContract.id,attachments:_attachments});}catch(e){}}
-
-async function loadActivity(contractId){
-  if(_activityCache[contractId]){renderActivityFeed(_activityCache[contractId]);return;}
-  document.getElementById("activity-loading").style.display="flex";document.getElementById("activity-feed").style.display="none";document.getElementById("activity-empty").style.display="none";
-  try{const res=await WD.api({action:"get_contract_activity",token:WD.getToken(),contractId});if(res.success){_activityCache[contractId]=res.entries||[];renderActivityFeed(_activityCache[contractId]);document.getElementById("activity-badge").textContent=(res.entries||[]).length;}else{document.getElementById("activity-loading").style.display="none";document.getElementById("activity-empty").style.display="";}}
-  catch(e){document.getElementById("activity-loading").style.display="none";document.getElementById("activity-empty").style.display="";}
-}
-function renderActivityFeed(entries){
-  document.getElementById("activity-loading").style.display="none";const feed=document.getElementById("activity-feed");
-  if(!entries?.length){feed.style.display="none";document.getElementById("activity-empty").style.display="";return;}
-  feed.style.display="";
-  feed.innerHTML=entries.map((e,i)=>{
-    const isClient=e.actor==="client",tag=isClient?"Client":"You";
-    const tagBg=isClient?"var(--blue-bg)":"var(--accent-bg)",tagColor=isClient?"var(--blue)":"var(--accent)";
-    return`<div class="activity-item" style="animation-delay:${i*.04}s"><div class="activity-dot ${isClient?"client":"contractor"}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="activity-content"><div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;"><span class="activity-who">${WD.escHtml(e.actorName||tag)}</span><span style="padding:2px 7px;border-radius:999px;font-size:.6rem;font-weight:700;background:${tagBg};color:${tagColor};">${tag}</span></div><div class="activity-desc">${WD.escHtml(formatActivityDesc(e))}</div><div class="activity-time">${WD.timeAgo(e.timestamp)}</div></div></div>`;
-  }).join("");
-}
-function formatActivityDesc(e){
-  const ch=typeof e.changes==="string"?JSON.parse(e.changes||"{}"):e.changes||{};
-  switch(e.action){case"create_contract":return"Created this contract";case"update_contract":return ch.status?`Changed status to "${ch.status}"`:"Updated details";case"save_milestones":return`Saved ${ch.count||"?"} milestones`;case"approve_milestone":return"Approved a milestone";case"request_revision":return"Requested revision"+(ch.notes?`: "${ch.notes}"`:"");case"upload_file":return`Uploaded: ${ch.fileName||"file"}`;case"log_time":return`Logged ${ch.hours||"?"}h${ch.description?` — ${ch.description}`:""}`;case"accept_contract":return"Accepted this contract";default:return(e.action||"").replace(/_/g," ");}
-}
-
-async function sendContractRequest(){
-  if(!_selectedContract)return;const btn=document.getElementById("detail-send-btn");WD.setBtnLoading(btn,true);
-  try{const res=await WD.api({action:"send_contract_request",token:WD.getToken(),contractId:_selectedContract.id});if(res.success){_selectedContract.requestStatus="pending_client";const idx=_contracts.findIndex(c=>c.id===_selectedContract.id);if(idx>-1)_contracts[idx].requestStatus="pending_client";btn.style.display="none";renderNoticeBanner(_selectedContract);renderContracts();WD.showToast("Sent to client.","success");}else WD.showToast(res.error||"Failed","error");}
-  catch(e){WD.showToast("Connection error.","error");}finally{WD.setBtnLoading(btn,false);}
-}
-async function respondRequest(contractId,response){
-  try{const res=await WD.api({action:"respond_to_contract_request",token:WD.getToken(),contractId,response});if(res.success){const idx=_contracts.findIndex(c=>c.id===contractId);if(idx>-1){_contracts[idx].requestStatus=response;_contracts[idx].status=response==="accepted"?"active":"cancelled";}renderContracts();WD.showToast(response==="accepted"?"Contract accepted.":"Contract declined.","success");}else WD.showToast(res.error||"Failed","error");}
-  catch(e){WD.showToast("Connection error.","error");}
-}
-function editContract(){if(!_selectedContract)return;openContractWizard("edit",_selectedContract);}
-function confirmDelete(){if(!_selectedContract)return;if(["active","completed"].includes(_selectedContract.status)){WD.showToast("Change status first.","warn");return;}WD.openModal("modal-delete");}
-async function executeDelete(){
-  if(!_selectedContract)return;const btn=document.getElementById("delete-confirm-btn");WD.setBtnLoading(btn,true);
-  try{const res=await WD.api({action:"delete_contract",token:WD.getToken(),contractId:_selectedContract.id});if(res.success){_contracts=_contracts.filter(c=>c.id!==_selectedContract.id);WD.closeModal("modal-delete");closeDetail();renderContracts();WD.showToast("Deleted.","success");}else WD.showToast(res.error||"Failed","error");}
-  catch(e){WD.showToast("Connection error.","error");}finally{WD.setBtnLoading(btn,false);}
-}
-
-function openContractWizard(mode,contract){
-  _wizMode=mode;_wizStep=0;
-  _wizData=mode==="edit"&&contract?{id:contract.id,title:contract.title,desc:contract.description||"",type:contract.type||"one-off",clientId:contract.clientId||"",budget:contract.budgetAmount||"",currency:contract.currency||"USD",dueDate:contract.dueDate||"",startDate:contract.startDate||"",estimatedHours:contract.estimatedHours||"",workHours:contract.workHoursPerWeek||"",noticePeriod:contract.noticePeriod||""}:{type:"one-off",currency:"USD"};
-  document.getElementById("contract-modal-title").textContent=mode==="edit"?"Edit contract":"New contract";
-  renderWizardStep();WD.openModal("modal-contract");
-}
-function closeContractModal(){WD.closeModal("modal-contract");}
-
-function renderWizardStep(){
-  const totalSteps=_wizMode==="edit"?2:3;
-  [0,1,2].forEach(i=>{const d=document.getElementById("wdot-"+i);if(d)d.className="wizard-dot"+(i===_wizStep?" active":i<_wizStep?" done":"");});
-  document.getElementById("wiz-back").style.display=_wizStep>0?"":"none";
-  document.getElementById("wiz-cancel").style.display=_wizMode==="edit"&&_wizStep>0?"none":"";
-  document.getElementById("wiz-next-label").textContent=_wizStep===totalSteps-1?(_wizMode==="edit"?"Save changes":"Create contract"):"Continue →";
-  const body=document.getElementById("wizard-body");
-  if(_wizStep===0&&_wizMode!=="edit"){
-    body.innerHTML=`<p style="font-size:.84rem;color:var(--ink-3);margin-bottom:14px;line-height:1.6;">Choose how this contract will be structured and billed.</p><div class="type-card-grid"><div class="type-card ${_wizData.type==="one-off"?"selected":""}" onclick="selectType('one-off',this)"><div class="type-card-icon">🎯</div><div class="type-card-label">One-off</div><div class="type-card-desc">Fixed scope & price</div></div><div class="type-card ${_wizData.type==="hourly"?"selected":""}" onclick="selectType('hourly',this)"><div class="type-card-icon">⏱️</div><div class="type-card-label">Hourly</div><div class="type-card-desc">Pay per hour</div></div><div class="type-card ${_wizData.type==="retainer"?"selected":""}" onclick="selectType('retainer',this)"><div class="type-card-icon">🔄</div><div class="type-card-label">Retainer</div><div class="type-card-desc">Ongoing monthly</div></div></div>`;
-  }else if((_wizStep===1&&_wizMode!=="edit")||(_wizStep===0&&_wizMode==="edit")){
-    const isR=_wizData.type==="retainer",isH=_wizData.type==="hourly";
-    body.innerHTML=`<div class="field"><label class="field-label">Contract title *</label><input class="field-input" type="text" id="wiz-title" value="${WD.escHtml(_wizData.title||"")}" placeholder="e.g. Website redesign" autocomplete="off"><span id="err-wiz-title" style="font-size:.71rem;color:var(--red);display:none;margin-top:2px;">Required</span></div>
-    <div class="field"><label class="field-label">Description <span style="font-weight:400;color:var(--ink-4);">(optional)</span></label><textarea class="field-input" id="wiz-desc" rows="2" style="height:auto;padding:10px 12px;resize:vertical;min-height:70px;" placeholder="Brief overview…">${WD.escHtml(_wizData.desc||"")}</textarea></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;"><div class="field"><label class="field-label">${isH?"Hourly rate":isR?"Monthly rate":"Budget"} <span style="font-weight:400;color:var(--ink-4);">(optional)</span></label><input class="field-input" type="number" id="wiz-budget" value="${_wizData.budget||""}" placeholder="e.g. 5000" min="0"></div><div class="field"><label class="field-label">Currency</label><select class="field-input" id="wiz-currency"><option value="USD" ${(_wizData.currency||"USD")==="USD"?"selected":""}>USD $</option><option value="EUR" ${_wizData.currency==="EUR"?"selected":""}>EUR €</option><option value="GBP" ${_wizData.currency==="GBP"?"selected":""}>GBP £</option><option value="CAD" ${_wizData.currency==="CAD"?"selected":""}>CAD $</option></select></div></div>
-    ${isH?`<div class="field"><label class="field-label">Estimated hours <span style="font-weight:400;color:var(--ink-4);">(optional)</span></label><input class="field-input" type="number" id="wiz-est-hours" value="${_wizData.estimatedHours||""}" placeholder="e.g. 40" min="0"></div>`:""}
-    ${isR?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;"><div class="field"><label class="field-label">Hrs/week</label><input class="field-input" type="number" id="wiz-workhours" value="${_wizData.workHours||""}" placeholder="e.g. 20"></div><div class="field"><label class="field-label">Notice period</label><input class="field-input" type="text" id="wiz-notice" value="${WD.escHtml(_wizData.noticePeriod||"")}" placeholder="e.g. 30 days"></div></div>`:""}
-    ${!isR?`<div class="field"><label class="field-label">Due date <span style="font-weight:400;color:var(--ink-4);">(optional)</span></label><input class="field-input" type="date" id="wiz-due" value="${_wizData.dueDate||""}"></div>`:""}
-    <div class="field"><label class="field-label">Start date <span style="font-weight:400;color:var(--ink-4);">(optional)</span></label><input class="field-input" type="date" id="wiz-start" value="${_wizData.startDate||""}"></div>`;
-    setTimeout(()=>document.getElementById("wiz-title")?.focus(),50);
-  }else if(_wizStep===2&&_wizMode!=="edit"){
-    const activeClients=_clients.filter(c=>c.status!=="deleted"&&c.status!=="archived");
-    body.innerHTML=`<p style="font-size:.84rem;color:var(--ink-3);margin-bottom:4px;line-height:1.6;">Select the client this contract is for.</p>${!activeClients.length?`<div class="notice-banner amber"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg><span>No clients yet. <a href="#" onclick="closeContractModal();navigate('clients');" style="font-weight:700;color:var(--amber-text);">Add a client first →</a></span></div>`:`<div class="field"><label class="field-label">Select client *</label><select class="field-input" id="wiz-client"><option value="">— Choose a client —</option>${activeClients.map(c=>`<option value="${c.id}" ${_wizData.clientId===c.id?"selected":""}>${WD.escHtml(c.name)}${c.company?" · "+WD.escHtml(c.company):""}</option>`).join("")}</select><span id="err-wiz-client" style="font-size:.71rem;color:var(--red);display:none;margin-top:2px;">Select a client</span></div>`}`;
+  var invSec = document.getElementById("cd-invite-section");
+  var invBox = document.getElementById("cd-invite-box");
+  if (invStat !== "accepted") {
+    invSec.style.display = "";
+    if (c.inviteCode && c.inviteToken) {
+      invBox.innerHTML = '<div class="invite-code-box">'
+        + '<div style="font-size:.7rem;font-weight:700;color:var(--ink-4);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px;">Invite code</div>'
+        + '<div class="invite-code-val">' + WD.escHtml(c.inviteCode) + '</div>'
+        + '<div class="invite-code-hint">Share this code or copy the link below</div>'
+        + '<div style="display:flex;gap:6px;margin-top:10px;">'
+        + '<button class="btn btn-sm btn-secondary" style="flex:1;justify-content:center;" onclick="copyInviteLink(\'' + WD.escHtml(c.inviteToken) + '\')">Copy link</button>'
+        + '<button class="btn btn-sm btn-primary" style="flex:1;justify-content:center;" onclick="openInviteModal()">Resend email</button>'
+        + '</div></div>';
+    } else {
+      invBox.innerHTML = '<div style="font-size:.78rem;color:var(--ink-4);">No invite sent yet. Click Send workspace invite to generate an invite.</div>';
+    }
+  } else {
+    invSec.style.display = "none";
   }
 }
-function selectType(type,el){_wizData.type=type;document.querySelectorAll(".type-card").forEach(c=>c.classList.remove("selected"));el.classList.add("selected");}
-function wizNext(){
-  const totalSteps=_wizMode==="edit"?2:3;
-  if(_wizStep===0&&_wizMode!=="edit"){_wizStep++;renderWizardStep();return;}
-  if((_wizStep===1&&_wizMode!=="edit")||(_wizStep===0&&_wizMode==="edit")){
-    const title=document.getElementById("wiz-title")?.value.trim();
-    if(!title){const e=document.getElementById("err-wiz-title");if(e)e.style.display="";document.getElementById("wiz-title")?.focus();return;}
-    _wizData.title=title;_wizData.desc=document.getElementById("wiz-desc")?.value.trim()||"";_wizData.budget=document.getElementById("wiz-budget")?.value||"";_wizData.currency=document.getElementById("wiz-currency")?.value||"USD";_wizData.dueDate=document.getElementById("wiz-due")?.value||"";_wizData.startDate=document.getElementById("wiz-start")?.value||"";_wizData.estimatedHours=document.getElementById("wiz-est-hours")?.value||"";_wizData.workHours=document.getElementById("wiz-workhours")?.value||"";_wizData.noticePeriod=document.getElementById("wiz-notice")?.value.trim()||"";
-    if(_wizMode==="edit"){saveEditContract();return;}_wizStep++;renderWizardStep();return;
-  }
-  if(_wizStep===2&&_wizMode!=="edit"){
-    const clientId=document.getElementById("wiz-client")?.value;if(!clientId){const e=document.getElementById("err-wiz-client");if(e)e.style.display="";return;}_wizData.clientId=clientId;createContract();
+
+function closeClientDetail() {
+  document.getElementById("client-detail").classList.remove("open");
+  document.getElementById("client-detail-overlay").classList.remove("open");
+  _selectedClient = null;
+}
+
+function copyInviteLink(token) {
+  var link = "https://workdez.com/app/client/signup.html?invite=" + token;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(link).then(function(){ WD.showToast("Invite link copied!", "success"); }).catch(function(){ fallbackCopy(link); });
+  } else { fallbackCopy(link); }
+}
+function fallbackCopy(text) {
+  var t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select(); document.execCommand("copy"); document.body.removeChild(t); WD.showToast("Link copied!", "success");
+}
+
+function openClientModal(mode, client) {
+  document.getElementById("client-modal-title").textContent = mode === "edit" ? "Edit client" : "Add client";
+  document.getElementById("client-save-label").textContent  = mode === "edit" ? "Save changes" : "Add client";
+  document.getElementById("edit-client-id").value  = (client && client.id)      || "";
+  document.getElementById("c-name").value          = (client && client.name)    || "";
+  document.getElementById("c-email").value         = (client && client.email)   || "";
+  document.getElementById("c-phone").value         = (client && client.phone)   || "";
+  document.getElementById("c-company").value       = (client && client.company) || "";
+  document.getElementById("c-notes").value         = (client && client.notes)   || "";
+  document.getElementById("client-modal-error").style.display = "none";
+  document.getElementById("err-c-name").style.display  = "none";
+  document.getElementById("err-c-email").style.display = "none";
+  document.getElementById("c-name").classList.remove("error");
+  document.getElementById("c-email").classList.remove("error");
+  WD.openModal("modal-client");
+  setTimeout(function(){ var el = document.getElementById("c-name"); if (el) el.focus(); }, 100);
+}
+
+function openEditClient() { if (_selectedClient) openClientModal("edit", _selectedClient); }
+
+function saveClient() {
+  var editId  = document.getElementById("edit-client-id").value;
+  var name    = document.getElementById("c-name").value.trim();
+  var email   = document.getElementById("c-email").value.trim().toLowerCase();
+  var phone   = document.getElementById("c-phone").value.trim();
+  var company = document.getElementById("c-company").value.trim();
+  var notes   = document.getElementById("c-notes").value.trim();
+  var ok = true;
+  document.getElementById("err-c-name").style.display  = "none";
+  document.getElementById("err-c-email").style.display = "none";
+  document.getElementById("c-name").classList.remove("error");
+  document.getElementById("c-email").classList.remove("error");
+  if (!name) { document.getElementById("err-c-name").style.display = ""; document.getElementById("c-name").classList.add("error"); ok = false; }
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { document.getElementById("err-c-email").style.display = ""; document.getElementById("c-email").classList.add("error"); ok = false; }
+  if (!ok) return;
+  var btn = document.getElementById("client-save-btn");
+  WD.setBtnLoading(btn, true);
+  document.getElementById("client-modal-error").style.display = "none";
+  var token = WD.getToken();
+  if (editId) {
+    WD.api({ action: "update_client", token: token, clientId: editId, name: name, email: email, phone: phone, company: company, notes: notes })
+      .then(function(res) {
+        if (res.success) {
+          for (var i = 0; i < _clients.length; i++) { if (_clients[i].id === editId) { Object.assign(_clients[i], { name: name, email: email, phone: phone, company: company, notes: notes }); break; } }
+          if (_selectedClient && _selectedClient.id === editId) Object.assign(_selectedClient, { name: name, email: email, phone: phone, company: company, notes: notes });
+          renderClients(); if (_selectedClient) populateClientDetail(_selectedClient);
+          WD.closeModal("modal-client"); WD.showToast("Client updated.", "success");
+        } else { document.getElementById("client-modal-error-text").textContent = res.error || "Failed to update."; document.getElementById("client-modal-error").style.display = "flex"; }
+      }).catch(function() { document.getElementById("client-modal-error-text").textContent = "Connection error."; document.getElementById("client-modal-error").style.display = "flex"; })
+      .finally(function() { WD.setBtnLoading(btn, false); });
+  } else {
+    WD.api({ action: "create_client", token: token, name: name, email: email, phone: phone, company: company, notes: notes })
+      .then(function(res) {
+        if (res.success) {
+          _clients.unshift(res.client); renderClients(); WD.closeModal("modal-client"); WD.showToast("Client added!", "success");
+          setTimeout(function(){ openClientDetail(res.client.id); }, 200);
+        } else { document.getElementById("client-modal-error-text").textContent = res.error || "Failed to add."; document.getElementById("client-modal-error").style.display = "flex"; }
+      }).catch(function() { document.getElementById("client-modal-error-text").textContent = "Connection error."; document.getElementById("client-modal-error").style.display = "flex"; })
+      .finally(function() { WD.setBtnLoading(btn, false); });
   }
 }
-function wizBack(){_wizStep=Math.max(0,_wizStep-1);renderWizardStep();}
-async function createContract(){
-  const btn=document.getElementById("wiz-next");WD.setBtnLoading(btn,true);
-  try{const res=await WD.api({action:"create_contract",token:WD.getToken(),title:_wizData.title,description:_wizData.desc,type:_wizData.type,clientId:_wizData.clientId,budgetAmount:parseFloat(_wizData.budget)||0,currency:_wizData.currency,dueDate:_wizData.dueDate,startDate:_wizData.startDate,estimatedHours:parseFloat(_wizData.estimatedHours)||0,workHoursPerWeek:parseFloat(_wizData.workHours)||0,noticePeriod:_wizData.noticePeriod});
-    if(res.success){const newC=Object.assign({},res.contract,{milestones:[],attachments:[]});_contracts.unshift(newC);renderContracts();closeContractModal();WD.showToast("Contract created!","success");setTimeout(()=>openDetail(newC.id),200);}
-    else if(res.requiresSubscription){closeContractModal();WD.showUpgradeModal();}
-    else WD.showToast(res.error||"Failed.","error");}
-  catch(e){WD.showToast("Connection error.","error");}finally{WD.setBtnLoading(btn,false);}
+
+function openInviteModal() {
+  if (!_selectedClient) return;
+  document.getElementById("invite-client-name").textContent = _selectedClient.name;
+  document.getElementById("invite-email").value = _selectedClient.email || "";
+  var box = document.getElementById("invite-existing-box");
+  if (_selectedClient.inviteCode) {
+    box.style.display = "";
+    box.innerHTML = '<div class="notice-banner amber" style="margin-bottom:8px;"><span>Existing invite code: <strong>' + WD.escHtml(_selectedClient.inviteCode) + '</strong> — sending a new one will replace it.</span></div>';
+  } else { box.style.display = "none"; }
+  WD.openModal("modal-invite");
+  setTimeout(function(){ var el = document.getElementById("invite-email"); if (el) el.focus(); }, 100);
 }
-async function saveEditContract(){
-  const btn=document.getElementById("wiz-next");WD.setBtnLoading(btn,true);
-  try{const res=await WD.api({action:"update_contract",token:WD.getToken(),contractId:_wizData.id,title:_wizData.title,description:_wizData.desc,budgetAmount:parseFloat(_wizData.budget)||0,currency:_wizData.currency,dueDate:_wizData.dueDate,startDate:_wizData.startDate,estimatedHours:parseFloat(_wizData.estimatedHours)||0,workHoursPerWeek:parseFloat(_wizData.workHours)||0,noticePeriod:_wizData.noticePeriod});
-    if(res.success){const idx=_contracts.findIndex(c=>c.id===_wizData.id);if(idx>-1)Object.assign(_contracts[idx],{title:_wizData.title,description:_wizData.desc,budgetAmount:parseFloat(_wizData.budget)||0,currency:_wizData.currency,dueDate:_wizData.dueDate,startDate:_wizData.startDate});if(_selectedContract?.id===_wizData.id)Object.assign(_selectedContract,{title:_wizData.title,description:_wizData.desc,budgetAmount:parseFloat(_wizData.budget)||0,currency:_wizData.currency,dueDate:_wizData.dueDate,startDate:_wizData.startDate});renderContracts();if(_selectedContract)populateDetail(_selectedContract);closeContractModal();WD.showToast("Updated.","success");}
-    else WD.showToast(res.error||"Failed","error");}
-  catch(e){WD.showToast("Connection error.","error");}finally{WD.setBtnLoading(btn,false);}
+
+function sendInvite() {
+  if (!_selectedClient) return;
+  var email = document.getElementById("invite-email").value.trim();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { WD.showToast("Enter a valid email address.", "warn"); return; }
+  var btn = document.getElementById("invite-send-btn");
+  WD.setBtnLoading(btn, true);
+  var sc = _selectedClient;
+  WD.api({ action: "generate_invite", token: WD.getToken(), clientEmail: email, clientName: sc.name, clientId: sc.id })
+    .then(function(res) {
+      if (res.success) {
+        for (var i = 0; i < _clients.length; i++) {
+          if (_clients[i].id === sc.id) { _clients[i].inviteToken = res.inviteToken; _clients[i].inviteCode = res.inviteCode; _clients[i].inviteStatus = "pending"; _clients[i].email = _clients[i].email || email; break; }
+        }
+        if (_selectedClient) { _selectedClient.inviteToken = res.inviteToken; _selectedClient.inviteCode = res.inviteCode; _selectedClient.inviteStatus = "pending"; _selectedClient.email = _selectedClient.email || email; }
+        renderClients(); if (_selectedClient) populateClientDetail(_selectedClient);
+        WD.closeModal("modal-invite"); WD.showToast("Invite sent to " + email, "success");
+      } else { WD.showToast(res.error || "Failed to send invite.", "error"); }
+    }).catch(function() { WD.showToast("Connection error.", "error"); })
+    .finally(function() { WD.setBtnLoading(btn, false); });
+}
+
+function archiveClient() {
+  if (!_selectedClient) return;
+  document.getElementById("archive-client-name").textContent = 'Archive "' + _selectedClient.name + '"?';
+  WD.openModal("modal-archive");
+}
+
+function executeArchive() {
+  if (!_selectedClient) return;
+  var name = _selectedClient.name, id = _selectedClient.id;
+  var btn = document.getElementById("archive-confirm-btn");
+  WD.setBtnLoading(btn, true);
+  WD.api({ action: "archive_client", token: WD.getToken(), clientId: id })
+    .then(function(res) {
+      if (res.success) {
+        for (var i = 0; i < _clients.length; i++) { if (_clients[i].id === id) { _clients[i].status = "archived"; break; } }
+        WD.closeModal("modal-archive"); renderClients(); closeClientDetail(); WD.showToast(name + " archived.", "success");
+      } else { WD.showToast(res.error || "Failed.", "error"); }
+    }).catch(function() { WD.showToast("Connection error.", "error"); })
+    .finally(function() { WD.setBtnLoading(btn, false); });
 }
 </script>
