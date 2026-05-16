@@ -27,12 +27,10 @@
 .invite-badge.pending{background:var(--amber-bg);color:var(--amber-text);border:1px solid var(--amber-border);}
 .invite-badge.accepted{background:var(--accent-bg);color:var(--accent-text);border:1px solid var(--accent-border);}
 .invite-badge.none{background:var(--bg-3);color:var(--ink-4);}
-/* Detail panel extras */
 .client-detail-avatar{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;color:#fff;flex-shrink:0;margin:0 auto 4px;}
 .contract-mini-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-2);cursor:pointer;transition:background .12s;}
 .contract-mini-row:last-child{border-bottom:none;}
 .contract-mini-row:hover{background:var(--bg-2);}
-/* Invite code display */
 .invite-code-box{background:var(--bg-2);border:2px dashed var(--accent-border);border-radius:var(--r);padding:14px 16px;text-align:center;}
 .invite-code-val{font-family:var(--font-serif);font-size:1.8rem;color:var(--accent);letter-spacing:.1em;margin:4px 0;}
 .invite-code-hint{font-size:.72rem;color:var(--ink-4);line-height:1.5;}
@@ -57,37 +55,36 @@
   </div>
 </div>
 
-  <div class="clients-toolbar">
-    <div class="client-search-wrap">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input class="client-search-input" type="text" id="client-search" placeholder="Search clients…" oninput="handleClientSearch()">
-    </div>
-    <button class="client-filter-btn active" onclick="setClientFilter('all',this)">All</button>
-    <button class="client-filter-btn" onclick="setClientFilter('active',this)">Active</button>
-    <button class="client-filter-btn" onclick="setClientFilter('invited',this)">Invited</button>
-    <button class="client-filter-btn" onclick="setClientFilter('archived',this)">Archived</button>
+<div class="clients-toolbar">
+  <div class="client-search-wrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input class="client-search-input" type="text" id="client-search" placeholder="Search clients..." oninput="handleClientSearch()">
   </div>
+  <button class="client-filter-btn active" onclick="setClientFilter('all',this)">All</button>
+  <button class="client-filter-btn" onclick="setClientFilter('active',this)">Active</button>
+  <button class="client-filter-btn" onclick="setClientFilter('invited',this)">Invited</button>
+  <button class="client-filter-btn" onclick="setClientFilter('archived',this)">Archived</button>
+</div>
 
-  <div id="clients-loading">
-    <div class="clients-grid">
-        <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:20px;"><div style="display:flex;gap:12px;margin-bottom:14px;"><div class="skeleton" style="width:44px;height:44px;border-radius:50%;flex-shrink:0;"></div><div style="flex:1;"><div class="skeleton" style="height:14px;width:60%;margin-bottom:6px;"></div><div class="skeleton" style="height:11px;width:80%;"></div></div></div><div style="display:flex;gap:8px;"><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div></div></div>
-        <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:20px;"><div style="display:flex;gap:12px;margin-bottom:14px;"><div class="skeleton" style="width:44px;height:44px;border-radius:50%;flex-shrink:0;"></div><div style="flex:1;"><div class="skeleton" style="height:14px;width:60%;margin-bottom:6px;"></div><div class="skeleton" style="height:11px;width:80%;"></div></div></div><div style="display:flex;gap:8px;"><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div></div></div>
-        <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:20px;"><div style="display:flex;gap:12px;margin-bottom:14px;"><div class="skeleton" style="width:44px;height:44px;border-radius:50%;flex-shrink:0;"></div><div style="flex:1;"><div class="skeleton" style="height:14px;width:60%;margin-bottom:6px;"></div><div class="skeleton" style="height:11px;width:80%;"></div></div></div><div style="display:flex;gap:8px;"><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div></div></div>
-      </div>
+<div id="clients-loading">
+  <div class="clients-grid">
+    <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:20px;"><div style="display:flex;gap:12px;margin-bottom:14px;"><div class="skeleton" style="width:44px;height:44px;border-radius:50%;flex-shrink:0;"></div><div style="flex:1;"><div class="skeleton" style="height:14px;width:60%;margin-bottom:6px;"></div><div class="skeleton" style="height:11px;width:80%;"></div></div></div><div style="display:flex;gap:8px;"><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div></div></div>
+    <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:20px;"><div style="display:flex;gap:12px;margin-bottom:14px;"><div class="skeleton" style="width:44px;height:44px;border-radius:50%;flex-shrink:0;"></div><div style="flex:1;"><div class="skeleton" style="height:14px;width:60%;margin-bottom:6px;"></div><div class="skeleton" style="height:11px;width:80%;"></div></div></div><div style="display:flex;gap:8px;"><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div></div></div>
+    <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:20px;"><div style="display:flex;gap:12px;margin-bottom:14px;"><div class="skeleton" style="width:44px;height:44px;border-radius:50%;flex-shrink:0;"></div><div style="flex:1;"><div class="skeleton" style="height:14px;width:60%;margin-bottom:6px;"></div><div class="skeleton" style="height:11px;width:80%;"></div></div></div><div style="display:flex;gap:8px;"><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div><div class="skeleton" style="flex:1;height:52px;border-radius:8px;"></div></div></div>
   </div>
-  <div id="clients-container"></div>
-  <div id="clients-empty" style="display:none;">
-    <div class="empty-state">
-      <div class="empty-state-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
-      </div>
-      <h3>No clients yet</h3>
-      <p>Add your first client to start creating contracts and inviting them to your workspace.</p>
-      <button class="btn btn-primary" onclick="openNewClient()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add client
-      </button>
+</div>
+<div id="clients-container"></div>
+<div id="clients-empty" style="display:none;">
+  <div class="empty-state">
+    <div class="empty-state-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
     </div>
+    <h3>No clients yet</h3>
+    <p>Add your first client to start creating contracts and inviting them to your workspace.</p>
+    <button class="btn btn-primary" onclick="openNewClient()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add client
+    </button>
   </div>
 </div>
 
@@ -109,68 +106,58 @@
     </div>
   </div>
   <div class="detail-scroll">
-    <!-- Profile -->
     <div class="detail-section" style="text-align:center;padding:24px 18px 16px;">
       <div class="client-detail-avatar" id="cd-avatar">?</div>
-      <div style="font-family:var(--font-serif);font-size:1.4rem;color:var(--ink);letter-spacing:-.02em;margin-bottom:2px;" id="cd-fullname">—</div>
-      <div style="font-size:.8rem;color:var(--ink-4);" id="cd-company-line">—</div>
+      <div style="font-family:var(--font-serif);font-size:1.4rem;color:var(--ink);letter-spacing:-.02em;margin-bottom:2px;" id="cd-fullname">-</div>
+      <div style="font-size:.8rem;color:var(--ink-4);" id="cd-company-line">-</div>
       <div style="margin-top:10px;" id="cd-invite-status-wrap"></div>
     </div>
-
-    <!-- Contact -->
     <div class="detail-section">
       <div class="detail-section-title">Contact</div>
       <div style="display:flex;flex-direction:column;gap:8px;">
         <div id="cd-email-row" style="display:none;">
           <div class="detail-field-label">Email</div>
-          <a id="cd-email-link" href="#" style="font-size:.84rem;color:var(--accent);font-weight:500;text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">—</a>
+          <a id="cd-email-link" href="#" style="font-size:.84rem;color:var(--accent);font-weight:500;text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">-</a>
         </div>
         <div id="cd-phone-row" style="display:none;">
           <div class="detail-field-label">Phone</div>
-          <div class="detail-field-val" id="cd-phone">—</div>
+          <div class="detail-field-val" id="cd-phone">-</div>
         </div>
         <div id="cd-notes-row" style="display:none;">
           <div class="detail-field-label">Notes</div>
-          <div class="detail-field-val" id="cd-notes" style="font-size:.82rem;color:var(--ink-3);line-height:1.6;font-weight:400;white-space:pre-wrap;">—</div>
+          <div class="detail-field-val" id="cd-notes" style="font-size:.82rem;color:var(--ink-3);line-height:1.6;font-weight:400;white-space:pre-wrap;">-</div>
         </div>
       </div>
     </div>
-
-    <!-- Stats -->
     <div class="detail-section">
       <div class="detail-section-title">Contracts</div>
       <div style="display:flex;gap:8px;margin-bottom:14px;">
         <div style="flex:1;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);padding:10px;text-align:center;">
-          <div style="font-family:var(--font-serif);font-size:1.3rem;color:var(--ink);" id="cd-stat-total">—</div>
+          <div style="font-family:var(--font-serif);font-size:1.3rem;color:var(--ink);" id="cd-stat-total">-</div>
           <div style="font-size:.6rem;font-weight:700;color:var(--ink-4);text-transform:uppercase;letter-spacing:.06em;margin-top:3px;">Total</div>
         </div>
         <div style="flex:1;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);padding:10px;text-align:center;">
-          <div style="font-family:var(--font-serif);font-size:1.3rem;color:var(--accent);" id="cd-stat-active">—</div>
+          <div style="font-family:var(--font-serif);font-size:1.3rem;color:var(--accent);" id="cd-stat-active">-</div>
           <div style="font-size:.6rem;font-weight:700;color:var(--ink-4);text-transform:uppercase;letter-spacing:.06em;margin-top:3px;">Active</div>
         </div>
         <div style="flex:1;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);padding:10px;text-align:center;">
-          <div style="font-family:var(--font-serif);font-size:1.3rem;color:var(--ink);" id="cd-stat-done">—</div>
+          <div style="font-family:var(--font-serif);font-size:1.3rem;color:var(--ink);" id="cd-stat-done">-</div>
           <div style="font-size:.6rem;font-weight:700;color:var(--ink-4);text-transform:uppercase;letter-spacing:.06em;margin-top:3px;">Done</div>
         </div>
       </div>
       <div id="cd-contracts-list"></div>
     </div>
-
-    <!-- Invite section -->
     <div class="detail-section" id="cd-invite-section" style="display:none;">
       <div class="detail-section-title">Workspace invite</div>
       <div id="cd-invite-box"></div>
     </div>
-
-    <!-- Danger zone -->
     <div class="detail-section">
       <div class="detail-section-title">Actions</div>
       <button class="btn btn-secondary" style="width:100%;justify-content:center;margin-bottom:8px;" onclick="openInviteModal()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
         Send workspace invite
       </button>
-      <button class="btn btn-secondary" style="width:100%;justify-content:center;color:var(--red);border-color:var(--red-border);" onclick="archiveClient()"
-        onmouseover="this.style.background='var(--red-bg)'" onmouseout="this.style.background=''">
+      <button class="btn btn-secondary" style="width:100%;justify-content:center;color:var(--red);border-color:var(--red-border);" onclick="archiveClient()" onmouseover="this.style.background='var(--red-bg)'" onmouseout="this.style.background=''">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
         Archive client
       </button>
@@ -216,7 +203,7 @@
       </div>
       <div class="field">
         <label class="field-label">Notes <span style="font-weight:400;color:var(--ink-4);">(optional)</span></label>
-        <textarea class="field-input" id="c-notes" rows="2" placeholder="Any notes about this client…" style="height:auto;padding:10px 12px;resize:vertical;min-height:68px;"></textarea>
+        <textarea class="field-input" id="c-notes" rows="2" placeholder="Any notes about this client..." style="height:auto;padding:10px 12px;resize:vertical;min-height:68px;"></textarea>
       </div>
     </div>
     <div class="modal-footer">
@@ -289,17 +276,15 @@
 </div>
 
 <script>
-// ═══════════════════════ STATE ═══════════════════════════
-let _clients=[],_contracts=[],_selectedClient=null;
-let _clientFilter="all",_clientSearchTimer=null;
+var _clients = [], _contracts = [], _selectedClient = null;
+var _clientFilter = "all", _clientSearchTimer = null;
 
-// ═══════════════════════ INIT ════════════════════════════
-window.pageInit=async function(user){await loadClients();};
-function openNewClient(){openClientModal("new");}
+window.pageInit = function(user) { loadClients(); };
+function openNewClient() { openClientModal("new"); }
 
-async function loadClients() {
-  const cachedClients   = window._shellCache?.cacheGet('clients');
-  const cachedContracts = window._shellCache?.cacheGet('contracts');
+function loadClients() {
+  var cachedClients   = window._shellCache && window._shellCache.cacheGet("clients");
+  var cachedContracts = window._shellCache && window._shellCache.cacheGet("contracts");
   if (cachedClients) {
     _clients   = cachedClients;
     _contracts = cachedContracts || [];
@@ -308,310 +293,323 @@ async function loadClients() {
     refreshClientsInBackground();
     return;
   }
-  try {
-    const token = WD.getToken();
-    const [clr, cr] = await Promise.all([
-      WD.api({ action: "get_clients",   token }),
-      WD.api({ action: "get_contracts", token })
-    ]);
-    if (clr.success) { _clients   = clr.clients   || []; window._shellCache?.cacheSet('clients',   _clients); }
-    if (cr.success)  { _contracts = cr.contracts  || []; window._shellCache?.cacheSet('contracts', _contracts); }
+  var token = WD.getToken();
+  Promise.all([
+    WD.api({ action: "get_clients",   token: token }),
+    WD.api({ action: "get_contracts", token: token })
+  ]).then(function(r) {
+    if (r[0].success) { _clients   = r[0].clients   || []; window._shellCache && window._shellCache.cacheSet("clients",   _clients); }
+    if (r[1].success) { _contracts = r[1].contracts || []; window._shellCache && window._shellCache.cacheSet("contracts", _contracts); }
     document.getElementById("clients-loading").style.display = "none";
     renderClients();
-  } catch(e) {
+  }).catch(function() {
     document.getElementById("clients-loading").style.display = "none";
     WD.showToast("Failed to load clients.", "error");
-  }
+  });
 }
 
-async function refreshClientsInBackground() {
-  try {
-    const token = WD.getToken();
-    const [clr, cr] = await Promise.all([
-      WD.api({ action: "get_clients",   token }),
-      WD.api({ action: "get_contracts", token })
-    ]);
-    if (clr.success) {
-      _clients = clr.clients || [];
-      window._shellCache?.cacheSet('clients', _clients);
+function refreshClientsInBackground() {
+  var token = WD.getToken();
+  Promise.all([
+    WD.api({ action: "get_clients",   token: token }),
+    WD.api({ action: "get_contracts", token: token })
+  ]).then(function(r) {
+    if (r[0].success) {
+      _clients = r[0].clients || [];
+      window._shellCache && window._shellCache.cacheSet("clients", _clients);
       if (!_selectedClient) renderClients();
     }
-    if (cr.success) {
-      _contracts = cr.contracts || [];
-      window._shellCache?.cacheSet('contracts', _contracts);
+    if (r[1].success) {
+      _contracts = r[1].contracts || [];
+      window._shellCache && window._shellCache.cacheSet("contracts", _contracts);
     }
-  } catch(e) {}
+  }).catch(function() {});
 }
-// ═══════════════════════ RENDER ══════════════════════════
-function renderClients(){
-  const q=(document.getElementById("client-search")?.value||"").toLowerCase();
-  const filtered=_clients.filter(c=>{
-    if(c.status==="deleted")return false;
-    if(_clientFilter==="active"&&c.status!=="active")return false;
-    if(_clientFilter==="archived"&&c.status!=="archived")return false;
-    if(_clientFilter==="invited"&&c.inviteStatus!=="pending")return false;
-    if(q&&!WD.fuzzyMatch(c.name,q)&&!WD.fuzzyMatch(c.company||"",q)&&!WD.fuzzyMatch(c.email||"",q))return false;
+
+function renderClients() {
+  var q = (document.getElementById("client-search") ? document.getElementById("client-search").value : "").toLowerCase();
+  var filtered = _clients.filter(function(c) {
+    if (c.status === "deleted") return false;
+    if (_clientFilter === "active"   && c.status !== "active")        return false;
+    if (_clientFilter === "archived" && c.status !== "archived")      return false;
+    if (_clientFilter === "invited"  && c.inviteStatus !== "pending") return false;
+    if (q && !WD.fuzzyMatch(c.name, q) && !WD.fuzzyMatch(c.company || "", q) && !WD.fuzzyMatch(c.email || "", q)) return false;
     return true;
   });
-
-  const total=_clients.filter(c=>c.status!=="deleted").length;
-  const lbl=document.getElementById("clients-count-label");
-  if(lbl)lbl.textContent=total===0?"Add your first client.":total+" client"+(total!==1?"s":"")+" in your workspace.";
-
-  const container=document.getElementById("clients-container"),empty=document.getElementById("clients-empty");
-  if(!filtered.length){container.innerHTML="";empty.style.display="";return;}
-  empty.style.display="none";
-
-  container.innerHTML=`<div class="clients-grid">${filtered.map((c,i)=>{
-    const init=WD.initials(c.name),color=WD.avatarColor(c.name);
-    const clientContracts=_contracts.filter(p=>p.clientId===c.id&&p.status!=="deleted");
-    const activeC=clientContracts.filter(p=>p.status==="active").length;
-    const doneC=clientContracts.filter(p=>p.status==="completed").length;
-    const invStat=c.inviteStatus||"none";
-    const invLabel=invStat==="accepted"?"✓ Joined":invStat==="pending"?"Invited":"Not invited";
-    const invClass=invStat==="accepted"?"accepted":invStat==="pending"?"pending":"none";
-    const isArchived=c.status==="archived";
-    return`<div class="client-card" style="${isArchived?"opacity:.6":""};animation-delay:${i*.04}s" onclick="openClientDetail('${c.id}')">
-      <div class="client-card-top">
-        <div class="client-avatar" style="background:${color}">${WD.escHtml(init)}</div>
-        <div class="client-card-info">
-          <div class="client-card-name">${WD.escHtml(c.name)}</div>
-          ${c.company?`<div class="client-card-company">${WD.escHtml(c.company)}</div>`:""}
-          ${c.email?`<div class="client-card-email">${WD.escHtml(c.email)}</div>`:""}
-        </div>
-        ${isArchived?`<span style="background:var(--bg-3);color:var(--ink-4);font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:999px;flex-shrink:0;">Archived</span>`:""}
-      </div>
-      <div class="client-stats">
-        <div class="client-stat"><div class="client-stat-val">${clientContracts.length}</div><div class="client-stat-lbl">Total</div></div>
-        <div class="client-stat"><div class="client-stat-val" style="color:var(--accent);">${activeC}</div><div class="client-stat-lbl">Active</div></div>
-        <div class="client-stat"><div class="client-stat-val">${doneC}</div><div class="client-stat-lbl">Done</div></div>
-      </div>
-      <div class="client-card-footer">
-        <span class="invite-badge ${invClass}">${invLabel}</span>
-        <span style="font-size:.73rem;color:var(--ink-4);">Since ${WD.fmtDateShort(c.createdAt)}</span>
-      </div>
-    </div>`;
-  }).join("")}</div>`;
+  var total = _clients.filter(function(c){ return c.status !== "deleted"; }).length;
+  var lbl = document.getElementById("clients-count-label");
+  if (lbl) lbl.textContent = total === 0 ? "Add your first client." : total + " client" + (total !== 1 ? "s" : "") + " in your workspace.";
+  var container = document.getElementById("clients-container");
+  var empty     = document.getElementById("clients-empty");
+  if (!filtered.length) { container.innerHTML = ""; empty.style.display = ""; return; }
+  empty.style.display = "none";
+  var rows = [];
+  filtered.forEach(function(c, i) {
+    var clientContracts = _contracts.filter(function(p){ return p.clientId === c.id && p.status !== "deleted"; });
+    var activeC  = clientContracts.filter(function(p){ return p.status === "active"; }).length;
+    var doneC    = clientContracts.filter(function(p){ return p.status === "completed"; }).length;
+    var invStat  = c.inviteStatus || "none";
+    var invLabel = invStat === "accepted" ? "Joined" : invStat === "pending" ? "Invited" : "Not invited";
+    var invClass = invStat === "accepted" ? "accepted" : invStat === "pending" ? "pending" : "none";
+    var isArch   = c.status === "archived";
+    var card = document.createElement("div");
+    card.className = "client-card";
+    card.style.animationDelay = (i * 0.04) + "s";
+    if (isArch) card.style.opacity = "0.6";
+    card.setAttribute("onclick", "openClientDetail('" + c.id + "')");
+    var top = '<div class="client-card-top">'
+      + '<div class="client-avatar" style="background:' + WD.avatarColor(c.name) + '">' + WD.escHtml(WD.initials(c.name)) + '</div>'
+      + '<div class="client-card-info">'
+      + '<div class="client-card-name">' + WD.escHtml(c.name) + '</div>'
+      + (c.company ? '<div class="client-card-company">' + WD.escHtml(c.company) + '</div>' : '')
+      + (c.email   ? '<div class="client-card-email">'   + WD.escHtml(c.email)   + '</div>' : '')
+      + '</div>'
+      + (isArch ? '<span style="background:var(--bg-3);color:var(--ink-4);font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:999px;flex-shrink:0;">Archived</span>' : '')
+      + '</div>';
+    var stats = '<div class="client-stats">'
+      + '<div class="client-stat"><div class="client-stat-val">' + clientContracts.length + '</div><div class="client-stat-lbl">Total</div></div>'
+      + '<div class="client-stat"><div class="client-stat-val" style="color:var(--accent);">' + activeC + '</div><div class="client-stat-lbl">Active</div></div>'
+      + '<div class="client-stat"><div class="client-stat-val">' + doneC + '</div><div class="client-stat-lbl">Done</div></div>'
+      + '</div>';
+    var footer = '<div class="client-card-footer">'
+      + '<span class="invite-badge ' + invClass + '">' + invLabel + '</span>'
+      + '<span style="font-size:.73rem;color:var(--ink-4);">Since ' + WD.fmtDateShort(c.createdAt) + '</span>'
+      + '</div>';
+    card.innerHTML = top + stats + footer;
+    rows.push(card);
+  });
+  var grid = document.createElement("div");
+  grid.className = "clients-grid";
+  rows.forEach(function(r){ grid.appendChild(r); });
+  container.innerHTML = "";
+  container.appendChild(grid);
 }
 
-function setClientFilter(f,el){_clientFilter=f;document.querySelectorAll(".client-filter-btn").forEach(b=>b.classList.remove("active"));el.classList.add("active");renderClients();}
-function handleClientSearch(){clearTimeout(_clientSearchTimer);_clientSearchTimer=setTimeout(renderClients,150);}
+function setClientFilter(f, el) {
+  _clientFilter = f;
+  document.querySelectorAll(".client-filter-btn").forEach(function(b){ b.classList.remove("active"); });
+  el.classList.add("active");
+  renderClients();
+}
+function handleClientSearch() {
+  clearTimeout(_clientSearchTimer);
+  _clientSearchTimer = setTimeout(renderClients, 150);
+}
 
-// ═══════════════════════ DETAIL PANEL ════════════════════
-function openClientDetail(id){
-  _selectedClient=_clients.find(c=>c.id===id);
-  if(!_selectedClient)return;
+function openClientDetail(id) {
+  _selectedClient = null;
+  for (var i = 0; i < _clients.length; i++) { if (_clients[i].id === id) { _selectedClient = _clients[i]; break; } }
+  if (!_selectedClient) return;
   populateClientDetail(_selectedClient);
   document.getElementById("client-detail").classList.add("open");
   document.getElementById("client-detail-overlay").classList.add("open");
 }
 
-function populateClientDetail(c){
-  const color=WD.avatarColor(c.name);
-  const init=WD.initials(c.name);
-  const av=document.getElementById("cd-avatar");
-  av.textContent=init;av.style.background=color;
+function populateClientDetail(c) {
+  var av = document.getElementById("cd-avatar");
+  av.textContent = WD.initials(c.name);
+  av.style.background = WD.avatarColor(c.name);
+  document.getElementById("cd-name").textContent        = c.name;
+  document.getElementById("cd-fullname").textContent    = c.name;
+  document.getElementById("cd-company-line").textContent = c.company || c.email || "";
+  if (c.email) {
+    document.getElementById("cd-email-row").style.display  = "";
+    document.getElementById("cd-email-link").textContent   = c.email;
+    document.getElementById("cd-email-link").href          = "mailto:" + c.email;
+  } else { document.getElementById("cd-email-row").style.display = "none"; }
+  if (c.phone) {
+    document.getElementById("cd-phone-row").style.display  = "";
+    document.getElementById("cd-phone").textContent        = c.phone;
+  } else { document.getElementById("cd-phone-row").style.display = "none"; }
+  if (c.notes) {
+    document.getElementById("cd-notes-row").style.display  = "";
+    document.getElementById("cd-notes").textContent        = c.notes;
+  } else { document.getElementById("cd-notes-row").style.display = "none"; }
 
-  document.getElementById("cd-name").textContent=c.name;
-  document.getElementById("cd-fullname").textContent=c.name;
-  document.getElementById("cd-company-line").textContent=c.company||c.email||"";
+  var invStat = c.inviteStatus || "none";
+  var sw = document.getElementById("cd-invite-status-wrap");
+  if (invStat === "accepted")       sw.innerHTML = '<span class="invite-badge accepted">Joined workspace</span>';
+  else if (invStat === "pending")   sw.innerHTML = '<span class="invite-badge pending">Invite pending</span>';
+  else                              sw.innerHTML = '<span class="invite-badge none">Not yet invited</span>';
 
-  // Contact
-  if(c.email){document.getElementById("cd-email-row").style.display="";document.getElementById("cd-email-link").textContent=c.email;document.getElementById("cd-email-link").href="mailto:"+c.email;}
-  else document.getElementById("cd-email-row").style.display="none";
-  if(c.phone){document.getElementById("cd-phone-row").style.display="";document.getElementById("cd-phone").textContent=c.phone;}
-  else document.getElementById("cd-phone-row").style.display="none";
-  if(c.notes){document.getElementById("cd-notes-row").style.display="";document.getElementById("cd-notes").textContent=c.notes;}
-  else document.getElementById("cd-notes-row").style.display="none";
+  var invBtn = document.getElementById("cd-invite-btn");
+  if (invBtn) invBtn.style.display = invStat === "accepted" ? "none" : "";
 
-  // Invite status
-  const sw=document.getElementById("cd-invite-status-wrap");
-  const invStat=c.inviteStatus||"none";
-  if(invStat==="accepted")sw.innerHTML=`<span class="invite-badge accepted">✓ Joined workspace</span>`;
-  else if(invStat==="pending")sw.innerHTML=`<span class="invite-badge pending">📧 Invite pending</span>`;
-  else sw.innerHTML=`<span class="invite-badge none">Not yet invited</span>`;
+  var cc = _contracts.filter(function(p){ return p.clientId === c.id && p.status !== "deleted"; });
+  document.getElementById("cd-stat-total").textContent  = cc.length;
+  document.getElementById("cd-stat-active").textContent = cc.filter(function(p){ return p.status === "active"; }).length;
+  document.getElementById("cd-stat-done").textContent   = cc.filter(function(p){ return p.status === "completed"; }).length;
 
-  // Invite button
-  const invBtn=document.getElementById("cd-invite-btn");
-  if(invBtn)invBtn.style.display=invStat==="accepted"?"none":"";
-
-  // Stats
-  const clientContracts=_contracts.filter(p=>p.clientId===c.id&&p.status!=="deleted");
-  document.getElementById("cd-stat-total").textContent=clientContracts.length;
-  document.getElementById("cd-stat-active").textContent=clientContracts.filter(p=>p.status==="active").length;
-  document.getElementById("cd-stat-done").textContent=clientContracts.filter(p=>p.status==="completed").length;
-
-  // Contracts list
-  const cl=document.getElementById("cd-contracts-list");
-  if(!clientContracts.length){cl.innerHTML=`<div style="font-size:.78rem;color:var(--ink-4);text-align:center;padding:12px 0;">No contracts yet.</div>`;}
-  else{
-    cl.innerHTML=clientContracts.slice(0,5).map(p=>`
-      <div class="contract-mini-row" onclick="closeClientDetail();navigate('contracts');setTimeout(()=>openDetail&&openDetail('${p.id}'),300);">
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:.83rem;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${WD.escHtml(p.title)}</div>
-          <div style="font-size:.7rem;color:var(--ink-4);margin-top:1px;">${WD.typePillHtml(p.type)}</div>
-        </div>
-        <div>${WD.badgeHtml(p.status)}</div>
-        <div style="font-size:.72rem;color:var(--ink-4);flex-shrink:0;">${p.type!=="retainer"?p.progress+"%":""}</div>
-      </div>`).join("")}
-    ${clientContracts.length>5?`<div style="font-size:.74rem;color:var(--accent);text-align:center;padding:8px 0;cursor:pointer;font-weight:600;" onclick="closeClientDetail();navigate('contracts');">View all ${clientContracts.length} contracts →</div>`:""}`;
+  var cl = document.getElementById("cd-contracts-list");
+  if (!cc.length) {
+    cl.innerHTML = '<div style="font-size:.78rem;color:var(--ink-4);text-align:center;padding:12px 0;">No contracts yet.</div>';
+  } else {
+    var clHtml = "";
+    cc.slice(0, 5).forEach(function(p) {
+      clHtml += '<div class="contract-mini-row" onclick="closeClientDetail();navigate(\'contracts\');setTimeout(function(){if(typeof openDetail===\'function\')openDetail(\'' + p.id + '\');},300);">';
+      clHtml += '<div style="flex:1;min-width:0;"><div style="font-size:.83rem;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + WD.escHtml(p.title) + '</div>';
+      clHtml += '<div style="font-size:.7rem;color:var(--ink-4);margin-top:1px;">' + WD.typePillHtml(p.type) + '</div></div>';
+      clHtml += '<div>' + WD.badgeHtml(p.status) + '</div>';
+      clHtml += '<div style="font-size:.72rem;color:var(--ink-4);flex-shrink:0;">' + (p.type !== "retainer" ? (p.progress || 0) + "%" : "") + '</div>';
+      clHtml += '</div>';
+    });
+    if (cc.length > 5) {
+      clHtml += '<div style="font-size:.74rem;color:var(--accent);text-align:center;padding:8px 0;cursor:pointer;font-weight:600;" onclick="closeClientDetail();navigate(\'contracts\');">View all ' + cc.length + ' contracts</div>';
+    }
+    cl.innerHTML = clHtml;
   }
 
-  // Invite section
-  const invSec=document.getElementById("cd-invite-section");
-  const invBox=document.getElementById("cd-invite-box");
-  if(invStat!=="accepted"){
-    invSec.style.display="";
-    if(c.inviteCode&&c.inviteToken){
-      invBox.innerHTML=`<div class="invite-code-box"><div style="font-size:.7rem;font-weight:700;color:var(--ink-4);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px;">Invite code</div><div class="invite-code-val">${WD.escHtml(c.inviteCode)}</div><div class="invite-code-hint">Share this code or copy the link below</div><div style="display:flex;gap:6px;margin-top:10px;"><button class="btn btn-sm btn-secondary" style="flex:1;justify-content:center;" onclick="copyInviteLink('${c.inviteToken}')">Copy link</button><button class="btn btn-sm btn-primary" style="flex:1;justify-content:center;" onclick="openInviteModal()">Resend email</button></div></div>`;
-    }else{
-      invBox.innerHTML=`<div style="font-size:.78rem;color:var(--ink-4);">No invite sent yet. Click "Send workspace invite" to generate an invite.</div>`;
+  var invSec = document.getElementById("cd-invite-section");
+  var invBox = document.getElementById("cd-invite-box");
+  if (invStat !== "accepted") {
+    invSec.style.display = "";
+    if (c.inviteCode && c.inviteToken) {
+      invBox.innerHTML = '<div class="invite-code-box">'
+        + '<div style="font-size:.7rem;font-weight:700;color:var(--ink-4);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px;">Invite code</div>'
+        + '<div class="invite-code-val">' + WD.escHtml(c.inviteCode) + '</div>'
+        + '<div class="invite-code-hint">Share this code or copy the link below</div>'
+        + '<div style="display:flex;gap:6px;margin-top:10px;">'
+        + '<button class="btn btn-sm btn-secondary" style="flex:1;justify-content:center;" onclick="copyInviteLink(\'' + WD.escHtml(c.inviteToken) + '\')">Copy link</button>'
+        + '<button class="btn btn-sm btn-primary" style="flex:1;justify-content:center;" onclick="openInviteModal()">Resend email</button>'
+        + '</div></div>';
+    } else {
+      invBox.innerHTML = '<div style="font-size:.78rem;color:var(--ink-4);">No invite sent yet. Click Send workspace invite to generate an invite.</div>';
     }
-  }else{
-    invSec.style.display="none";
+  } else {
+    invSec.style.display = "none";
   }
 }
 
-function closeClientDetail(){
+function closeClientDetail() {
   document.getElementById("client-detail").classList.remove("open");
   document.getElementById("client-detail-overlay").classList.remove("open");
-  _selectedClient=null;
+  _selectedClient = null;
 }
 
-function copyInviteLink(token){
-  const link="https://workdez.com/app/client/signup.html?invite="+token;
-  navigator.clipboard.writeText(link).then(()=>WD.showToast("Invite link copied!","success")).catch(()=>{const t=document.createElement("textarea");t.value=link;document.body.appendChild(t);t.select();document.execCommand("copy");document.body.removeChild(t);WD.showToast("Link copied!","success");});
+function copyInviteLink(token) {
+  var link = "https://workdez.com/app/client/signup.html?invite=" + token;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(link).then(function(){ WD.showToast("Invite link copied!", "success"); }).catch(function(){ fallbackCopy(link); });
+  } else { fallbackCopy(link); }
+}
+function fallbackCopy(text) {
+  var t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select(); document.execCommand("copy"); document.body.removeChild(t); WD.showToast("Link copied!", "success");
 }
 
-// ═══════════════════════ ADD / EDIT CLIENT ════════════════
-function openClientModal(mode,client){
-  document.getElementById("client-modal-title").textContent=mode==="edit"?"Edit client":"Add client";
-  document.getElementById("client-save-label").textContent=mode==="edit"?"Save changes":"Add client";
-  document.getElementById("edit-client-id").value=client?.id||"";
-  document.getElementById("c-name").value=client?.name||"";
-  document.getElementById("c-email").value=client?.email||"";
-  document.getElementById("c-phone").value=client?.phone||"";
-  document.getElementById("c-company").value=client?.company||"";
-  document.getElementById("c-notes").value=client?.notes||"";
-  document.getElementById("client-modal-error").style.display="none";
-  document.getElementById("err-c-name").style.display="none";
-  document.getElementById("err-c-email").style.display="none";
+function openClientModal(mode, client) {
+  document.getElementById("client-modal-title").textContent = mode === "edit" ? "Edit client" : "Add client";
+  document.getElementById("client-save-label").textContent  = mode === "edit" ? "Save changes" : "Add client";
+  document.getElementById("edit-client-id").value  = (client && client.id)      || "";
+  document.getElementById("c-name").value          = (client && client.name)    || "";
+  document.getElementById("c-email").value         = (client && client.email)   || "";
+  document.getElementById("c-phone").value         = (client && client.phone)   || "";
+  document.getElementById("c-company").value       = (client && client.company) || "";
+  document.getElementById("c-notes").value         = (client && client.notes)   || "";
+  document.getElementById("client-modal-error").style.display = "none";
+  document.getElementById("err-c-name").style.display  = "none";
+  document.getElementById("err-c-email").style.display = "none";
   document.getElementById("c-name").classList.remove("error");
   document.getElementById("c-email").classList.remove("error");
   WD.openModal("modal-client");
-  setTimeout(()=>document.getElementById("c-name")?.focus(),100);
+  setTimeout(function(){ var el = document.getElementById("c-name"); if (el) el.focus(); }, 100);
 }
 
-function openEditClient(){
-  if(!_selectedClient)return;
-  openClientModal("edit",_selectedClient);
-}
+function openEditClient() { if (_selectedClient) openClientModal("edit", _selectedClient); }
 
-async function saveClient(){
-  const editId=document.getElementById("edit-client-id").value;
-  const name=document.getElementById("c-name").value.trim();
-  const email=document.getElementById("c-email").value.trim().toLowerCase();
-  const phone=document.getElementById("c-phone").value.trim();
-  const company=document.getElementById("c-company").value.trim();
-  const notes=document.getElementById("c-notes").value.trim();
-
-  // Validate
-  let ok=true;
-  document.getElementById("err-c-name").style.display="none";
-  document.getElementById("err-c-email").style.display="none";
+function saveClient() {
+  var editId  = document.getElementById("edit-client-id").value;
+  var name    = document.getElementById("c-name").value.trim();
+  var email   = document.getElementById("c-email").value.trim().toLowerCase();
+  var phone   = document.getElementById("c-phone").value.trim();
+  var company = document.getElementById("c-company").value.trim();
+  var notes   = document.getElementById("c-notes").value.trim();
+  var ok = true;
+  document.getElementById("err-c-name").style.display  = "none";
+  document.getElementById("err-c-email").style.display = "none";
   document.getElementById("c-name").classList.remove("error");
   document.getElementById("c-email").classList.remove("error");
-
-  if(!name){document.getElementById("err-c-name").style.display="";document.getElementById("c-name").classList.add("error");ok=false;}
-  if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){document.getElementById("err-c-email").style.display="";document.getElementById("c-email").classList.add("error");ok=false;}
-  if(!ok)return;
-
-  const btn=document.getElementById("client-save-btn");WD.setBtnLoading(btn,true);
-  document.getElementById("client-modal-error").style.display="none";
-
-  try{
-    if(editId){
-      // Update
-      const res=await WD.api({action:"update_client",token:WD.getToken(),clientId:editId,name,email,phone,company,notes});
-      if(res.success){
-        const idx=_clients.findIndex(c=>c.id===editId);
-        if(idx>-1)Object.assign(_clients[idx],{name,email,phone,company,notes});
-        if(_selectedClient?.id===editId)Object.assign(_selectedClient,{name,email,phone,company,notes});
-        renderClients();if(_selectedClient)populateClientDetail(_selectedClient);
-        WD.closeModal("modal-client");WD.showToast("Client updated.","success");
-      }else{document.getElementById("client-modal-error-text").textContent=res.error||"Failed to update.";document.getElementById("client-modal-error").style.display="flex";}
-    }else{
-      // Create
-      const res=await WD.api({action:"create_client",token:WD.getToken(),name,email,phone,company,notes});
-      if(res.success){
-        _clients.unshift(res.client);renderClients();WD.closeModal("modal-client");WD.showToast("Client added!","success");
-        setTimeout(()=>openClientDetail(res.client.id),200);
-      }else{document.getElementById("client-modal-error-text").textContent=res.error||"Failed to add.";document.getElementById("client-modal-error").style.display="flex";}
-    }
-  }catch(e){document.getElementById("client-modal-error-text").textContent="Connection error.";document.getElementById("client-modal-error").style.display="flex";}
-  finally{WD.setBtnLoading(btn,false);}
-}
-
-// ═══════════════════════ INVITE ═══════════════════════════
-function openInviteModal(){
-  if(!_selectedClient)return;
-  document.getElementById("invite-client-name").textContent=_selectedClient.name;
-  document.getElementById("invite-email").value=_selectedClient.email||"";
-
-  // Show existing invite if any
-  const box=document.getElementById("invite-existing-box");
-  if(_selectedClient.inviteCode){
-    box.style.display="";
-    box.innerHTML=`<div class="notice-banner amber" style="margin-bottom:8px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg><span>Existing invite code: <strong>${WD.escHtml(_selectedClient.inviteCode)}</strong> — sending a new one will replace it.</span></div>`;
-  }else{
-    box.style.display="none";
+  if (!name) { document.getElementById("err-c-name").style.display = ""; document.getElementById("c-name").classList.add("error"); ok = false; }
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { document.getElementById("err-c-email").style.display = ""; document.getElementById("c-email").classList.add("error"); ok = false; }
+  if (!ok) return;
+  var btn = document.getElementById("client-save-btn");
+  WD.setBtnLoading(btn, true);
+  document.getElementById("client-modal-error").style.display = "none";
+  var token = WD.getToken();
+  if (editId) {
+    WD.api({ action: "update_client", token: token, clientId: editId, name: name, email: email, phone: phone, company: company, notes: notes })
+      .then(function(res) {
+        if (res.success) {
+          for (var i = 0; i < _clients.length; i++) { if (_clients[i].id === editId) { Object.assign(_clients[i], { name: name, email: email, phone: phone, company: company, notes: notes }); break; } }
+          if (_selectedClient && _selectedClient.id === editId) Object.assign(_selectedClient, { name: name, email: email, phone: phone, company: company, notes: notes });
+          renderClients(); if (_selectedClient) populateClientDetail(_selectedClient);
+          WD.closeModal("modal-client"); WD.showToast("Client updated.", "success");
+        } else { document.getElementById("client-modal-error-text").textContent = res.error || "Failed to update."; document.getElementById("client-modal-error").style.display = "flex"; }
+      }).catch(function() { document.getElementById("client-modal-error-text").textContent = "Connection error."; document.getElementById("client-modal-error").style.display = "flex"; })
+      .finally(function() { WD.setBtnLoading(btn, false); });
+  } else {
+    WD.api({ action: "create_client", token: token, name: name, email: email, phone: phone, company: company, notes: notes })
+      .then(function(res) {
+        if (res.success) {
+          _clients.unshift(res.client); renderClients(); WD.closeModal("modal-client"); WD.showToast("Client added!", "success");
+          setTimeout(function(){ openClientDetail(res.client.id); }, 200);
+        } else { document.getElementById("client-modal-error-text").textContent = res.error || "Failed to add."; document.getElementById("client-modal-error").style.display = "flex"; }
+      }).catch(function() { document.getElementById("client-modal-error-text").textContent = "Connection error."; document.getElementById("client-modal-error").style.display = "flex"; })
+      .finally(function() { WD.setBtnLoading(btn, false); });
   }
+}
+
+function openInviteModal() {
+  if (!_selectedClient) return;
+  document.getElementById("invite-client-name").textContent = _selectedClient.name;
+  document.getElementById("invite-email").value = _selectedClient.email || "";
+  var box = document.getElementById("invite-existing-box");
+  if (_selectedClient.inviteCode) {
+    box.style.display = "";
+    box.innerHTML = '<div class="notice-banner amber" style="margin-bottom:8px;"><span>Existing invite code: <strong>' + WD.escHtml(_selectedClient.inviteCode) + '</strong> — sending a new one will replace it.</span></div>';
+  } else { box.style.display = "none"; }
   WD.openModal("modal-invite");
-  setTimeout(()=>document.getElementById("invite-email")?.focus(),100);
+  setTimeout(function(){ var el = document.getElementById("invite-email"); if (el) el.focus(); }, 100);
 }
 
-async function sendInvite(){
-  if(!_selectedClient)return;
-  const email=document.getElementById("invite-email").value.trim();
-  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){WD.showToast("Enter a valid email address.","warn");return;}
-
-  const btn=document.getElementById("invite-send-btn");WD.setBtnLoading(btn,true);
-  try{
-    const res=await WD.api({action:"generate_invite",token:WD.getToken(),clientEmail:email,clientName:_selectedClient.name,clientId:_selectedClient.id});
-    if(res.success){
-      // Update local client with invite info
-      const idx=_clients.findIndex(c=>c.id===_selectedClient.id);
-      if(idx>-1){_clients[idx].inviteToken=res.inviteToken;_clients[idx].inviteCode=res.inviteCode;_clients[idx].inviteStatus="pending";_clients[idx].email=_clients[idx].email||email;}
-      if(_selectedClient){_selectedClient.inviteToken=res.inviteToken;_selectedClient.inviteCode=res.inviteCode;_selectedClient.inviteStatus="pending";_selectedClient.email=_selectedClient.email||email;}
-      renderClients();if(_selectedClient)populateClientDetail(_selectedClient);
-      WD.closeModal("modal-invite");WD.showToast("Invite sent to "+email,"success");
-    }else WD.showToast(res.error||"Failed to send invite.","error");
-  }catch(e){WD.showToast("Connection error.","error");}
-  finally{WD.setBtnLoading(btn,false);}
+function sendInvite() {
+  if (!_selectedClient) return;
+  var email = document.getElementById("invite-email").value.trim();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { WD.showToast("Enter a valid email address.", "warn"); return; }
+  var btn = document.getElementById("invite-send-btn");
+  WD.setBtnLoading(btn, true);
+  var sc = _selectedClient;
+  WD.api({ action: "generate_invite", token: WD.getToken(), clientEmail: email, clientName: sc.name, clientId: sc.id })
+    .then(function(res) {
+      if (res.success) {
+        for (var i = 0; i < _clients.length; i++) {
+          if (_clients[i].id === sc.id) { _clients[i].inviteToken = res.inviteToken; _clients[i].inviteCode = res.inviteCode; _clients[i].inviteStatus = "pending"; _clients[i].email = _clients[i].email || email; break; }
+        }
+        if (_selectedClient) { _selectedClient.inviteToken = res.inviteToken; _selectedClient.inviteCode = res.inviteCode; _selectedClient.inviteStatus = "pending"; _selectedClient.email = _selectedClient.email || email; }
+        renderClients(); if (_selectedClient) populateClientDetail(_selectedClient);
+        WD.closeModal("modal-invite"); WD.showToast("Invite sent to " + email, "success");
+      } else { WD.showToast(res.error || "Failed to send invite.", "error"); }
+    }).catch(function() { WD.showToast("Connection error.", "error"); })
+    .finally(function() { WD.setBtnLoading(btn, false); });
 }
 
-// ═══════════════════════ ARCHIVE ═════════════════════════
-function archiveClient(){
-  if(!_selectedClient)return;
-  document.getElementById("archive-client-name").textContent=`Archive "${_selectedClient.name}"?`;
+function archiveClient() {
+  if (!_selectedClient) return;
+  document.getElementById("archive-client-name").textContent = 'Archive "' + _selectedClient.name + '"?';
   WD.openModal("modal-archive");
 }
 
-async function executeArchive(){
-  if(!_selectedClient)return;
-  const name=_selectedClient.name;
-  const btn=document.getElementById("archive-confirm-btn");
-  WD.setBtnLoading(btn,true);
-  try{
-    const res=await WD.api({action:"archive_client",token:WD.getToken(),clientId:_selectedClient.id});
-    if(res.success){
-      const idx=_clients.findIndex(c=>c.id===_selectedClient.id);
-      if(idx>-1)_clients[idx].status="archived";
-      WD.closeModal("modal-archive");
-      renderClients();closeClientDetail();
-      WD.showToast(name+" archived.","success");
-    }else WD.showToast(res.error||"Failed.","error");
-  }catch(e){WD.showToast("Connection error.","error");}
-  finally{WD.setBtnLoading(btn,false);}
+function executeArchive() {
+  if (!_selectedClient) return;
+  var name = _selectedClient.name, id = _selectedClient.id;
+  var btn = document.getElementById("archive-confirm-btn");
+  WD.setBtnLoading(btn, true);
+  WD.api({ action: "archive_client", token: WD.getToken(), clientId: id })
+    .then(function(res) {
+      if (res.success) {
+        for (var i = 0; i < _clients.length; i++) { if (_clients[i].id === id) { _clients[i].status = "archived"; break; } }
+        WD.closeModal("modal-archive"); renderClients(); closeClientDetail(); WD.showToast(name + " archived.", "success");
+      } else { WD.showToast(res.error || "Failed.", "error"); }
+    }).catch(function() { WD.showToast("Connection error.", "error"); })
+    .finally(function() { WD.setBtnLoading(btn, false); });
 }
 </script>
