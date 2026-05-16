@@ -676,6 +676,7 @@ async function loadPage(file) {
     content.style.animation = "";
 
     // Execute any scripts in the injected HTML
+window.pageInit = null;
 content.querySelectorAll("script").forEach(old => {
   const s = document.createElement("script");
   s.text = old.innerHTML;
