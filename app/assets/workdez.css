@@ -1294,7 +1294,7 @@ select.field-input {
   max-width: 100vw;
   background: var(--bg);
   border-left: 1px solid var(--border);
-  z-index: 60;
+  z-index: 200;
   display: flex;
   flex-direction: column;
   transform: translateX(100%);
