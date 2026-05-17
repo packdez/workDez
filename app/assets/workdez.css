@@ -270,7 +270,7 @@ button { cursor: pointer; border: none; background: none; }
   background var(--t) var(--ease),
   border-color var(--t) var(--ease);
   overflow: hidden;
-  z-index: 0;
+  z-index: 10;
 }
 
 /* Sidebar header */
@@ -1299,12 +1299,13 @@ select.field-input {
   transition: transform var(--t-slow) var(--ease);
   box-shadow: -12px 0 48px rgba(0,0,0,0.1);
   overflow: hidden;
+  z-index: 1200;
 }
 .detail-panel.open { transform: translateX(0); }
 .detail-overlay {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 1150;
   background: rgba(0,0,0,0.4);
   backdrop-filter: blur(3px);
   opacity: 0;
