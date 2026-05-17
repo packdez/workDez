@@ -269,12 +269,25 @@ async function loadPage(file){
     finishLoadingBar();
     content.innerHTML=html;
     content.style.animation="none";content.offsetHeight;content.style.animation="";
+    
+    window.pageInit = null;
     content.querySelectorAll("script").forEach(old=>{
       const s=document.createElement("script");
       Array.from(old.attributes).forEach(a=>s.setAttribute(a.name,a.value));
       s.textContent=old.textContent;old.parentNode.replaceChild(s,old);
     });
+    
+    requestAnimationFrame(() => {
+      content.querySelectorAll('*').forEach(el => {
+        if (getComputedStyle(el).position === 'fixed') {
+          document.body.appendChild(el);
+        }
+      });
+    });
+    
     if(typeof window.pageInit==="function")window.pageInit(currentUser);
+
+    
   }catch(e){
     finishLoadingBar();
     content.innerHTML=`<div class="empty-state" style="padding:80px 32px;"><div class="empty-state-icon" style="background:var(--red-bg);border-color:var(--red-border);color:var(--red);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><h3>Page failed to load</h3><p>Could not load ${WD.escHtml(file)}.</p><button class="btn btn-secondary" onclick="loadPage('${WD.escHtml(file)}')">Try again</button></div>`;
