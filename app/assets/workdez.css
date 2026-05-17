@@ -1304,7 +1304,7 @@ select.field-input {
 .detail-overlay {
   position: fixed;
   inset: 0;
-  z-index: 999;
+  z-index: 9998;
   background: rgba(0,0,0,0.4);
   backdrop-filter: blur(3px);
   opacity: 0;
