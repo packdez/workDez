@@ -271,7 +271,6 @@ button { cursor: pointer; border: none; background: none; }
   background var(--t) var(--ease),
   border-color var(--t) var(--ease);
   overflow: hidden;
-  isolation: isolate;
 }
 
 /* Sidebar header */
