@@ -257,18 +257,20 @@ button { cursor: pointer; border: none; background: none; }
    ============================================================ */
 #sidebar {
   width: var(--sidebar-w);
-  min-width: var(--sidebar-w);
   flex-shrink: 0;
   background: var(--bg);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  position: relative;
-  z-index: 20;
-  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
   transition: transform var(--t-slow) var(--ease),
   background var(--t) var(--ease),
   border-color var(--t) var(--ease);
+  overflow: hidden;
+  z-index: 0;
 }
 
 /* Sidebar header */
@@ -521,7 +523,7 @@ button { cursor: pointer; border: none; background: none; }
    ============================================================ */
 #main {
   flex: 1;
-  margin-left: 0;
+  margin-left: var(--sidebar-w);
   display: flex;
   flex-direction: column;
   min-height: 100svh;
