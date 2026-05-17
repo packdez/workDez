@@ -675,13 +675,20 @@ async function loadPage(file) {
     content.offsetHeight; // reflow
     content.style.animation = "";
 
-    // Execute any scripts in the injected HTML
-window.pageInit = null;
-content.querySelectorAll("script").forEach(old => {
+  window.pageInit = null;
+  content.querySelectorAll("script").forEach(old => {
   const s = document.createElement("script");
-  s.text = old.innerHTML;
+  s.textContent = old.textContent;
   document.body.appendChild(s);
   document.body.removeChild(s);
+});
+
+requestAnimationFrame(() => {
+  content.querySelectorAll('*').forEach(el => {
+    if (getComputedStyle(el).position === 'fixed') {
+      document.body.appendChild(el);
+    }
+  });
 });
 
     // Call page init if defined
@@ -853,11 +860,7 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape") closeNotifications();
 });
 
-// Move detail panel and overlay to body root
-const panel = document.getElementById('contract-detail');
-const overlay = document.getElementById('detail-overlay');
-if (panel) document.body.appendChild(panel);
-if (overlay) document.body.appendChild(overlay);
+
 </script>
 </body>
 </html>
