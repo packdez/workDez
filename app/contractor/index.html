@@ -852,6 +852,12 @@ window.addEventListener("beforeunload", () => {
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") closeNotifications();
 });
+
+// Move detail panel and overlay to body root
+const panel = document.getElementById('contract-detail');
+const overlay = document.getElementById('detail-overlay');
+if (panel) document.body.appendChild(panel);
+if (overlay) document.body.appendChild(overlay);
 </script>
 </body>
 </html>
